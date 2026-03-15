@@ -1,0 +1,103 @@
+# ~/.shell_aliases
+# Shared aliases for both Bash and Zsh
+# Sourced by ~/.bashrc and ~/.zshrc
+#
+# STRUCTURE: Organized by action type for easy discovery and maintenance
+# TIP: Add new aliases to the relevant section below. Create new sections as needed!
+
+# ============================================================================
+# NAVIGATION & DIRECTORIES
+# ============================================================================
+
+alias ~='cd ~'                                # Jump to home directory
+alias ..='cd ..'                              # Go up one directory
+alias desk='cd ~/Desktop'                     # Quick access to Desktop
+alias pro='cd ~/Desktop/Projects'             # Quick access to Projects folder
+alias dotfiles='cd ~/Desktop/dotfiles-backup' # Navigate to dotfiles
+alias models='cd /home/roking/Desktop/Projects/models' # Navigate to models project
+alias tele='cd Desktop/Project'               # Quick access to Tele project
+alias wavespeed='cd ~/softwares/wavespeed-desktop && npm run dev' # Start wavespeed dev environment
+
+# ============================================================================
+# FILE LISTING & DISPLAY
+# ============================================================================
+
+alias la='ls -A'                              # List all files (including hidden, no . and ..)
+alias ll='ls -alF'                            # Long format with file indicators
+alias l='ls -CF'                              # Classify format (shows file types)
+alias show='kitty +kitten icat'               # Display images in terminal using kitty
+
+# ============================================================================
+# TERMINAL UTILITIES
+# ============================================================================
+
+alias C='clear'                               # Clear terminal screen
+alias sta='btm'                               # System stats dashboard (btm tool)
+alias polkes='pwd'                            # Print working directory (fun alias)
+
+# ============================================================================
+# GIT
+# ============================================================================
+
+alias G='git'                                 # Shorthand for git
+alias GS='git status'                         # Quick git status
+alias GA='git add'                            # Quick git add
+alias GC='git commit'                         # Quick git commit
+
+# ============================================================================
+# PYTHON
+# ============================================================================
+
+alias py='python'                             # Shorthand for python
+alias py3='python3'                           # Shorthand for python3
+
+# ============================================================================
+# DEVELOPMENT & SERVICES
+# ============================================================================
+
+alias run='modal run'                         # Run modal commands
+# alias docker='podman'                         # Use podman instead of docker
+
+# OpenClaw Telegram Bot (Claude)
+alias claudebot='openclaw gateway'            # Start Claude bot gateway
+alias claudebot-status='openclaw status'      # Check bot status
+alias claudebot-logs='openclaw logs --follow' # View bot logs in real-time
+alias claudebot-stop='openclaw gateway stop'  # Stop bot gateway
+alias claudebot-restart='openclaw gateway restart' # Restart bot gateway
+
+# ============================================================================
+# SYSTEM MANAGEMENT (systemctl)
+# ============================================================================
+
+alias start='sudo systemctl start'             # Start a service
+alias stop='sudo systemctl stop'               # Stop a service
+alias restart='sudo systemctl restart'         # Restart a service
+alias enable='sudo systemctl enable'           # Enable service on boot
+alias disable='sudo systemctl disable'         # Disable service on boot
+alias status='sudo systemctl status'           # Check service status
+alias isenable='sudo systemctl is-enabled'     # Check if service is enabled
+alias arc-status='systemctl --user status auto-rename-copies' # Check auto-rename-copies service
+
+# ============================================================================
+# APPLICATIONS & EXTERNAL TOOLS
+# ============================================================================
+
+alias whatsapp='thorium-browser --app=https://web.whatsapp.com' # Open WhatsApp Web
+alias airdrop='flatpak run org.localsend.localsend_app' # Open LocalSend app
+
+# ============================================================================
+# CONFIGURATION & ENVIRONMENT
+# ============================================================================
+
+alias edit-secrets='nano ~/.secrets'           # Edit secrets file
+alias edit-env='nano .env'                     # Edit environment variables
+alias make-env='cp ~/.env.template .env && echo "Created .env - remember to add it to .gitignore!"' # Create .env from template
+alias shgide='xdg-open ~/Desktop/dotfiles-backup/docs/SHELL-CONFIG-GUIDE.md' # Open shell config guide
+alias backup-configs='~/Desktop/dotfiles-backup/backup.sh' # Backup configuration files
+alias sa='sys-sync --alias'                    # Sync aliases with sys-sync
+alias senv='sys-sync --env'                    # Sync environment with sys-sync
+alias agentzero='podman start agent-zero && podman port agent-zero' 
+alias agentclose='podman stop agent-zero' 
+alias lms='~/Downloads/LM-Studio*.AppImage' 
+alias snbx='cd ~/Desktop/Projects/gemini/sandbox && pi' 
+

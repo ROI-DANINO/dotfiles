@@ -1,0 +1,70 @@
+# ~/.shell_env
+# Shared environment variables and PATH configuration
+# Sourced by both Bash (~/.bashrc) and Zsh (~/.zshrc)
+
+# User-specific PATH entries
+if ! [[ "$PATH" =~ "$HOME/.local/bin:$HOME/.bin:" ]]; then
+    PATH="$HOME/.local/bin:$HOME/.bin:$PATH"
+fi
+
+# Java 25 configuration
+export JAVA_HOME="/usr/lib/jvm/java-25-openjdk"
+if ! [[ "$PATH" =~ "$JAVA_HOME/bin" ]]; then
+    PATH="$JAVA_HOME/bin:$PATH"
+fi
+
+# Python 3.14 configuration
+PYTHON_314="/usr/bin/python3.14"
+if [ -f "$PYTHON_314" ]; then
+    alias python3.14="$PYTHON_314"
+fi
+
+# Editor preferences
+export EDITOR="nano"
+export VISUAL="$EDITOR"
+
+# Default browser (ensures apps open links in Firefox)
+export BROWSER="firefox"
+
+# Load global secrets (API keys, tokens, etc.)
+# File should have chmod 600 permissions
+if [[ -f "$HOME/.secrets" ]]; then
+    source "$HOME/.secrets"
+fi
+
+# Function to load project-specific .env files
+load-env() {
+    local env_file="${1:-.env}"
+
+    if [[ ! -f "$env_file" ]]; then
+        echo "Error: $env_file not found"
+        return 1
+    fi
+
+    echo "Loading environment from: $env_file"
+
+    # Export variables from .env file
+    # Supports: KEY=value, export KEY=value, and comments
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        # Skip empty lines and comments
+        [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
+
+        # Remove 'export ' prefix if present
+        line="${line#export }"
+
+        # Export the variable
+        if [[ "$line" =~ ^[a-zA-Z_][a-zA-Z0-9_]*= ]]; then
+            export "$line"
+            echo "  ✓ ${line%%=*}"
+        fi
+    done < "$env_file"
+
+    echo "Environment loaded successfully"
+}
+
+# Export the final PATH
+if ! [[ "$PATH" =~ "/home/roking/.opencode/bin" ]]; then
+    PATH="/home/roking/.opencode/bin:$PATH"
+fi
+
+export PATH
