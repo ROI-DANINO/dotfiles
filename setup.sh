@@ -45,16 +45,10 @@ echo "Detected shell rc: $SHELL_RC"
 echo ""
 
 # --- shell ---
-if ask "[shell]   Install shell env, aliases + p10k?"; then
+if ask "[shell]   Install shell env, aliases, zshrc + p10k?"; then
   link "$DOTFILES_DIR/shell/env"     "$HOME/.shell_env"
   link "$DOTFILES_DIR/shell/aliases" "$HOME/.shell_aliases"
-
-  for line in \
-    "[ -f ~/.shell_env ] && source ~/.shell_env" \
-    "[ -f ~/.shell_aliases ] && source ~/.shell_aliases"; do
-    grep -qF "$line" "$SHELL_RC" || echo "$line" >> "$SHELL_RC"
-  done
-  ok "Shell source lines added to $SHELL_RC"
+  link "$DOTFILES_DIR/shell/zshrc"   "$HOME/.zshrc"
 
   if [ -f "$DOTFILES_DIR/shell/p10k.zsh" ]; then
     link "$DOTFILES_DIR/shell/p10k.zsh" "$HOME/.p10k.zsh"
