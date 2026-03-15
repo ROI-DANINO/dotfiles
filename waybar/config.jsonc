@@ -1,0 +1,133 @@
+{
+    "layer": "top",
+    "position": "top",
+    "height": 28,
+    "spacing": 0,
+    "margin-top": 4,
+    "margin-left": 8,
+    "margin-right": 8,
+
+    "modules-left": ["niri/workspaces", "niri/window"],
+    "modules-center": [],
+    "modules-right": ["custom/swaync", "tray", "cpu", "memory", "network", "bluetooth", "pulseaudio", "backlight", "custom/battery", "clock"],
+
+    "niri/workspaces": {
+        "format": "{index}",
+        "on-click": "activate",
+        "disable-scroll": false
+    },
+
+    "niri/window": {
+        "format": "{}",
+        "max-length": 40,
+        "rewrite": {
+            "(.*) — Mozilla Firefox": " $1",
+            "(.*) - Visual Studio Code": " $1",
+            "(.*) - kitty": " $1",
+            "(.*) - Alacritty": " $1"
+        }
+    },
+
+    "tray": {
+        "icon-size": 16,
+        "spacing": 8
+    },
+
+    "cpu": {
+        "interval": 5,
+        "format": " {usage}%",
+        "tooltip": false,
+        "on-click": "kitty -e btop"
+    },
+
+    "memory": {
+        "interval": 10,
+        "format": " {used:0.1f}G",
+        "tooltip-format": "{used:0.1f}G used / {total:0.1f}G total"
+    },
+
+    "network": {
+        "format-wifi": "  {signalStrength}%",
+        "format-ethernet": "  {ipaddr}",
+        "format-disconnected": "  Disconnected",
+        "tooltip-format-wifi": "{essid} ({signalStrength}%)",
+        "tooltip-format-ethernet": "{ifname}: {ipaddr}",
+        "on-click": "kitty -e nmtui",
+        "on-click-right": "kitty -e nmtui"
+    },
+
+    "bluetooth": {
+        "format": " {status}",
+        "format-connected": " {device_alias}",
+        "format-off": " Off",
+        "on-click": "blueman-manager",
+        "tooltip-format": "{controller_alias}\t{controller_address}",
+        "tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{device_enumerate}",
+        "tooltip-format-enumerate-connected": "{device_alias}\t{device_address}"
+    },
+
+    "pulseaudio": {
+        "format": "{volume}% {icon}",
+        "format-bluetooth": "{volume}% {icon}",
+        "format-bluetooth-muted": "  {icon}",
+        "format-muted": " ",
+        "format-source": "{volume}% ",
+        "format-source-muted": " ",
+        "format-icons": {
+            "headphone": "",
+            "hands-free": "",
+            "headset": "",
+            "phone": "",
+            "portable": "",
+            "car": "",
+            "default": ["", "", ""]
+        },
+        "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+        "on-click-right": "pavucontrol"
+    },
+
+    "backlight": {
+        "device": "intel_backlight",
+        "format": "{percent}% {icon}",
+        "format-icons": ["", "", "", "", "", "", "", "", ""],
+        "on-scroll-up": "light -A 5",
+        "on-scroll-down": "light -U 5"
+    },
+
+    "custom/battery": {
+        "exec": "~/.config/waybar/battery.sh",
+        "interval": 10,
+        "return-type": "json",
+        "format": "{}",
+        "tooltip": true
+    },
+
+    "clock": {
+        "format": "{:%H:%M}",
+        "format-alt": "{:%a %d %b %H:%M}",
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+        "interval": 30,
+        "on-click": "swaync-client -t -sw"
+    },
+
+    "custom/swaync": {
+        "tooltip": false,
+        "format": "{icon} {}",
+        "format-icons": {
+            "notification": "󱅫",
+            "none": "󰂚",
+            "dnd-notification": "󱅫",
+            "dnd-none": "󰂛",
+            "inhibited-notification": "󱅫",
+            "inhibited-none": "󰂚",
+            "dnd-inhibited-notification": "󱅫",
+            "dnd-inhibited-none": "󰂛"
+        },
+        "return-type": "json",
+        "exec-if": "which swaync-client",
+        "exec": "swaync-client -swb",
+        "on-click": "swaync-client -t -sw",
+        "on-click-right": "swaync-client -d -sw",
+        "escape": true
+    }
+}

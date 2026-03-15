@@ -1,0 +1,249 @@
+/* Waybar Style - COSMIC DE Custom Theme */
+/* Colors derived from CosmicTheme.Dark.Builder palette */
+
+/* Palette:
+   bg_color:         #615449   (custom warm brown accent)
+   Terminal bg:      #1e1814   (dark warm, derived from bg_color)
+   Surface:          #2e2622   Surface2: #4a3e38
+   Foreground:       #dedede   (neutral_9)   Muted: #cabab4 (accent_warm_grey)
+   Blue (bright):    #63d0df   (accent_blue)   Blue (normal): #249dac (ext_blue)
+   Purple (bright):  #e79cfe   (accent_purple)
+   Green (bright):   #92cf9c   (accent_green)
+   Red (bright):     #fda1a0   (accent_red)
+   Yellow (bright):  #f7e062   (accent_yellow)
+   Cyan (bright):    #7de0ee
+   Ext warm grey:    #9b8e8a
+*/
+
+* {
+    font-family: "JetBrainsMono Nerd Font Mono", "Font Awesome 6 Free";
+    font-size: 13px;
+    font-weight: 500;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+}
+
+/* Main bar — uses COSMIC bg_color at 92% opacity */
+window#waybar {
+    background: rgba(97, 84, 73, 0.92);
+    border-radius: 8px;
+    color: #dedede;
+}
+
+window#waybar.hidden {
+    opacity: 0.2;
+}
+
+/* Tooltip styling */
+tooltip {
+    background: rgba(30, 24, 20, 0.97);
+    border: 1px solid #4a3e38;
+    border-radius: 8px;
+}
+
+tooltip label {
+    color: #dedede;
+    padding: 4px;
+}
+
+/* ===== MODULES ===== */
+
+/* Workspaces */
+#workspaces {
+    margin-left: 8px;
+}
+
+#workspaces button {
+    padding: 0 8px;
+    margin: 4px 2px;
+    border-radius: 6px;
+    background: transparent;
+    color: #cabab4;
+    transition: all 0.2s ease;
+}
+
+#workspaces button:hover {
+    background: #2e2622;
+    color: #dedede;
+}
+
+#workspaces button.active {
+    background: rgba(99, 208, 223, 0.2);
+    color: #63d0df;
+}
+
+#workspaces button.urgent {
+    background: rgba(253, 161, 160, 0.2);
+    color: #fda1a0;
+}
+
+/* Focused window */
+#window {
+    margin: 0 12px;
+    color: #cabab4;
+}
+
+/* System tray */
+#tray {
+    margin-right: 4px;
+    padding: 0 8px;
+}
+
+#tray > .passive {
+    -gtk-icon-effect: dim;
+}
+
+#tray > .needs-attention {
+    -gtk-icon-effect: highlight;
+}
+
+/* CPU module */
+#cpu {
+    padding: 0 8px;
+    margin: 4px 0;
+    border-radius: 6px;
+    background: #2e2622;
+    color: #63d0df;
+}
+
+#cpu:hover {
+    background: #4a3e38;
+}
+
+/* Memory module */
+#memory {
+    padding: 0 8px;
+    margin: 4px 0;
+    border-radius: 6px;
+    background: #2e2622;
+    color: #92cf9c;
+}
+
+#memory:hover {
+    background: #4a3e38;
+}
+
+/* Network module */
+#network {
+    padding: 0 8px;
+    margin: 4px 0;
+    border-radius: 6px;
+    color: #7de0ee;
+}
+
+#network.disconnected {
+    color: #9b8e8a;
+}
+
+#network:hover {
+    background: #2e2622;
+}
+
+/* Bluetooth module */
+#bluetooth {
+    padding: 0 8px;
+    margin: 4px 0;
+    border-radius: 6px;
+    color: #249dac;
+}
+
+#bluetooth.connected {
+    color: #63d0df;
+}
+
+#bluetooth:hover {
+    background: #2e2622;
+}
+
+/* Pulseaudio/Volume module */
+#pulseaudio {
+    padding: 0 8px;
+    margin: 4px 0;
+    border-radius: 6px;
+    color: #dedede;
+}
+
+#pulseaudio.muted {
+    color: #4a3e38;
+}
+
+#pulseaudio:hover {
+    background: #2e2622;
+}
+
+/* Backlight module */
+#backlight {
+    padding: 0 8px;
+    margin: 4px 0;
+    border-radius: 6px;
+    color: #f7e062;
+}
+
+#backlight:hover {
+    background: #2e2622;
+}
+
+/* Battery module */
+#custom-battery {
+    padding: 0 10px;
+    margin: 4px 0;
+    border-radius: 6px;
+    background: #2e2622;
+    color: #dedede;
+}
+
+#custom-battery.charging {
+    color: #7de0ee;
+    background: rgba(125, 224, 238, 0.1);
+}
+
+#custom-battery.good {
+    color: #92cf9c;
+}
+
+#custom-battery.warning {
+    color: #f7e062;
+}
+
+#custom-battery.critical {
+    color: #fda1a0;
+    animation: blink 1s linear infinite;
+}
+
+#custom-battery.health-limit {
+    color: #e79cfe;
+}
+
+@keyframes blink {
+    to {
+        color: #fda1a0;
+        background: rgba(253, 161, 160, 0.2);
+    }
+}
+
+/* SwayNC notification bell */
+#custom-swaync {
+    padding: 0 10px;
+    margin: 4px 0;
+    border-radius: 6px;
+    color: #e79cfe;
+}
+
+#custom-swaync:hover {
+    background: #2e2622;
+}
+
+/* Clock */
+#clock {
+    padding: 0 12px;
+    margin: 4px 8px 4px 0;
+    border-radius: 6px;
+    background: rgba(99, 208, 223, 0.2);
+    color: #63d0df;
+    font-weight: 600;
+}
+
+#clock:hover {
+    background: rgba(99, 208, 223, 0.35);
+}

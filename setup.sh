@@ -102,6 +102,20 @@ else
 fi
 echo ""
 
+# --- waybar ---
+if cmd_exists waybar; then
+  if ask "[waybar]  Install waybar config?"; then
+    link "$DOTFILES_DIR/waybar/config.jsonc" "$HOME/.config/waybar/config.jsonc"
+    link "$DOTFILES_DIR/waybar/style.css"    "$HOME/.config/waybar/style.css"
+    link "$DOTFILES_DIR/waybar/battery.sh"   "$HOME/.config/waybar/battery.sh"
+  else
+    info "Skipped waybar"
+  fi
+else
+  info "[waybar]  waybar not installed — skipping"
+fi
+echo ""
+
 # --- git ---
 if cmd_exists git; then
   if ask "[git]     Install git config?"; then
