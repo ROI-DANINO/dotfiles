@@ -50,7 +50,7 @@ Run `./setup.sh --help` for more options (if implemented).
 
 ## TODO
 
-- [ ] Edit `shell/p10k.zsh` to your liking
+- [x] Edit `shell/p10k.zsh` to your liking — keeping lean style as-is
 - [ ] Add COSMIC config once configured
 - [ ] See `packages.md` for full install list on a fresh machine
 
