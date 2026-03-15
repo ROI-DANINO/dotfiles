@@ -1,0 +1,80 @@
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+# Created by newuser for 5.9
+
+# Source shared environment variables (PATH, JAVA_HOME, etc.)
+[[ -f ~/.shell_env ]] && source ~/.shell_env
+
+# Source shared aliases
+[[ -f ~/.shell_aliases ]] && source ~/.shell_aliases
+
+# Load Powerlevel10k theme
+source ~/powerlevel10k/powerlevel10k.zsh-theme
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# --- ADVANCED ZSH SETTINGS ---
+
+# 1. Better Tab Completion
+autoload -Uz compinit && compinit
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' # Case-insensitive completion
+
+# 2. History Settings
+HISTFILE=~/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+setopt SHARE_HISTORY          # Share history between Alacritty windows
+setopt HIST_IGNORE_DUPS       # Don't record same command twice
+setopt HIST_IGNORE_SPACE      # Don't record commands starting with a space
+
+# 3. Quality of Life
+setopt AUTO_CD                # Type a folder name to go there without 'cd'
+setopt INTERACTIVE_COMMENTS   # Allow comments in the terminal
+
+# 4. Global Aliases (Zsh exclusive)
+alias -g G='| grep'
+alias -g L='| less'
+
+# yezi file maneger
+function y() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
+	yazi "$@" --cwd-file="$tmp"
+	if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+		cd -- "$cwd"
+	fi
+	rm -f -- "$tmp"
+}
+
+# fzf integration
+source <(fzf --zsh)
+
+# Plugins (Order matters: highlighting should usually come last)
+source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+export PATH="$HOME/.npm-global/bin:$PATH"
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/home/roking/.lmstudio/bin"
+# End of LM Studio CLI section
+
+# opencode — kill on terminal close
+opencode() {
+    ( trap 'kill 0' EXIT HUP TERM INT; command opencode "$@" )
+}
+
+
+# Screenshot aliases
+alias ss='niri msg action screenshot'
+alias ssw='niri msg action screenshot-window'
+alias sss='niri msg action screenshot-screen'
+
+# Media viewer alias
+alias img='oculante'
