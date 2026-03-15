@@ -5,7 +5,7 @@ Personal dotfiles for Fedora / COSMIC DE / niri. Symlink-based. Interactive setu
 ## Quick start
 
 ```bash
-git clone https://github.com/your-repo/dotfiles ~/dotfiles
+git clone https://github.com/ROI-DANINO/dotfiles ~/dotfiles
 cd ~/dotfiles
 ./setup.sh
 source ~/.zshrc
@@ -19,6 +19,9 @@ source ~/.zshrc
 | shell aliases | `shell/aliases` | `~/.shell_aliases` |
 | p10k prompt | `shell/p10k.zsh` | `~/.p10k.zsh` |
 | kitty | `kitty/kitty.conf` | `~/.config/kitty/kitty.conf` |
+| alacritty | `alacritty/alacritty.toml` | `~/.config/alacritty/alacritty.toml` |
+| zellij | `zellij/config.kdl` | `~/.config/zellij/config.kdl` |
+| waybar | `waybar/` | `~/.config/waybar/` |
 | git | `git/gitconfig` | `~/.gitconfig` |
 | niri | `niri/config.kdl` | `~/.config/niri/config.kdl` |
 
@@ -47,9 +50,9 @@ Run `./setup.sh --help` for more options (if implemented).
 
 ## TODO
 
-- [ ] Copy `~/.p10k.zsh` → `shell/p10k.zsh` and edit to your liking
-- [ ] Add niri config once settled (`niri/config.kdl`)
+- [ ] Edit `shell/p10k.zsh` to your liking
 - [ ] Add COSMIC config once configured
+- [ ] See `packages.md` for full install list on a fresh machine
 
 ---
 
