@@ -72,6 +72,36 @@ else
 fi
 echo ""
 
+# --- alacritty ---
+if cmd_exists alacritty; then
+  if ask "[alacritty] Install alacritty config?"; then
+    link "$DOTFILES_DIR/alacritty/alacritty.toml" "$HOME/.config/alacritty/alacritty.toml"
+  else
+    info "Skipped alacritty"
+  fi
+else
+  info "[alacritty] alacritty not installed — skipping"
+fi
+echo ""
+
+# --- zellij ---
+if cmd_exists zellij; then
+  if ask "[zellij]  Install zellij config?"; then
+    link "$DOTFILES_DIR/zellij/config.kdl" "$HOME/.config/zellij/config.kdl"
+    for f in "$DOTFILES_DIR/zellij/themes"/*; do
+      [ -f "$f" ] && link "$f" "$HOME/.config/zellij/themes/$(basename "$f")"
+    done
+    for f in "$DOTFILES_DIR/zellij/layouts"/*; do
+      [ -f "$f" ] && link "$f" "$HOME/.config/zellij/layouts/$(basename "$f")"
+    done
+  else
+    info "Skipped zellij"
+  fi
+else
+  info "[zellij]  zellij not installed — skipping"
+fi
+echo ""
+
 # --- git ---
 if cmd_exists git; then
   if ask "[git]     Install git config?"; then

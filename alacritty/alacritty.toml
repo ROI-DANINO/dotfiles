@@ -1,0 +1,108 @@
+[terminal.shell]
+program = "/bin/zsh"
+args = ["--login", "-c", "zellij attach --create default || zellij"]
+
+[window]
+opacity = 0.9
+
+[window.padding]
+x = 4
+y = 4
+
+# Mouse bindings
+[[mouse.bindings]]
+mouse = "Right"
+mods = "None"
+chars = "\r"
+
+[[mouse.bindings]]
+mouse = "Right"
+mods = "Control"
+chars = "\r"
+
+# Copy on select
+[selection]
+save_to_clipboard = true
+
+[font]
+size = 12.0
+
+[font.normal]
+family = "JetBrainsMono Nerd Font Mono"
+style = "Regular"
+
+[font.bold]
+family = "JetBrainsMono Nerd Font Mono"
+style = "Bold"
+
+# COSMIC DE Custom Theme (from CosmicTheme.Dark.Builder palette)
+[colors.primary]
+background = "#1e1814"
+foreground = "#dedede"
+
+[colors.cursor]
+text = "#1e1814"
+cursor = "#cabab4"
+
+[colors.selection]
+text = "#dedede"
+background = "#615449"
+
+[colors.normal]
+black   = "#2e2622"
+red     = "#c67878"
+green   = "#5d9a6a"
+yellow  = "#b8a011"
+blue    = "#249dac"
+magenta = "#9050c8"
+cyan    = "#449aaa"
+white   = "#cabab4"
+
+[colors.bright]
+black   = "#4a3e38"
+red     = "#fda1a0"
+green   = "#92cf9c"
+yellow  = "#f7e062"
+blue    = "#63d0df"
+magenta = "#e79cfe"
+cyan    = "#7de0ee"
+white   = "#dedede"
+
+# Indexed colors (16-255) for better compatibility
+[[colors.indexed_colors]]
+index = 16
+color = "#ffad00"
+
+[[colors.indexed_colors]]
+index = 17
+color = "#ffaeac"
+
+# Visual bell
+[bell]
+animation = "EaseOutExpo"
+duration = 0
+
+# Cursor settings (matching Kitty defaults)
+[cursor]
+style = "Block"
+unfocused_hollow = true
+blink_interval = 750
+
+# Scrolling
+[scrolling]
+history = 10000
+multiplier = 3
+
+# Live config reload
+[general]
+live_config_reload = true
+
+# URL hints (press Ctrl+Shift+U to open URLs)
+[[hints.enabled]]
+command = "xdg-open"
+hyperlinks = true
+post_processing = true
+persist = false
+mouse.enabled = true
+binding = { key = "U", mods = "Control|Shift" }
+regex = "(ipfs:|ipns:|magnet:|mailto:|gemini://|gopher://|https://|http://|news:|file:|git://|ssh:|ftp://)[^\u0000-\u001F\u007F-\u009F<>\"\\s{-}\\^⟨⟩`]+"
