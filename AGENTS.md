@@ -40,9 +40,9 @@ Owner: Roi Danino. Primary machine: Fedora 43, niri compositor, COSMIC DE.
 | `Mod+F` | spawn cosmic-files | ✓ |
 | `Mod+Slash` | spawn walker (launcher) | ✓ locked |
 | `Mod+Q` | close window | ✓ |
-| `Mod+Shift+L` | hyprlock (lock screen) | 🚧 hyprlock not yet installed |
-| `Mod+Shift+S` | suspend | 🚧 in progress |
-| `Mod+Shift+X` | lock + suspend | 🚧 in progress |
+| `Mod+Shift+L` | swaylock (lock screen) | ✓ |
+| `Mod+Shift+S` | suspend | ✓ |
+| `Mod+Shift+X` | lock + suspend | ✓ |
 | `Mod+H/L` | focus column left/right | ✓ |
 | `Mod+J/K` | focus window down/up | ✓ |
 | `Mod+Left/Right/Up/Down` | focus (arrow aliases) | ✓ |
@@ -86,7 +86,7 @@ Owner: Roi Danino. Primary machine: Fedora 43, niri compositor, COSMIC DE.
 
 | Area | What's undecided | Notes |
 |------|-----------------|-------|
-| hyprlock + hypridle | not yet installed | replaces swaylock; Mod+Shift+L=lock, Mod+Shift+S=sleep, Mod+Shift+X=both |
+| hyprlock + hypridle | not available on Fedora repos; using swaylock instead | ✓ done |
 | waybar | layout, modules, style | currently functional but not finalized |
 | COSMIC DE | no config yet | will add when owner starts using it |
 | walker | no custom config yet | using defaults |
