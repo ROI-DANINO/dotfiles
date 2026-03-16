@@ -179,7 +179,9 @@ binds {
     Mod+F { spawn "cosmic-files"; }
     Mod+Slash { spawn "walker"; }
     Alt+M { spawn "kitty" "-e" "btm"; }
-    Mod+Alt+L { spawn "swaylock"; }
+    Mod+Shift+L { spawn "hyprlock"; }
+    Mod+Shift+S { spawn "bash" "-c" "systemctl suspend"; }
+    Mod+Shift+X { spawn "bash" "-c" "hyprlock & systemctl suspend"; }
 
 
     // You can also use a shell. Do this if you need pipes, multiple commands, etc.
@@ -216,7 +218,7 @@ binds {
     Mod+Shift+H     { move-column-left; }
     Mod+Shift+J     { move-window-down; }
     Mod+Shift+K     { move-window-up; }
-    Mod+Shift+L     { move-column-right; }
+    // Mod+Shift+L is reserved for lock (hyprlock)
     // Mod+Space: toggle keyboard language (us/Hebrew) — handled by xkb grp:win_space_toggle
 
     // Alternative commands that move across workspaces when reaching

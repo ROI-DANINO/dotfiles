@@ -1,6 +1,7 @@
-# dotfiles
+# dotfiles — Roi Danino
 
-Personal dotfiles for Fedora / COSMIC DE / niri. Symlink-based. Interactive setup. Vim-native keybindings.
+Personal dotfiles for Fedora / COSMIC DE / niri.
+Symlink-based. Interactive setup.
 
 ## Quick start
 
@@ -11,49 +12,41 @@ cd ~/dotfiles
 source ~/.zshrc
 ```
 
+See `packages.md` for everything to install before running setup.
+
 ## What's included
 
-| Component | Config file | Installed to |
-|-----------|-------------|--------------|
-| shell env | `shell/env` | `~/.shell_env` |
-| shell aliases | `shell/aliases` | `~/.shell_aliases` |
-| p10k prompt | `shell/p10k.zsh` | `~/.p10k.zsh` |
-| kitty | `kitty/kitty.conf` | `~/.config/kitty/kitty.conf` |
-| alacritty | `alacritty/alacritty.toml` | `~/.config/alacritty/alacritty.toml` |
-| zellij | `zellij/config.kdl` | `~/.config/zellij/config.kdl` |
-| waybar | `waybar/` | `~/.config/waybar/` |
-| git | `git/gitconfig` | `~/.gitconfig` |
-| niri | `niri/config.kdl` | `~/.config/niri/config.kdl` |
+| Component | Config | Status |
+|-----------|--------|--------|
+| shell env + aliases | `shell/env`, `shell/aliases` | ✓ |
+| zshrc | `shell/zshrc` | ✓ |
+| p10k prompt | `shell/p10k.zsh` | ✓ lean style |
+| kitty | `kitty/kitty.conf` | ✓ |
+| alacritty | `alacritty/alacritty.toml` | ✓ |
+| zellij | `zellij/config.kdl` | ✓ |
+| git | `git/gitconfig` | ✓ |
+| niri | `niri/config.kdl` | 🚧 in progress |
+| waybar | `waybar/` | 🚧 in progress |
+| system tuning | `system/` | ✓ manual apply |
 
 ## System configs
 
-See **[system/README.md](system/README.md)** — these configs (sysctl, zram, journald, earlyoom) are applied manually per machine and not installed by `setup.sh`.
+See `system/README.md` — applied manually per machine, not by `setup.sh`.
 
-## Keybinding philosophy
+## In progress
 
-Vim motions (hjkl) are consistently mapped across:
-- **kitty splits** — split navigation and management
-- **niri window focus** — switch between windows
-- **future editor integration** — planned for Neovim/Helix setup
-
-Stick to application defaults for keybindings that don't naturally map to vim-style (e.g., app-specific hotkeys). No machine-specific custom bindings — keep configs portable.
-
-## Setup script
-
-`./setup.sh` is interactive and will:
-- Prompt for each component (shell, kitty, git, niri)
-- Detect your shell (`zsh` or `bash`)
-- Create symlinks from repo files to your home directory
-- Back up existing configs to `~/.dotfiles-backup-TIMESTAMP/` before overwriting
-
-Run `./setup.sh --help` for more options (if implemented).
+- **niri** — keybinds, startup apps, and layout still being refined
+- **waybar** — layout and modules undecided
+- **hyprlock + hypridle** — replacing swaylock, not yet installed/configured
+- **COSMIC DE** — not yet configured
 
 ## TODO
 
-- [x] Edit `shell/p10k.zsh` to your liking — keeping lean style as-is
+- [ ] Install and configure hyprlock + hypridle
+- [ ] Finalize waybar layout and modules
 - [ ] Add COSMIC config once configured
-- [ ] See `packages.md` for full install list on a fresh machine
+- [ ] Add walker config once customized
 
 ---
 
-**Note:** This repo does NOT include `~/.secrets`, `~/.ssh/`, GPG keys, or `.env` files. Back those up separately.
+Not included: `~/.secrets`, `~/.ssh/`, GPG keys, `.env` files.
