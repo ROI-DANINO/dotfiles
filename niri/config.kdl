@@ -179,9 +179,7 @@ binds {
     Mod+F { spawn "cosmic-files"; }
     Mod+Slash { spawn "walker"; }
     Alt+M { spawn "kitty" "-e" "btm"; }
-    Mod+Shift+L { spawn "swaylock"; }
-    Mod+Shift+S { spawn "bash" "-c" "systemctl suspend"; }
-    Mod+Shift+X { spawn "bash" "-c" "swaylock & systemctl suspend"; }
+    Mod+Shift+L { spawn "swaylock" "-c" "000000"; }
 
 
     // You can also use a shell. Do this if you need pipes, multiple commands, etc.

@@ -21,9 +21,7 @@
 
 | Bind | Action |
 |------|--------|
-| `Mod+Shift+L` | lock screen (swaylock) |
-| `Mod+Shift+S` | suspend |
-| `Mod+Shift+X` | lock + suspend |
+| `Mod+Shift+L` | lock screen (swaylock, black) |
 | `Mod+Shift+E` | quit niri |
 | `Mod+Shift+P` | power off monitors |
 

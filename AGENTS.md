@@ -40,9 +40,7 @@ Owner: Roi Danino. Primary machine: Fedora 43, niri compositor, COSMIC DE.
 | `Mod+F` | spawn cosmic-files | ✓ |
 | `Mod+Slash` | spawn walker (launcher) | ✓ locked |
 | `Mod+Q` | close window | ✓ |
-| `Mod+Shift+L` | swaylock (lock screen) | ✓ |
-| `Mod+Shift+S` | suspend | ✓ |
-| `Mod+Shift+X` | lock + suspend | ✓ |
+| `Mod+Shift+L` | swaylock -c 000000 (lock, black screen) | ✓ |
 | `Mod+H/L` | focus column left/right | ✓ |
 | `Mod+J/K` | focus window down/up | ✓ |
 | `Mod+Left/Right/Up/Down` | focus (arrow aliases) | ✓ |
