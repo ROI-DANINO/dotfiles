@@ -1,0 +1,174 @@
+#!/usr/bin/env python3
+import gi
+import os
+import json
+import math
+import subprocess
+gi.require_version('Gtk', '3.0')
+gi.require_version('GtkLayerShell', '0.1')
+from gi.repository import Gtk, GtkLayerShell, GLib
+
+blink_visible = True
+
+
+def get_workspace_text():
+    try:
+        out = subprocess.check_output(['niri', 'msg', '--json', 'workspaces'],
+                                      text=True, timeout=1)
+        workspaces = json.loads(out)
+        total = len(workspaces)
+        current = next((ws['idx'] for ws in workspaces if ws.get('is_focused')), 1)
+        return f"{current}/{total}"
+    except Exception:
+        return '?/?'
+
+
+def get_ram_gb():
+    stats = {}
+    with open('/proc/meminfo') as f:
+        for line in f:
+            key, val = line.split(':')
+            stats[key.strip()] = int(val.split()[0])
+    used_kb = stats['MemTotal'] - stats['MemAvailable']
+    return f"{used_kb / 1024 / 1024:.1f}G"
+
+
+def get_battery():
+    try:
+        with open('/sys/class/power_supply/BAT0/capacity') as f:
+            pct = int(f.read().strip())
+        with open('/sys/class/power_supply/AC0/online') as f:
+            plugged_in = f.read().strip() == '1'
+        return pct, plugged_in
+    except Exception:
+        return None, None
+
+
+def get_network():
+    try:
+        for iface in os.listdir('/sys/class/net/'):
+            if iface == 'lo':
+                continue
+            try:
+                with open(f'/sys/class/net/{iface}/operstate') as f:
+                    if f.read().strip() != 'up':
+                        continue
+            except Exception:
+                continue
+            if os.path.exists(f'/sys/class/net/{iface}/wireless'):
+                return 'wifi'
+            return 'eth'
+        return 'none'
+    except Exception:
+        return 'none'
+
+
+def get_time():
+    from datetime import datetime
+    return datetime.now().strftime('%H:%M')
+
+
+def build_markup(ws, bat_span):
+    net = get_network()
+    net_icon, net_color = {
+        'wifi': ('📡', '#7ec8e3'),
+        'eth':  ('🔌', '#a0cfaa'),
+        'none': ('✖ no net', '#e06060'),
+    }[net]
+    return (
+        f'<span foreground="#c5a8f0" font="monospace 13">{ws}</span>  '
+        f'<span foreground="{net_color}" font="monospace 13">{net_icon}</span>  '
+        + bat_span
+        + f'<span foreground="#f7e062" font="monospace 13">{get_ram_gb()}</span>'
+        f'  '
+        f'<span foreground="#92cf9c" font="monospace 13">{get_time()}</span>'
+    )
+
+
+def update(label):
+    ws = get_workspace_text()
+    pct, charging = get_battery()
+    bat_span = ''
+    if pct is not None:
+        color = '#92cf9c' if charging else '#e06060'
+        bat_span = f'<span foreground="{color}" font="monospace 13">{pct}%</span>  '
+    label.set_markup(build_markup(ws, bat_span))
+    return True
+
+
+def blink_tick(label):
+    global blink_visible
+    pct, charging = get_battery()
+    if pct is not None and pct < 15 and not charging:
+        blink_visible = not blink_visible
+        ws = get_workspace_text()
+        color = '#e06060'
+        bat_span = (
+            f'<span foreground="{color}" font="monospace 13">{pct}%</span>  '
+            if blink_visible else
+            f'<span foreground="{color}" font="monospace 13">   </span>  '
+        )
+        label.set_markup(build_markup(ws, bat_span))
+    return True
+
+
+def main():
+    win = Gtk.Window(type=Gtk.WindowType.TOPLEVEL)
+    win.set_decorated(False)
+    win.set_resizable(False)
+    win.set_app_paintable(True)
+
+    screen = win.get_screen()
+    visual = screen.get_rgba_visual()
+    if visual:
+        win.set_visual(visual)
+
+    GtkLayerShell.init_for_window(win)
+    GtkLayerShell.set_layer(win, GtkLayerShell.Layer.OVERLAY)
+    GtkLayerShell.set_anchor(win, GtkLayerShell.Edge.TOP, True)
+    GtkLayerShell.set_anchor(win, GtkLayerShell.Edge.RIGHT, True)
+    GtkLayerShell.set_margin(win, GtkLayerShell.Edge.TOP, 10)
+    GtkLayerShell.set_margin(win, GtkLayerShell.Edge.RIGHT, 10)
+    GtkLayerShell.set_exclusive_zone(win, -1)
+
+    def on_draw(widget, cr):
+        w = widget.get_allocated_width()
+        h = widget.get_allocated_height()
+        r = 12
+        cr.arc(r,   r,   r, math.pi,       3*math.pi/2)
+        cr.arc(w-r, r,   r, 3*math.pi/2,   0)
+        cr.arc(w-r, h-r, r, 0,             math.pi/2)
+        cr.arc(r,   h-r, r, math.pi/2,     math.pi)
+        cr.close_path()
+        cr.clip()
+        cr.set_source_rgba(30/255, 24/255, 20/255, 0.90)
+        cr.paint()
+        return False
+
+    win.connect('draw', on_draw)
+
+    css = b"""
+    * { background-color: transparent; }
+    label { padding: 5px 12px; }
+    """
+    provider = Gtk.CssProvider()
+    provider.load_from_data(css)
+    Gtk.StyleContext.add_provider_for_screen(
+        win.get_screen(), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+    )
+
+    label = Gtk.Label()
+    label.set_use_markup(True)
+    update(label)
+
+    win.add(label)
+    win.connect('destroy', Gtk.main_quit)
+    win.show_all()
+
+    GLib.timeout_add(500, update, label)
+    GLib.timeout_add(500, blink_tick, label)
+    Gtk.main()
+
+
+if __name__ == '__main__':
+    main()
