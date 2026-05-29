@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# wob-daemon — persistent OSD bar daemon for niri volume/brightness feedback
+# Spawned once at niri startup; writes to /tmp/wob.fifo to display values.
+FIFO=/tmp/wob.fifo
+rm -f "$FIFO"
+mkfifo "$FIFO"
+# tail -f keeps the FIFO open between writes so wob never gets EOF and exits
+exec tail -f "$FIFO" | wob

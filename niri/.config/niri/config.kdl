@@ -7,7 +7,7 @@ prefer-no-csd
 spawn-at-startup "waybar"
 spawn-at-startup "swaync"
 spawn-at-startup "walker" "--gapplication-service"
-spawn-at-startup "sh" "-c" "rm -f /tmp/wob.fifo && mkfifo /tmp/wob.fifo && tail -f /tmp/wob.fifo | wob"
+spawn-at-startup "~/.local/bin/wob-daemon"
 spawn-at-startup "nm-applet" "--indicator"
 spawn-at-startup "blueman-applet"
 spawn-at-startup "~/.local/bin/wallpaper-rotate"
