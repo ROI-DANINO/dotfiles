@@ -1,0 +1,180 @@
+#!/usr/bin/env python3
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
+from datetime import datetime
+from pathlib import Path
+
+import gi
+
+gi.require_version("Gtk", "3.0")
+gi.require_version("Gdk", "3.0")
+from gi.repository import Gdk, Gtk
+
+
+STATE_NAME = "niri-screenshot-last-dir"
+
+
+def state_file():
+    state_home = Path(os.environ.get("XDG_STATE_HOME", Path.home() / ".local" / "state"))
+    return state_home / STATE_NAME
+
+
+def last_save_dir():
+    path = state_file()
+    if not path.exists():
+        return None
+
+    saved = Path(path.read_text(encoding="utf-8").strip()).expanduser()
+    if saved.is_dir():
+        return saved
+    return None
+
+
+def remember_save_dir(path):
+    directory = Path(path).expanduser().resolve().parent
+    target = state_file()
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(str(directory) + "\n", encoding="utf-8")
+
+
+def default_initial_dir():
+    remembered = last_save_dir()
+    if remembered:
+        return remembered
+
+    pictures = Path.home() / "Pictures"
+    screenshots = pictures / "Screenshots"
+    for directory in (screenshots, pictures, Path.home()):
+        if directory.is_dir():
+            return directory
+    return Path.home()
+
+
+def default_save_path(directory):
+    timestamp = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
+    return Path(directory) / f"Screenshot from {timestamp}.png"
+
+
+def require_commands(*commands):
+    missing = [command for command in commands if shutil.which(command) is None]
+    if missing:
+        notify("Screenshot failed", "Missing command: " + ", ".join(missing))
+        return False
+    return True
+
+
+def notify(title, body):
+    if shutil.which("notify-send"):
+        subprocess.run(["notify-send", title, body], check=False)
+
+
+def choose_action():
+    result = {"action": None}
+
+    window = Gtk.Window(title="Screenshot")
+    window.set_keep_above(True)
+    window.set_position(Gtk.WindowPosition.CENTER)
+    window.set_resizable(False)
+    window.set_border_width(18)
+
+    label = Gtk.Label()
+    label.set_markup("<b>Space</b> copy to clipboard    <b>Enter</b> save    <b>Esc</b> cancel")
+    window.add(label)
+
+    def on_key_press(_window, event):
+        if event.keyval == Gdk.KEY_space:
+            result["action"] = "copy"
+            Gtk.main_quit()
+        elif event.keyval in (Gdk.KEY_Return, Gdk.KEY_KP_Enter):
+            result["action"] = "save"
+            Gtk.main_quit()
+        elif event.keyval == Gdk.KEY_Escape:
+            result["action"] = "cancel"
+            Gtk.main_quit()
+        return True
+
+    window.connect("key-press-event", on_key_press)
+    window.connect("destroy", Gtk.main_quit)
+    window.show_all()
+    window.present()
+    Gtk.main()
+    window.destroy()
+    return result["action"]
+
+
+def select_area():
+    result = subprocess.run(["slurp"], text=True, capture_output=True, check=False)
+    if result.returncode != 0:
+        return None
+    return result.stdout.strip() or None
+
+
+def capture_area(geometry, path):
+    return subprocess.run(["grim", "-g", geometry, str(path)], check=False).returncode == 0
+
+
+def copy_to_clipboard(path):
+    with Path(path).open("rb") as image:
+        result = subprocess.run(["wl-copy", "--type", "image/png"], stdin=image, check=False)
+    if result.returncode == 0:
+        notify("Screenshot copied", "Ready to paste.")
+    return result.returncode == 0
+
+
+def save_as(path):
+    initial = default_save_path(default_initial_dir())
+    result = subprocess.run(
+        [
+            "zenity",
+            "--file-selection",
+            "--save",
+            "--confirm-overwrite",
+            "--title",
+            "Save screenshot",
+            "--filename",
+            str(initial),
+        ],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        return False
+
+    destination = Path(result.stdout.strip()).expanduser()
+    if not destination.name:
+        return False
+
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(path, destination)
+    remember_save_dir(destination)
+    notify("Screenshot saved", str(destination))
+    return True
+
+
+def main():
+    if not require_commands("grim", "slurp", "wl-copy", "zenity"):
+        return 1
+
+    geometry = select_area()
+    if not geometry:
+        return 0
+
+    with tempfile.NamedTemporaryFile(suffix=".png") as image:
+        if not capture_area(geometry, image.name):
+            notify("Screenshot failed", "Could not capture the selected area.")
+            return 1
+
+        action = choose_action()
+        if action == "copy":
+            return 0 if copy_to_clipboard(image.name) else 1
+        if action == "save":
+            return 0 if save_as(image.name) else 0
+        return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

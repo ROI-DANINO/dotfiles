@@ -1,0 +1,25 @@
+# Stow global ignore — files/dirs never symlinked into the target
+
+# Version control
+\.git
+\.gitignore
+\.gitmodules
+
+# Repo-level docs and scripts (not config packages)
+README\.md
+AGENTS\.md
+packages\.md
+keybinds\.md
+setup\.sh
+stow\.sh
+docs
+system
+possible_upgrades
+
+# Editor and test artifacts
+\.pytest_cache
+.*\.bak
+.*\.save
+.*\.save\.[0-9]+
+.*\.pyc
+__pycache__

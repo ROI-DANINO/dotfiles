@@ -1,0 +1,114 @@
+#!/usr/bin/env python3
+import gi
+import json
+import math
+import subprocess
+import threading
+gi.require_version('Gtk', '3.0')
+gi.require_version('GtkLayerShell', '0.1')
+from gi.repository import Gtk, GtkLayerShell, GLib
+
+
+def get_workspace_text():
+    try:
+        out = subprocess.check_output(['niri', 'msg', '--json', 'workspaces'], text=True)
+        workspaces = json.loads(out)
+        total = len(workspaces)
+        current = next((ws['idx'] for ws in workspaces if ws.get('is_focused')), 1)
+        return f"{current}/{total}"
+    except Exception:
+        return "?/?"
+
+
+def workspaces_from_event(data):
+    workspaces = data.get('WorkspacesChanged', {}).get('workspaces', [])
+    if not workspaces:
+        return None
+    total = len(workspaces)
+    current = next((ws['idx'] for ws in workspaces if ws.get('is_focused')), 1)
+    return f"{current}/{total}"
+
+
+def watch_events(label):
+    proc = subprocess.Popen(
+        ['niri', 'msg', '--json', 'event-stream'],
+        stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True
+    )
+    for line in proc.stdout:
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            data = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        text = workspaces_from_event(data)
+        if text:
+            GLib.idle_add(label.set_markup, make_markup(text))
+
+
+def make_markup(text):
+    return f'<span foreground="#c5a8f0" font="monospace 13">{text}</span>'
+
+
+def main():
+    win = Gtk.Window(type=Gtk.WindowType.TOPLEVEL)
+    win.set_decorated(False)
+    win.set_resizable(False)
+    win.set_app_paintable(True)
+
+    screen = win.get_screen()
+    visual = screen.get_rgba_visual()
+    if visual:
+        win.set_visual(visual)
+
+    GtkLayerShell.init_for_window(win)
+    GtkLayerShell.set_layer(win, GtkLayerShell.Layer.OVERLAY)
+    GtkLayerShell.set_anchor(win, GtkLayerShell.Edge.TOP, True)
+    GtkLayerShell.set_anchor(win, GtkLayerShell.Edge.LEFT, True)
+    GtkLayerShell.set_margin(win, GtkLayerShell.Edge.TOP, 10)
+    GtkLayerShell.set_margin(win, GtkLayerShell.Edge.LEFT, 10)
+    GtkLayerShell.set_exclusive_zone(win, -1)
+
+    def on_draw(widget, cr):
+        w = widget.get_allocated_width()
+        h = widget.get_allocated_height()
+        r = 12
+        cr.arc(r,   r,   r, math.pi,     3 * math.pi / 2)
+        cr.arc(w-r, r,   r, 3*math.pi/2, 0)
+        cr.arc(w-r, h-r, r, 0,           math.pi / 2)
+        cr.arc(r,   h-r, r, math.pi / 2, math.pi)
+        cr.close_path()
+        cr.clip()
+        cr.set_source_rgba(30/255, 24/255, 20/255, 0.90)
+        cr.paint()
+        return False
+
+    win.connect('draw', on_draw)
+
+    css = b"""
+    * { background-color: transparent; }
+    label { padding: 5px 12px; }
+    """
+    provider = Gtk.CssProvider()
+    provider.load_from_data(css)
+    Gtk.StyleContext.add_provider_for_screen(
+        win.get_screen(), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+    )
+
+    label = Gtk.Label()
+    label.set_use_markup(True)
+    label.set_markup(make_markup(get_workspace_text()))
+
+    win.add(label)
+    win.connect('destroy', Gtk.main_quit)
+    win.show_all()
+
+    t = threading.Thread(target=watch_events, args=(label,), daemon=True)
+    t.start()
+
+    Gtk.main()
+
+
+if __name__ == '__main__':
+    main()

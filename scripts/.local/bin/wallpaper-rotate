@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Change wallpaper every INTERVAL seconds, cycling randomly through ~/Pictures
+INTERVAL=600
+WALLPAPER_DIR="$HOME/Pictures/walpapers"
+
+swww-daemon &
+sleep 1
+
+mapfile -t WALLS < <(find "$WALLPAPER_DIR" -maxdepth 1 -type f \( \
+    -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \
+    -o -iname "*.webp" -o -iname "*.avif" \))
+
+[ ${#WALLS[@]} -eq 0 ] && exit 1
+
+i=$(( RANDOM % ${#WALLS[@]} ))
+
+while true; do
+    swww img "${WALLS[$i]}" \
+        --transition-type fade \
+        --transition-duration 1.5
+    sleep "$INTERVAL"
+    i=$(( (i + 1 + RANDOM % (${#WALLS[@]} - 1)) % ${#WALLS[@]} ))
+done
