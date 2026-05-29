@@ -125,9 +125,9 @@ def main():
 
     GtkLayerShell.init_for_window(win)
     GtkLayerShell.set_layer(win, GtkLayerShell.Layer.OVERLAY)
-    GtkLayerShell.set_anchor(win, GtkLayerShell.Edge.TOP, True)
+    GtkLayerShell.set_anchor(win, GtkLayerShell.Edge.BOTTOM, True)
     GtkLayerShell.set_anchor(win, GtkLayerShell.Edge.RIGHT, True)
-    GtkLayerShell.set_margin(win, GtkLayerShell.Edge.TOP, 10)
+    GtkLayerShell.set_margin(win, GtkLayerShell.Edge.BOTTOM, 10)
     GtkLayerShell.set_margin(win, GtkLayerShell.Edge.RIGHT, 10)
     GtkLayerShell.set_exclusive_zone(win, -1)
 
