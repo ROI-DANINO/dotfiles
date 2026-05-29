@@ -228,7 +228,7 @@ binds {
     Mod+Shift+Right { move-column-right; }
     Mod+Shift+H     { move-column-left; }
     Mod+Shift+J     { move-window-down; }
-    // Mod+Shift+L is reserved for lock (hyprlock)
+    // Mod+Shift+L is reserved for swaylock
     // Mod+Space: toggle keyboard language (us/Hebrew) — handled by xkb grp:win_space_toggle
 
     // Alternative commands that move across workspaces when reaching

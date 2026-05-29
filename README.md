@@ -44,16 +44,21 @@ TLP manages battery health with a strict 85% charge ceiling (`STOP_CHARGE_THRESH
 
 ## Daemon architecture
 
-Niri starts four daemons at login via `spawn-at-startup`:
+Niri starts eight daemons at login via `spawn-at-startup`, plus one systemd user service:
 
-| Daemon | How it runs | Managed by |
-|--------|-------------|------------|
-| waybar | direct spawn | niri |
-| swaync | direct spawn | niri |
-| wob-daemon | direct spawn | niri |
-| elephant | systemd user service | systemd (`elephant.service`) |
+| Daemon | How it runs | Purpose |
+|--------|-------------|---------|
+| waybar | niri direct spawn | status bar |
+| swaync | niri direct spawn | notification daemon + center |
+| walker | niri direct spawn (`--gapplication-service`) | app launcher backend |
+| wob-daemon | niri direct spawn | volume/brightness OSD (FIFO pipe) |
+| nm-applet | niri direct spawn (`--indicator`) | network tray applet |
+| blueman-applet | niri direct spawn | bluetooth tray applet |
+| wallpaper-rotate | niri direct spawn | swww wallpaper rotation (10 min) |
+| swayidle | niri direct spawn | idle monitor power-off (300s); does NOT lock |
+| elephant | systemd user service | walker data-provider backend |
 
-Walker is launched on-demand (`Mod+Slash`) and contacts the elephant backend over a socket. Elephant is protected against restart loops via `StartLimitBurst=5` / `StartLimitIntervalSec=60`.
+Idle timeout powers off monitors only — explicit lock is `Mod+Shift+L` (swaylock). Elephant is protected against restart loops via `StartLimitBurst=5` / `StartLimitIntervalSec=60`.
 
 ## System configs
 

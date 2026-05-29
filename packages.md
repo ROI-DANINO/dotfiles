@@ -144,7 +144,7 @@ npm install -g @anthropic-ai/claude-code
 ```bash
 mkdir -p ~/.npm-global
 npm config set prefix ~/.npm-global
-# PATH is already set in shell/.shell_env
+# PATH is already set in shell/.zshrc
 ```
 
 ## VR (optional)

@@ -8,8 +8,11 @@
 
 # Machine-local config overrides (never commit these)
 # Pattern: create <file>.local alongside any tracked config for per-machine overrides
-*.local
+# Note: *.local is scoped to root + named dirs only; scripts/.local/ is a stow package dir
 .gitconfig.local
+.zshrc.local
+.shell_env.local
+*.gitconfig.local
 
 # Project environment files
 .env

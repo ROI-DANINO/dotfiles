@@ -114,14 +114,19 @@ Active stow packages (managed by `stow.sh`):
 
 ### Niri startup chain
 
-Niri's `spawn-at-startup` section launches three direct processes and relies on one systemd user service:
+Niri's `spawn-at-startup` section launches eight direct processes and relies on one systemd user service:
 
 ```
 niri (compositor)
  ├── spawn-at-startup: waybar
  ├── spawn-at-startup: swaync
- ├── spawn-at-startup: wob-daemon    ← script in ~/.local/bin/wob-daemon
- └── spawn-at-startup: walker        ← on-demand launcher, contacts elephant via socket
+ ├── spawn-at-startup: walker --gapplication-service
+ ├── spawn-at-startup: ~/.local/bin/wob-daemon
+ ├── spawn-at-startup: nm-applet --indicator
+ ├── spawn-at-startup: blueman-applet
+ ├── spawn-at-startup: ~/.local/bin/wallpaper-rotate
+ └── spawn-at-startup: swayidle -w timeout 300 "niri msg action power-off-monitors"
+                                              resume "niri msg action power-on-monitors"
 ```
 
 ### Elephant (walker backend)
@@ -152,7 +157,11 @@ Creates a named FIFO at `/tmp/wob.fifo`, then keeps it alive with `tail -f | wob
 
 ### swayidle
 
-Managed via `~/.local/bin/toggle-idle`. Blanks display after 5 minutes, locks with `swaylock -c 000000`.
+Started directly by Niri at login. On a 300-second idle timeout it runs `niri msg action power-off-monitors` (display blank only — **not a lock**). On resume it runs `power-on-monitors`.
+
+Explicit lock is separate: `Mod+Shift+L` runs `swaylock -c 000000`.
+
+`~/.local/bin/toggle-idle` is a manual toggle — if swayidle is running it kills it; if not, it starts it with the same power-off behavior and immediately blanks the display.
 
 ### wallpaper-rotate
 
@@ -211,8 +220,10 @@ It applies CSS class `health-limit` when the battery is sitting at the TLP cap (
 | `Mod+Left/Right/Up/Down` | focus (arrow aliases) | ✓ |
 | `Mod+Shift+H` | move column left | ✓ |
 | `Mod+Shift+J` | move window down | ✓ |
-| `Mod+Shift+K` | move window up | ✓ |
+| `Mod+Shift+K` | spawn toggle-idle (screen blank toggle) | ✓ |
 | `Mod+Shift+Right` | move column right | ✓ (Shift+L reserved for lock) |
+| `Mod+Shift+B` | spawn toggle-bar (waybar ↔ sysbar) | ✓ |
+| `Mod+Shift+C` | spawn claude-desktop | ✓ |
 | `Mod+U/I` | focus workspace up/down | ✓ |
 | `Mod+Ctrl+U/I` | move column to workspace up/down | ✓ |
 | `Mod+R` | cycle column width | ✓ |
@@ -239,10 +250,14 @@ It applies CSS class `health-limit` when the battery is sitting at the TLP cap (
 | App | Purpose | Managed by |
 |-----|---------|------------|
 | waybar | status bar | niri direct spawn |
-| swaync | notifications / notification center | niri direct spawn |
-| wob-daemon | volume/brightness OSD | niri direct spawn |
-| walker | app launcher | niri direct spawn (on-demand via keybind) |
-| elephant | walker data-provider backend | systemd user service |
+| swaync | notification daemon + center | niri direct spawn |
+| walker | app launcher (`--gapplication-service` mode) | niri direct spawn |
+| wob-daemon | volume/brightness OSD via FIFO | niri direct spawn |
+| nm-applet | network tray applet (`--indicator`) | niri direct spawn |
+| blueman-applet | bluetooth tray applet | niri direct spawn |
+| wallpaper-rotate | swww wallpaper rotation (10 min cycle) | niri direct spawn |
+| swayidle | idle monitor power-off (300s timeout) | niri direct spawn |
+| elephant | walker data-provider backend | systemd user service (not in spawn-at-startup) |
 
 ---
 

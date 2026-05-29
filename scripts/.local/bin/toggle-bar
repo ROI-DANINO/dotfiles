@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 if pgrep -x waybar > /dev/null; then
     pkill -x waybar
-    ~/.local/bin/sysbar &
+    ~/.config/niri/sysbar &
 else
     pkill -f "python3.*sysbar"
     pkill -f "python3.*wsbar"
