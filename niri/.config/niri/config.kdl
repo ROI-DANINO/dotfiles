@@ -6,12 +6,11 @@ prefer-no-csd
 
 spawn-at-startup "waybar"
 spawn-at-startup "swaync"
-spawn-at-startup "walker --gapplication-service"
-spawn-at-startup "elephant"
+spawn-at-startup "walker" "--gapplication-service"
 spawn-at-startup "sh" "-c" "rm -f /tmp/wob.fifo && mkfifo /tmp/wob.fifo && tail -f /tmp/wob.fifo | wob"
 spawn-at-startup "nm-applet" "--indicator"
 spawn-at-startup "blueman-applet"
-spawn-at-startup "/home/roking/.local/bin/wallpaper-rotate"
+spawn-at-startup "~/.local/bin/wallpaper-rotate"
 spawn-at-startup "swayidle" "-w" "timeout" "300" "niri msg action power-off-monitors" "resume" "niri msg action power-on-monitors"
 
 // Input device configuration.
@@ -185,8 +184,8 @@ binds {
     Mod+Slash { spawn "walker"; }
     Mod+Shift+C { spawn "env" "ELECTRON_OZONE_PLATFORM_HINT=auto" "claude-desktop"; }
     Alt+M { spawn "kitty" "-e" "btm"; }
-    Mod+Shift+B { spawn "/home/roking/.local/bin/toggle-bar"; }
-    Mod+Shift+K { spawn "/home/roking/.local/bin/toggle-idle"; }
+    Mod+Shift+B { spawn "~/.local/bin/toggle-bar"; }
+    Mod+Shift+K { spawn "~/.local/bin/toggle-idle"; }
     Mod+Shift+L { spawn "swaylock" "-c" "000000"; }
 
 
@@ -326,7 +325,7 @@ binds {
     // Mod+Space       { switch-layout "next"; }
     // Mod+Shift+Space { switch-layout "prev"; }
 
-    Ctrl+Space { spawn "/home/roking/dotfiles/niri/screenshot-area"; }
+    Ctrl+Space { spawn "~/.config/niri/screenshot-area"; }
     Print { screenshot; }
     Ctrl+Print { screenshot-screen; }
     Alt+Print { screenshot-window; }

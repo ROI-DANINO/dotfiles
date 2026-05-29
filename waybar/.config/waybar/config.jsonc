@@ -1,5 +1,6 @@
 {
-    "layer": "top",
+    "layer": "overlay",
+    "exclusive-zone": -1,
     "position": "top",
     "height": 28,
     "spacing": 0,
@@ -7,9 +8,9 @@
     "margin-left": 8,
     "margin-right": 8,
 
-    "modules-left": ["niri/workspaces", "niri/window"],
-    "modules-center": [],
-    "modules-right": ["custom/swaync", "tray", "cpu", "memory", "network", "bluetooth", "pulseaudio", "backlight", "custom/battery", "clock"],
+    "modules-left": ["niri/workspaces", "niri/window", "cpu", "memory"],
+    "modules-center": ["clock"],
+    "modules-right": ["network", "custom/swaync", "tray", "pulseaudio", "backlight", "custom/battery"],
 
     "niri/workspaces": {
         "format": "{index}",

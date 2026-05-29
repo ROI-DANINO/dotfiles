@@ -6,12 +6,13 @@
    Terminal bg:      #1e1814   (dark warm, derived from bg_color)
    Surface:          #2e2622   Surface2: #4a3e38
    Foreground:       #dedede   (neutral_9)   Muted: #cabab4 (accent_warm_grey)
-   Blue (bright):    #63d0df   (accent_blue)   Blue (normal): #249dac (ext_blue)
+   Sandstone:        #b8956a   (primary accent)
+   Copper:           #cb8040   (secondary accent)
+   Dark stone:       #8a6a48   (muted accent)
    Purple (bright):  #e79cfe   (accent_purple)
    Green (bright):   #92cf9c   (accent_green)
    Red (bright):     #fda1a0   (accent_red)
    Yellow (bright):  #f7e062   (accent_yellow)
-   Cyan (bright):    #7de0ee
    Ext warm grey:    #9b8e8a
 */
 
@@ -69,8 +70,8 @@ tooltip label {
 }
 
 #workspaces button.active {
-    background: rgba(99, 208, 223, 0.2);
-    color: #63d0df;
+    background: rgba(184, 149, 106, 0.2);
+    color: #b8956a;
 }
 
 #workspaces button.urgent {
@@ -104,7 +105,7 @@ tooltip label {
     margin: 4px 0;
     border-radius: 6px;
     background: #2e2622;
-    color: #63d0df;
+    color: #7a9ab8;
 }
 
 #cpu:hover {
@@ -117,7 +118,7 @@ tooltip label {
     margin: 4px 0;
     border-radius: 6px;
     background: #2e2622;
-    color: #92cf9c;
+    color: #7ec4a0;
 }
 
 #memory:hover {
@@ -129,7 +130,7 @@ tooltip label {
     padding: 0 8px;
     margin: 4px 0;
     border-radius: 6px;
-    color: #7de0ee;
+    color: #9bbdd6;
 }
 
 #network.disconnected {
@@ -145,11 +146,11 @@ tooltip label {
     padding: 0 8px;
     margin: 4px 0;
     border-radius: 6px;
-    color: #249dac;
+    color: #8a6a48;
 }
 
 #bluetooth.connected {
-    color: #63d0df;
+    color: #b8956a;
 }
 
 #bluetooth:hover {
@@ -161,7 +162,7 @@ tooltip label {
     padding: 0 8px;
     margin: 4px 0;
     border-radius: 6px;
-    color: #dedede;
+    color: #b4c6d4;
 }
 
 #pulseaudio.muted {
@@ -177,7 +178,7 @@ tooltip label {
     padding: 0 8px;
     margin: 4px 0;
     border-radius: 6px;
-    color: #f7e062;
+    color: #d4b896;
 }
 
 #backlight:hover {
@@ -194,7 +195,7 @@ tooltip label {
 }
 
 #custom-battery.charging {
-    color: #7de0ee;
+    color: #cb8040;
     background: rgba(125, 224, 238, 0.1);
 }
 
@@ -236,14 +237,15 @@ tooltip label {
 
 /* Clock */
 #clock {
-    padding: 0 12px;
-    margin: 4px 8px 4px 0;
+    padding: 0 16px;
+    margin: 4px 0;
     border-radius: 6px;
-    background: rgba(99, 208, 223, 0.2);
-    color: #63d0df;
+    background: rgba(138, 175, 210, 0.15);
+    color: #8aafd2;
     font-weight: 600;
+    font-size: 14px;
 }
 
 #clock:hover {
-    background: rgba(99, 208, 223, 0.35);
+    background: rgba(138, 175, 210, 0.28);
 }
