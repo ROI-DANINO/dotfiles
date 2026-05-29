@@ -1,9 +1,15 @@
 [credential "https://github.com"]
-	helper = 
+	helper =
 	helper = !/usr/bin/gh auth git-credential
 [credential "https://gist.github.com"]
-	helper = 
+	helper =
 	helper = !/usr/bin/gh auth git-credential
-[user]
-	name = Roi Danino
-	email = Roi126584@gmail.com
+
+# Machine-specific identity (name, email, signingkey) lives in ~/.gitconfig.local
+# That file is gitignored and never committed to the dotfiles repo.
+# Create it on each machine:
+#   [user]
+#       name = Your Name
+#       email = your@email.com
+[include]
+	path = ~/.gitconfig.local

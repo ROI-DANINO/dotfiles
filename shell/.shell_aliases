@@ -14,7 +14,7 @@ alias ..='cd ..'                              # Go up one directory
 alias desk='cd ~/Desktop'                     # Quick access to Desktop
 alias pro='cd ~/Desktop/Projects'             # Quick access to Projects folder
 alias dotfiles='cd ~/dotfiles'                # Navigate to dotfiles repo
-alias models='cd /home/roking/Desktop/Projects/models' # Navigate to models project
+alias models='cd ~/Desktop/Projects/models'            # Navigate to models project
 alias tele='cd Desktop/Project'               # Quick access to Tele project
 alias wavespeed='cd ~/softwares/wavespeed-desktop && npm run dev' # Start wavespeed dev environment
 
@@ -76,7 +76,7 @@ alias enable='sudo systemctl enable'           # Enable service on boot
 alias disable='sudo systemctl disable'         # Disable service on boot
 alias status='sudo systemctl status'           # Check service status
 alias isenable='sudo systemctl is-enabled'     # Check if service is enabled
-alias arc-status='systemctl --user status auto-rename-copies' # Check auto-rename-copies service
+# arc-status removed — auto-rename-copies.service was purged 2026-05-30 (was crash-looping every 5s)
 
 # ============================================================================
 # APPLICATIONS & EXTERNAL TOOLS
@@ -99,8 +99,9 @@ alias agentclose='podman stop agent-zero'
 alias lms='~/Downloads/LM-Studio*.AppImage' 
 alias snbx='cd ~/Desktop/Projects/gemini/sandbox && pi' 
 
-alias cheat='/home/roking/dotfiles && cat keybinds.md' 
-alias claude='claude --dangerously-skip-permissions' 
-alias vr='/home/roking/.local/bin/vr-desktop' 
+alias cheat='cat ~/dotfiles/keybinds.md'
+# WARNING: bypasses ALL Claude Code permission prompts — only use in trusted, personal environments
+alias claude='claude --dangerously-skip-permissions'
+alias vr='~/.local/bin/vr-desktop'
 alias stremio='flatpak run com.stremio.Stremio' 
 alias roi='~/Desktop/Projects/Roi_Danino' 

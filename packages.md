@@ -1,11 +1,28 @@
 # Packages — Fresh Machine Setup
 
-Install these before running `./stow.sh`.
+Reference list for what `install.sh` installs. Run `install.sh` instead of doing this manually — it's idempotent and handles everything below.
+
+```bash
+git clone https://github.com/ROI-DANINO/dotfiles ~/dotfiles
+bash ~/dotfiles/install.sh
+```
+
+---
 
 ## Core Tools
 
 ```bash
 sudo dnf install git gh stow
+```
+
+## Shell
+
+```bash
+sudo dnf install zsh zsh-autosuggestions zsh-syntax-highlighting
+chsh -s $(which zsh)
+
+# Powerlevel10k prompt
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
 ```
 
 ## Terminals
@@ -14,49 +31,54 @@ sudo dnf install git gh stow
 sudo dnf install kitty alacritty
 ```
 
-## Shell
+## Multiplexer (Rust)
 
 ```bash
-# zsh + p10k
-sudo dnf install zsh zsh-autosuggestions zsh-syntax-highlighting
-chsh -s $(which zsh)
-
-# Powerlevel10k
-git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
+# via cargo (install.sh handles this):
+cargo install --locked zellij
 ```
 
-## Multiplexer
+## Window Manager — Niri session
 
 ```bash
-sudo dnf install zellij
+sudo dnf install niri waybar SwayNotificationCenter swaylock swayidle wob mako walker elephant
 ```
 
-## Window Manager (niri session)
+### elephant (walker data-provider backend)
+Provides search index / application data to walker. Managed as a **systemd user service** — do not spawn it directly from niri `spawn-at-startup`.
 
 ```bash
-sudo dnf install niri waybar swaync swaylock swayidle wob mako walker
-```
-
-### elephant (walker data provider)
-Powers walker's extended search capabilities. Install from:
-https://github.com/nickvdyck/elephant/releases
-
-After installing, enable as a systemd user service:
-```bash
+# install.sh handles this:
 systemctl --user enable --now elephant
 ```
 
-### swww (wallpaper daemon — Rust, GPU-accelerated transitions)
+Service file: `~/.config/systemd/user/elephant.service`
+Key guards: `Restart=on-failure`, `StartLimitBurst=5`, `StartLimitIntervalSec=60`, `MemoryHigh=512M`
+
+### swww (wallpaper daemon — Rust, GPU-accelerated)
+
 ```bash
-# Check Fedora repos first:
+# via cargo (install.sh handles this):
+cargo install --locked swww
+
+# or check Fedora repos:
 sudo dnf install swww
-# or build from source: https://github.com/LGFae/swww
 ```
+
+Launched at startup via `scripts/.local/bin/wallpaper-rotate`. Rotates from `~/Pictures/walpapers` every 10 minutes.
+
+### wob (on-screen volume/brightness bar)
+
+Started via `scripts/.local/bin/wob-daemon` (not raw `wob`). The daemon creates `/tmp/wob.fifo` and keeps the pipe alive with `tail -f` to prevent orphan processes. Write a 0–100 integer to the FIFO to trigger the OSD.
+
+### swayidle (screen idle / lock)
+
+Managed via `scripts/.local/bin/toggle-idle`. Blanks screen after 5 minutes of inactivity. Uses `swaylock -c 000000` for locking.
 
 ## Notifications
 
 ```bash
-sudo dnf install mako  # already included above via waybar deps; confirm it's present
+sudo dnf install mako  # lightweight — used alongside swaync
 ```
 
 ## Battery Management
@@ -64,12 +86,16 @@ sudo dnf install mako  # already included above via waybar deps; confirm it's pr
 ```bash
 sudo dnf install tlp tlp-rdw
 sudo systemctl enable --now tlp
-
-# Set charge limit (85% recommended for longevity):
-sudo tlp setcharge 0 85 BAT0
-# Or edit /etc/tlp.conf:
-# STOP_CHARGE_THRESH_BAT0=85
 ```
+
+Charge threshold is capped at **85%** for battery longevity (Zenbook / ASUS hardware).
+
+```ini
+# /etc/tlp.conf
+STOP_CHARGE_THRESH_BAT0=85
+```
+
+The Waybar `battery.sh` reads `/sys/class/power_supply/BAT0/charge_control_end_threshold` dynamically and shows a `health-limit` CSS class when sitting at the cap.
 
 ## Network & Bluetooth
 
@@ -77,48 +103,32 @@ sudo tlp setcharge 0 85 BAT0
 sudo dnf install network-manager-applet blueman
 ```
 
-## Display & Input
+## Display & Input Controls
 
 ```bash
-sudo dnf install brightnessctl playerctl
-# light (alternative for backlight — used by waybar config):
-sudo dnf install light
+sudo dnf install brightnessctl playerctl light
 ```
 
-## File Managers
+## File Management & CLI Tools
 
 ```bash
-# yazi (Rust TUI — primary)
-sudo dnf install yazi
-
-# thunar (GUI, Mod+F)
-sudo dnf install thunar
+sudo dnf install yazi thunar fzf wl-clipboard bottom
 ```
 
-## CLI Tools
-
-```bash
-sudo dnf install fzf btm wl-clipboard
-# bottom (btm) may be in a different package name:
-# sudo dnf install bottom
-```
+- `yazi` — Rust TUI file manager (primary, alias: `y`)
+- `thunar` — GUI file manager (`Mod+F`)
+- `bottom` — system monitor (`Alt+M`)
+- `wl-clipboard` — Wayland clipboard (`wl-copy`/`wl-paste`)
 
 ## Fonts
 
 ```bash
-# JetBrainsMono Nerd Font (used by kitty, alacritty, zellij, waybar)
 sudo dnf install jetbrains-mono-fonts
-# or install Nerd Font patched version from: https://www.nerdfonts.com/font-downloads
+# For Nerd Font variant: download from https://www.nerdfonts.com/font-downloads
 # Unzip to ~/.local/share/fonts/ and run: fc-cache -fv
 ```
 
-## Image Viewer
-
-```bash
-# oculante (alias: img)
-sudo dnf install oculante
-# or: https://github.com/woelper/oculante/releases
-```
+Used by: kitty, alacritty, zellij, waybar.
 
 ## AI Tools
 
@@ -126,11 +136,10 @@ sudo dnf install oculante
 # Claude Code
 npm install -g @anthropic-ai/claude-code
 
-# opencode
-# https://opencode.ai
+# opencode: https://opencode.ai
 ```
 
-## npm global path
+## npm Global Path
 
 ```bash
 mkdir -p ~/.npm-global
@@ -144,10 +153,13 @@ npm config set prefix ~/.npm-global
 sudo dnf install wivrn wayvr
 ```
 
+`wayvr` provides a virtual desktop layer for VR inside the Niri/Wayland session. Launch via `scripts/.local/bin/vr-desktop`.
+
+---
+
 ## After installing everything
 
 ```bash
-cd ~/dotfiles
-./stow.sh
 source ~/.zshrc
+# then log out and back in to start the Niri session
 ```

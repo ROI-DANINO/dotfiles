@@ -63,8 +63,8 @@ load-env() {
 }
 
 # Export the final PATH
-if ! [[ "$PATH" =~ "/home/roking/.opencode/bin" ]]; then
-    PATH="/home/roking/.opencode/bin:$PATH"
+if ! [[ "$PATH" =~ "$HOME/.opencode/bin" ]]; then
+    PATH="$HOME/.opencode/bin:$PATH"
 fi
 
 export PATH

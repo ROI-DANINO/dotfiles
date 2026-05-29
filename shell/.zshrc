@@ -62,7 +62,7 @@ source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 export PATH="$HOME/.npm-global/bin:$PATH"
 
 # Added by LM Studio CLI (lms)
-export PATH="$PATH:/home/roking/.lmstudio/bin"
+export PATH="$PATH:$HOME/.lmstudio/bin"
 # End of LM Studio CLI section
 
 # Screenshot aliases
@@ -74,11 +74,11 @@ alias sss='niri msg action screenshot-screen'
 alias img='oculante'
 
 # bun completions
-[ -s "/home/roking/.bun/_bun" ] && source "/home/roking/.bun/_bun"
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
 # AI Team workspace
-alias ai-team="/home/roking/Desktop/Projects/ai-team/scripts/ai-team.sh"
+alias ai-team="$HOME/Desktop/Projects/ai-team/scripts/ai-team.sh"

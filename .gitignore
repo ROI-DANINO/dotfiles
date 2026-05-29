@@ -1,3 +1,22 @@
+# OS artifacts
 .DS_Store
+
+# Editor swap/backup files
 *.swp
 *.bak
+*.save
+
+# Machine-local config overrides (never commit these)
+# Pattern: create <file>.local alongside any tracked config for per-machine overrides
+*.local
+.gitconfig.local
+
+# Project environment files
+.env
+.env.*
+!.env.template
+
+# Runtime artifacts
+__pycache__/
+*.pyc
+.pytest_cache/
