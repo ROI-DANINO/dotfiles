@@ -65,12 +65,6 @@ export PATH="$HOME/.npm-global/bin:$PATH"
 export PATH="$PATH:/home/roking/.lmstudio/bin"
 # End of LM Studio CLI section
 
-# opencode — kill on terminal close
-opencode() {
-    ( trap 'kill 0' EXIT HUP TERM INT; command opencode "$@" )
-}
-
-
 # Screenshot aliases
 alias ss='niri msg action screenshot'
 alias ssw='niri msg action screenshot-window'
@@ -78,3 +72,13 @@ alias sss='niri msg action screenshot-screen'
 
 # Media viewer alias
 alias img='oculante'
+
+# bun completions
+[ -s "/home/roking/.bun/_bun" ] && source "/home/roking/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+# AI Team workspace
+alias ai-team="/home/roking/Desktop/Projects/ai-team/scripts/ai-team.sh"

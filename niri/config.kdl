@@ -8,6 +8,11 @@ spawn-at-startup "waybar"
 spawn-at-startup "swaync"
 spawn-at-startup "walker --gapplication-service"
 spawn-at-startup "elephant"
+spawn-at-startup "sh" "-c" "rm -f /tmp/wob.fifo && mkfifo /tmp/wob.fifo && tail -f /tmp/wob.fifo | wob"
+spawn-at-startup "nm-applet" "--indicator"
+spawn-at-startup "blueman-applet"
+spawn-at-startup "/home/roking/.local/bin/wallpaper-rotate"
+spawn-at-startup "swayidle" "-w" "timeout" "300" "niri msg action power-off-monitors" "resume" "niri msg action power-on-monitors"
 
 // Input device configuration.
 // Find the full list of options on the wiki:
@@ -39,7 +44,7 @@ input {
     mouse {
         // off
         // natural-scroll
-        // accel-speed 0.2
+        accel-speed 0.2
         // accel-profile "flat"
         // scroll-method "no-scroll"
     }
@@ -82,8 +87,8 @@ layout {
 
     focus-ring {
         width 3
-        active-color "#63d0df"    // COSMIC accent_blue
-        inactive-color "#4a3e38"  // COSMIC dark warm surface
+        active-color "#cabab4"
+        inactive-color "#4a3e38"
     }
 
     border {
@@ -176,9 +181,12 @@ binds {
     Mod+T { spawn "kitty"; }
     Mod+A { spawn "alacritty"; }
     Mod+W { spawn "zen"; }
-    Mod+F { spawn "cosmic-files"; }
+    Mod+F { spawn "thunar"; }
     Mod+Slash { spawn "walker"; }
+    Mod+Shift+C { spawn "env" "ELECTRON_OZONE_PLATFORM_HINT=auto" "claude-desktop"; }
     Alt+M { spawn "kitty" "-e" "btm"; }
+    Mod+Shift+B { spawn "/home/roking/.local/bin/toggle-bar"; }
+    Mod+Shift+K { spawn "/home/roking/.local/bin/toggle-idle"; }
     Mod+Shift+L { spawn "swaylock" "-c" "000000"; }
 
 
@@ -188,10 +196,16 @@ binds {
 
     // Example volume keys mappings for PipeWire & WirePlumber.
     // The allow-when-locked=true property makes them work even when the session is locked.
-    XF86AudioRaiseVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%+"; }
-    XF86AudioLowerVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"; }
+    XF86AudioRaiseVolume allow-when-locked=true { spawn "sh" "-c" "wpctl set-volume --limit 1.0 @DEFAULT_AUDIO_SINK@ 5%+ && wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{v=int($2*100); print (v>100?100:v)}' > /tmp/wob.fifo"; }
+    XF86AudioLowerVolume allow-when-locked=true { spawn "sh" "-c" "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%- && wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{print int($2*100)}' > /tmp/wob.fifo"; }
     XF86AudioMute        allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
     XF86AudioMicMute     allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
+    XF86AudioPlay        allow-when-locked=true { spawn "playerctl" "play-pause"; }
+    XF86AudioPause       allow-when-locked=true { spawn "playerctl" "play-pause"; }
+    XF86AudioNext        allow-when-locked=true { spawn "playerctl" "next"; }
+    XF86AudioPrev        allow-when-locked=true { spawn "playerctl" "previous"; }
+    XF86MonBrightnessUp   allow-when-locked=true { spawn "sh" "-c" "brightnessctl set +5% && echo $(($(brightnessctl get) * 100 / $(brightnessctl max))) > /tmp/wob.fifo"; }
+    XF86MonBrightnessDown allow-when-locked=true { spawn "sh" "-c" "brightnessctl set 5%- && echo $(($(brightnessctl get) * 100 / $(brightnessctl max))) > /tmp/wob.fifo"; }
 
     Mod+Q { close-window; }
 
@@ -215,7 +229,6 @@ binds {
     Mod+Shift+Right { move-column-right; }
     Mod+Shift+H     { move-column-left; }
     Mod+Shift+J     { move-window-down; }
-    Mod+Shift+K     { move-window-up; }
     // Mod+Shift+L is reserved for lock (hyprlock)
     // Mod+Space: toggle keyboard language (us/Hebrew) — handled by xkb grp:win_space_toggle
 
@@ -288,7 +301,7 @@ binds {
     Mod+Shift+R { switch-preset-window-height; }
     Mod+Ctrl+R { reset-window-height; }
     Mod+M { maximize-column; }
-    // Mod+F is used for file manager (yazi)
+    // Mod+F is used for file manager (thunar)
     Mod+Shift+F { fullscreen-window; }
     Mod+C { center-column; }
 
@@ -313,7 +326,7 @@ binds {
     // Mod+Space       { switch-layout "next"; }
     // Mod+Shift+Space { switch-layout "prev"; }
 
-    Ctrl+Space { screenshot; }           // interactive area selection
+    Ctrl+Space { spawn "/home/roking/dotfiles/niri/screenshot-area"; }
     Print { screenshot; }
     Ctrl+Print { screenshot-screen; }
     Alt+Print { screenshot-window; }

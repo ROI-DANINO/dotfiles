@@ -116,6 +116,30 @@ else
 fi
 echo ""
 
+# --- mako ---
+if cmd_exists mako; then
+  if ask "[mako]    Install mako config?"; then
+    link "$DOTFILES_DIR/mako/config" "$HOME/.config/mako/config"
+  else
+    info "Skipped mako"
+  fi
+else
+  info "[mako]    mako not installed — skipping"
+fi
+echo ""
+
+# --- swaync ---
+if cmd_exists swaync; then
+  if ask "[swaync]  Install swaync config?"; then
+    link "$DOTFILES_DIR/swaync/config.json" "$HOME/.config/swaync/config.json"
+  else
+    info "Skipped swaync"
+  fi
+else
+  info "[swaync]  swaync not installed — skipping"
+fi
+echo ""
+
 # --- git ---
 if cmd_exists git; then
   if ask "[git]     Install git config?"; then

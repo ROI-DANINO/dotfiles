@@ -25,8 +25,11 @@ See `packages.md` for everything to install before running setup.
 | alacritty | `alacritty/alacritty.toml` | ✓ |
 | zellij | `zellij/config.kdl` | ✓ |
 | git | `git/gitconfig` | ✓ |
-| niri | `niri/config.kdl` | 🚧 in progress |
-| waybar | `waybar/` | 🚧 in progress |
+| niri | `niri/config.kdl` | ✓ |
+| waybar | `waybar/` | ✓ |
+| sysbar | `~/.local/bin/sysbar` | ✓ custom GTK bar (battery, RAM, network, time) |
+| wallpaper | `~/.local/bin/wallpaper-rotate` | ✓ swww, rotates every 10min from `~/Pictures/walpapers` |
+| idle | `~/.local/bin/toggle-idle` | ✓ swayidle, blanks screen after 5min |
 | system tuning | `system/` | ✓ manual apply |
 
 ## System configs
@@ -35,17 +38,13 @@ See `system/README.md` — applied manually per machine, not by `setup.sh`.
 
 ## In progress
 
-- **niri** — keybinds, startup apps, and layout still being refined
-- **waybar** — layout and modules undecided
-- **hyprlock + hypridle** — replacing swaylock, not yet installed/configured
-- **COSMIC DE** — not yet configured
+- **walker** — not yet configured/customized
 
 ## TODO
 
-- [ ] Install and configure hyprlock + hypridle
-- [ ] Finalize waybar layout and modules
-- [ ] Add COSMIC config once configured
-- [ ] Add walker config once customized
+- [x] Finalize waybar layout and modules
+- [x] Add COSMIC config once configured
+- [ ] Customize walker and add config to dotfiles (currently running on defaults, no config file exists yet)
 
 ---
 

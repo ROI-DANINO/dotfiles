@@ -24,6 +24,8 @@
 | `Mod+Shift+L` | lock screen (swaylock, black) |
 | `Mod+Shift+E` | quit niri |
 | `Mod+Shift+P` | power off monitors |
+| `Mod+Shift+K` | toggle idle/screen-blank (on = blanks after 5min, off = stays on for movies) |
+| `Mod+Shift+B` | toggle between waybar and sysbar |
 
 ---
 
@@ -48,7 +50,7 @@
 | `Mod+Shift+H` / `Mod+Shift+Left` | move column left |
 | `Mod+Shift+Right` | move column right |
 | `Mod+Shift+J` / `Mod+Shift+Down` | move window down |
-| `Mod+Shift+K` / `Mod+Shift+Up` | move window up |
+| `Mod+Shift+Up` | move window up |
 | `Mod+Comma` | consume window into column |
 | `Mod+Period` | expel window from column |
 
