@@ -12,18 +12,60 @@
 @define-color theme_tooltip_bg_color   #1E3045;
 @define-color theme_tooltip_fg_color   #F0E7D5;
 
-headerbar,
-.titlebar {
+/* Orchis-Dark hardcodes colors — override its exact selectors */
+
+.background {
+  background-color: #2F4156;
+  color: #F0E7D5;
+}
+
+.view {
   background-color: #1E3045;
   color: #F0E7D5;
 }
 
-.sidebar {
+textview text {
   background-color: #1E3045;
+  color: #F0E7D5;
+}
+
+.titlebar,
+headerbar,
+box.vertical headerbar {
+  background-color: #1E3045;
+  color: #F0E7D5;
+}
+
+.titlebar:backdrop {
+  background-color: #263749;
+  color: #9FB4C1;
+}
+
+.sidebar,
+placessidebar {
+  background-color: #1E3045;
+  color: #F0E7D5;
+}
+
+placessidebar row {
+  color: #F0E7D5;
+}
+
+placessidebar row:selected,
+placessidebar row:selected:hover {
+  background-color: #C8D9E6;
+  color: #1E3045;
 }
 
 popover,
 .popover {
   background-color: #2F4156;
   border: 1px solid #567C8D;
+}
+
+selection,
+.view:selected,
+treeview:selected {
+  background-color: #C8D9E6;
+  color: #1E3045;
 }
