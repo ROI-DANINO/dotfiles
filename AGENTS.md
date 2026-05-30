@@ -309,8 +309,6 @@ It applies CSS class `health-limit` when the battery is sitting at the TLP cap (
 
 ## What Was Removed (2026-05-30 hygiene pass)
 
-The following components were purposefully removed due to conflicts, instability, or bloat. **Do not suggest reinstalling them as part of standard optimization or troubleshooting.** If the user explicitly requests a feature or workflow that genuinely requires one of these, surface the context below first so they can make an informed decision.
-
 | Component | Why removed | If re-requested |
 |-----------|------------|-----------------|
 | **COSMIC DE**, KDE, Sway, XFCE4 | Legacy DE clutter purged from `~/.config` and `~/.local/share` (~134MB) | Only reintroduce if user wants to run that DE alongside Niri |
