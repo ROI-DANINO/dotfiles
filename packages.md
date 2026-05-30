@@ -97,6 +97,12 @@ The Waybar `battery.sh` reads `/sys/class/power_supply/BAT0/charge_control_end_t
 sudo dnf install network-manager-applet blueman
 ```
 
+## GTK Theme Override
+
+No packages required. The `gtk` stow module deploys `~/.config/gtk-3.0/gtk.css`
+and `~/.config/gtk-4.0/gtk.css` which layer brand navy/cream/teal colors on top
+of the active Orchis-Dark GTK theme. Applies to: blueman, thunar, nm-applet, walker.
+
 ## Display & Input Controls
 
 ```bash

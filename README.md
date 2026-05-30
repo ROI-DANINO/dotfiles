@@ -34,6 +34,7 @@ See `packages.md` for a manual reference of everything that gets installed.
 | Kitty | `kitty/` | Primary terminal |
 | Zellij | `zellij/` | Terminal multiplexer |
 | Git | `git/` | Global gitconfig |
+| GTK | `gtk/` | Brand palette override for GTK apps |
 | TLP | configured via `/etc/tlp.conf` | Battery charge capped at 85% |
 | Wallpapers | `wallpapers/` | Stowed into `~/Pictures/walpapers`; image assets are tracked with Git LFS |
 

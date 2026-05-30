@@ -1,0 +1,29 @@
+/* Brand palette — layered on top of Orchis-Dark */
+
+@define-color theme_bg_color           #2F4156;
+@define-color theme_base_color         #1E3045;
+@define-color theme_fg_color           #F0E7D5;
+@define-color theme_selected_bg_color  #C8D9E6;
+@define-color theme_selected_fg_color  #1E3045;
+@define-color borders                  #567C8D;
+@define-color unfocused_borders        #3a556a;
+@define-color insensitive_bg_color     #263749;
+@define-color insensitive_fg_color     #9FB4C1;
+@define-color theme_tooltip_bg_color   #1E3045;
+@define-color theme_tooltip_fg_color   #F0E7D5;
+
+headerbar,
+.titlebar {
+  background-color: #1E3045;
+  color: #F0E7D5;
+}
+
+.sidebar {
+  background-color: #1E3045;
+}
+
+popover,
+.popover {
+  background-color: #2F4156;
+  border: 1px solid #567C8D;
+}

@@ -1,0 +1,20 @@
+/* Brand palette — layered on top of Orchis-Dark (GTK4) */
+
+@define-color window_bg_color          #2F4156;
+@define-color window_fg_color          #F0E7D5;
+@define-color view_bg_color            #1E3045;
+@define-color view_fg_color            #F0E7D5;
+@define-color accent_bg_color          #567C8D;
+@define-color accent_fg_color          #F0E7D5;
+@define-color accent_color             #C8D9E6;
+@define-color headerbar_bg_color       #1E3045;
+@define-color headerbar_fg_color       #F0E7D5;
+@define-color sidebar_bg_color         #1E3045;
+@define-color popover_bg_color         #2F4156;
+
+/* GTK4 also checks these legacy names */
+@define-color theme_bg_color           #2F4156;
+@define-color theme_base_color         #1E3045;
+@define-color theme_fg_color           #F0E7D5;
+@define-color theme_selected_bg_color  #C8D9E6;
+@define-color theme_selected_fg_color  #1E3045;

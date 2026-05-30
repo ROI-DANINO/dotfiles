@@ -33,6 +33,7 @@ PACKAGES=(
   zellij
   shell
   git
+  gtk
   scripts
   wallpapers
 )
