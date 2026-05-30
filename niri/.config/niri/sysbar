@@ -71,17 +71,17 @@ def get_time():
 def build_markup(ws, bat_span):
     net = get_network()
     net_icon, net_color = {
-        'wifi': ('📡', '#7ec8e3'),
-        'eth':  ('🔌', '#a0cfaa'),
-        'none': ('✖ no net', '#e06060'),
+        'wifi': ('📡', '#C8D9E6'),
+        'eth':  ('🔌', '#A8C9B0'),
+        'none': ('✖ no net', '#C9856F'),
     }[net]
     return (
-        f'<span foreground="#c5a8f0" font="monospace 13">{ws}</span>  '
+        f'<span foreground="#C8D9E6" font="monospace 13">{ws}</span>  '
         f'<span foreground="{net_color}" font="monospace 13">{net_icon}</span>  '
         + bat_span
-        + f'<span foreground="#f7e062" font="monospace 13">{get_ram_gb()}</span>'
+        + f'<span foreground="#F0E7D5" font="monospace 13">{get_ram_gb()}</span>'
         f'  '
-        f'<span foreground="#92cf9c" font="monospace 13">{get_time()}</span>'
+        f'<span foreground="#FFFFFF" font="monospace 13">{get_time()}</span>'
     )
 
 
@@ -90,7 +90,7 @@ def update(label):
     pct, charging = get_battery()
     bat_span = ''
     if pct is not None:
-        color = '#92cf9c' if charging else '#e06060'
+        color = '#A8C9B0' if charging else '#C9856F'
         bat_span = f'<span foreground="{color}" font="monospace 13">{pct}%</span>  '
     label.set_markup(build_markup(ws, bat_span))
     return True
@@ -102,7 +102,7 @@ def blink_tick(label):
     if pct is not None and pct < 15 and not charging:
         blink_visible = not blink_visible
         ws = get_workspace_text()
-        color = '#e06060'
+        color = '#C9856F'
         bat_span = (
             f'<span foreground="{color}" font="monospace 13">{pct}%</span>  '
             if blink_visible else
@@ -141,7 +141,7 @@ def main():
         cr.arc(r,   h-r, r, math.pi/2,     math.pi)
         cr.close_path()
         cr.clip()
-        cr.set_source_rgba(30/255, 24/255, 20/255, 0.90)
+        cr.set_source_rgba(47/255, 65/255, 86/255, 0.84)
         cr.paint()
         return False
 

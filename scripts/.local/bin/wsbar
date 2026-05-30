@@ -48,7 +48,7 @@ def watch_events(label):
 
 
 def make_markup(text):
-    return f'<span foreground="#c5a8f0" font="monospace 13">{text}</span>'
+    return f'<span foreground="#C8D9E6" font="monospace 13">{text}</span>'
 
 
 def main():
@@ -80,7 +80,7 @@ def main():
         cr.arc(r,   h-r, r, math.pi / 2, math.pi)
         cr.close_path()
         cr.clip()
-        cr.set_source_rgba(30/255, 24/255, 20/255, 0.90)
+        cr.set_source_rgba(47/255, 65/255, 86/255, 0.84)
         cr.paint()
         return False
 
