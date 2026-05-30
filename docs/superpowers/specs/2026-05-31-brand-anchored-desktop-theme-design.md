@@ -14,6 +14,7 @@ The final direction is warm, brand-anchored navy:
 - Focus and selection: Sky Blue
 - Structure and secondary accents: Teal
 - Warmth: Vanilla Cream, not gold
+- Transparency: preferred wherever readability remains strong
 - Wallpaper complement: ocean/teal and natural earth tones support the brand quietly
 
 This pass must define one semantic palette and map it into active color-bearing configs. It must not mechanically replace random hex values without considering each app's role.
@@ -65,6 +66,25 @@ The wallpapers originally suggested a deep ocean/forest palette, but previewing 
 
 Exact official brand colors must remain exact when used as brand tokens. Derived tokens are only for terminal/dark-system ergonomics and must stay visually close to Navy/Sky Blue/Vanilla Cream.
 
+## Transparency Rules
+
+Transparency is part of the desired desktop feel. The wallpaper should show through system surfaces where that improves atmosphere without damaging readability.
+
+Use transparency for:
+
+- Kitty terminal background, with `background_opacity` tuned around `0.82` to `0.90`.
+- Waybar bar and module surfaces, using translucent Navy/deep Navy backgrounds.
+- SwayNC control center and notifications where text contrast remains clear.
+- `niri/.config/niri/sysbar` and `scripts/.local/bin/wsbar` GTK overlay backgrounds.
+
+Avoid transparency for:
+
+- Tiny text on already-busy wallpaper areas.
+- Error/critical notification content where legibility matters more than atmosphere.
+- Selection foreground/background combinations if contrast becomes ambiguous.
+
+Default implementation target: start slightly more transparent than the current Kitty `0.90`, then verify visually before going lower.
+
 ## Included Config Surfaces
 
 Apply the palette to these active color-bearing configs:
@@ -95,6 +115,7 @@ Only update visual color values. Do not change keybinds.
 Kitty is the locked/default terminal and should receive the complete terminal palette.
 
 - `background`: `navy-deep`
+- `background_opacity`: start around `0.84` to `0.88`, adjusting only after visual verification
 - `foreground`: `brand-cream`
 - `cursor`: `brand-sky`
 - `selection_background`: `selection`
