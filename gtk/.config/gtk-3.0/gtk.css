@@ -57,6 +57,34 @@ placessidebar row:selected:hover {
   color: #1E3045;
 }
 
+toolbar {
+  background-color: #1E3045;
+}
+
+menubar,
+.menubar {
+  background-color: #1E3045;
+  color: #F0E7D5;
+}
+
+menubar:backdrop,
+.menubar:backdrop {
+  background-color: #263749;
+  color: #9FB4C1;
+}
+
+menu {
+  background-color: #2F4156;
+}
+
+menu menuitem {
+  color: #F0E7D5;
+}
+
+menu menuitem:disabled {
+  color: #9FB4C1;
+}
+
 popover,
 .popover {
   background-color: #2F4156;
