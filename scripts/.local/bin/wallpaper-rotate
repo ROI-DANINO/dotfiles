@@ -1,23 +1,52 @@
 #!/usr/bin/env bash
-# Change wallpaper every INTERVAL seconds, cycling randomly through ~/Pictures
+# Change wallpaper every INTERVAL seconds, showing every wallpaper once per random cycle.
 INTERVAL=600
 WALLPAPER_DIR="$HOME/Pictures/walpapers"
 
 swww-daemon &
 sleep 1
 
-mapfile -t WALLS < <(find "$WALLPAPER_DIR" -maxdepth 1 -type f \( \
-    -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \
-    -o -iname "*.webp" -o -iname "*.avif" \))
+load_wallpapers() {
+    mapfile -t WALLS < <(find -L "$WALLPAPER_DIR" -maxdepth 1 -type f \( \
+        -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \
+        -o -iname "*.webp" -o -iname "*.avif" \) | sort)
+}
 
-[ ${#WALLS[@]} -eq 0 ] && exit 1
+shuffle_wallpapers() {
+    local i j tmp
 
-i=$(( RANDOM % ${#WALLS[@]} ))
+    SHUFFLED=("${WALLS[@]}")
+    for ((i = ${#SHUFFLED[@]} - 1; i > 0; i--)); do
+        j=$((RANDOM % (i + 1)))
+        tmp=${SHUFFLED[$i]}
+        SHUFFLED[$i]=${SHUFFLED[$j]}
+        SHUFFLED[$j]=$tmp
+    done
+
+    if [ "${#SHUFFLED[@]}" -gt 1 ] && [ -n "${LAST_WALLPAPER:-}" ] && [ "${SHUFFLED[0]}" = "$LAST_WALLPAPER" ]; then
+        tmp=${SHUFFLED[0]}
+        SHUFFLED[0]=${SHUFFLED[1]}
+        SHUFFLED[1]=$tmp
+    fi
+}
+
+load_wallpapers
+[ "${#WALLS[@]}" -eq 0 ] && exit 1
+shuffle_wallpapers
+i=0
 
 while true; do
-    swww img "${WALLS[$i]}" \
+    if [ "$i" -ge "${#SHUFFLED[@]}" ]; then
+        load_wallpapers
+        [ "${#WALLS[@]}" -eq 0 ] && sleep "$INTERVAL" && continue
+        shuffle_wallpapers
+        i=0
+    fi
+
+    swww img "${SHUFFLED[$i]}" \
         --transition-type fade \
         --transition-duration 1.5
+    LAST_WALLPAPER=${SHUFFLED[$i]}
     sleep "$INTERVAL"
-    i=$(( (i + 1 + RANDOM % (${#WALLS[@]} - 1)) % ${#WALLS[@]} ))
+    i=$((i + 1))
 done

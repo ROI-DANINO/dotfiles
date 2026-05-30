@@ -65,7 +65,7 @@ cargo install --locked swww
 sudo dnf install swww
 ```
 
-Launched at startup via `scripts/.local/bin/wallpaper-rotate`. Rotates from `~/Pictures/walpapers` every 10 minutes.
+Launched at startup via `scripts/.local/bin/wallpaper-rotate`. Rotates from `~/Pictures/walpapers` every 10 minutes in a random no-repeat cycle, then rescans the folder before the next pass. Wallpaper images live in the `wallpapers/` stow package and are tracked with Git LFS.
 
 ### wob (on-screen volume/brightness bar)
 

@@ -105,6 +105,7 @@ Active stow packages (managed by `stow.sh`):
 | `shell/` | `~/.zshrc`, `~/.shell_env`, etc. |
 | `git/` | `~/.gitconfig` |
 | `scripts/` | `~/.local/bin/` scripts |
+| `wallpapers/` | `~/Pictures/walpapers/` image assets, tracked with Git LFS |
 
 **`system/`** is NOT a stow package — manual reference only.
 
@@ -165,7 +166,7 @@ Explicit lock is separate: `Mod+Shift+L` runs `swaylock -c 000000`.
 
 ### wallpaper-rotate
 
-Script: `~/.local/bin/wallpaper-rotate`. Uses `swww img` to rotate wallpapers from `~/Pictures/walpapers` every 10 minutes. Requires `swww-daemon` to be running (also started by the script).
+Script: `~/.local/bin/wallpaper-rotate`. Uses `swww img` to rotate wallpapers from `~/Pictures/walpapers` every 10 minutes. It shuffles the list and shows every wallpaper once before repeating; the folder is rescanned between full passes. Wallpaper images are stored in the `wallpapers/` stow package and tracked with Git LFS. Requires `swww-daemon` to be running (also started by the script).
 
 ---
 

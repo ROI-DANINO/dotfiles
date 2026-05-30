@@ -36,6 +36,7 @@ PACKAGES=(
   shell
   git
   scripts
+  wallpapers
 )
 
 echo ""

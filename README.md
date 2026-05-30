@@ -28,7 +28,7 @@ See `packages.md` for a manual reference of everything that gets installed.
 | SwayNC | `swaync/` | Notification center |
 | Walker | managed by niri startup | App launcher, powered by elephant |
 | Elephant | systemd user service | Walker data-provider backend |
-| swww | `scripts/.local/bin/wallpaper-rotate` | Wallpaper daemon, rotates every 10 min from `~/Pictures/walpapers` |
+| swww | `scripts/.local/bin/wallpaper-rotate` | Wallpaper daemon, rotates every 10 min from `~/Pictures/walpapers` in a random no-repeat cycle |
 | swayidle | `scripts/.local/bin/toggle-idle` | Screen blank after 5 min |
 | wob | `scripts/.local/bin/wob-daemon` | Volume/brightness OSD via FIFO pipe |
 | zsh | `shell/` | env, aliases, zshrc, p10k prompt |
@@ -37,6 +37,7 @@ See `packages.md` for a manual reference of everything that gets installed.
 | Zellij | `zellij/` | Terminal multiplexer |
 | Git | `git/` | Global gitconfig |
 | TLP | configured via `/etc/tlp.conf` | Battery charge capped at 85% |
+| Wallpapers | `wallpapers/` | Stowed into `~/Pictures/walpapers`; image assets are tracked with Git LFS |
 
 ## Power management
 
@@ -54,7 +55,7 @@ Niri starts eight daemons at login via `spawn-at-startup`, plus one systemd user
 | wob-daemon | niri direct spawn | volume/brightness OSD (FIFO pipe) |
 | nm-applet | niri direct spawn (`--indicator`) | network tray applet |
 | blueman-applet | niri direct spawn | bluetooth tray applet |
-| wallpaper-rotate | niri direct spawn | swww wallpaper rotation (10 min) |
+| wallpaper-rotate | niri direct spawn | swww wallpaper rotation (10 min, random no-repeat cycle) |
 | swayidle | niri direct spawn | idle monitor power-off (300s); does NOT lock |
 | elephant | systemd user service | walker data-provider backend |
 
@@ -84,6 +85,7 @@ Idle timeout powers off monitors only — explicit lock is `Mod+Shift+L` (swaylo
 ├── shell/              # env, aliases, zshrc, p10k.zsh
 ├── git/
 ├── scripts/            # .local/bin scripts (wallpaper, wob-daemon, etc.)
+├── wallpapers/         # Pictures/walpapers via GNU Stow; Git LFS image assets
 └── system/             # manual-only: earlyoom, journald, sysctl, zram
 ```
 
