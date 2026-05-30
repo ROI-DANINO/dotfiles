@@ -106,7 +106,7 @@ sudo dnf install brightnessctl playerctl light
 ## File Management & CLI Tools
 
 ```bash
-sudo dnf install yazi thunar fzf wl-clipboard bottom
+sudo dnf install yazi Thunar fzf wl-clipboard bottom
 ```
 
 - `yazi` — Rust TUI file manager (primary, alias: `y`)

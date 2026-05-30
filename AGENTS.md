@@ -65,6 +65,32 @@ Before running `stow.sh` or `install.sh`, check for existing non-stow-managed fi
 
 ---
 
+### **PROTOCOL 5 — Package Removal Safety (MANDATORY)**
+
+**Never give `sudo dnf remove` commands without dry-running first.**
+
+DNF silently pulls dependent packages that may be in active use. This has already caused real breakage (Thunar removed as a dep of xfce4-panel, zenity removed by autoremove — both actively used in this setup).
+
+The correct procedure for any package removal:
+
+1. **Dry-run first.** Output this command and wait for the user to report what DNF says it will remove:
+   ```bash
+   sudo dnf remove --assumeno <packages>
+   ```
+2. **Read the full "Removing:" list.** Cross-check every package against `install.sh`, the keybind map, and the startup chain before proceeding.
+3. **Only then** output the real `sudo dnf remove -y` command.
+4. **Treat `autoremove` the same way** — always `--assumeno` first, read the list, confirm nothing used is in it.
+
+**Known gotchas on this system:**
+- `Thunar` (capital T) — GUI file manager, `Mod+F` keybind, in `install.sh`. Shares XFCE libs but is NOT an XFCE-only tool.
+- `zenity` — used by scripts; pulled out by autoremove.
+- `swaylock`, `swayidle`, `swaync`, `swaybg` — Sway utilities actively used by niri session. Do NOT remove with Sway WM.
+- `gnome-keyring`, `gnome-keyring-pam` — used system-wide, not GNOME-specific.
+
+**Why this exists:** 2026-05-30 incident — removing XFCE packages silently took Thunar; autoremove took zenity. Both required manual reinstall.
+
+---
+
 ### **PROTOCOL 4 — Secrets Architecture**
 
 The following pattern is in use. Do not suggest alternatives that put secrets in tracked files.
