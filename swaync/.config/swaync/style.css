@@ -1,0 +1,64 @@
+* {
+    font-family: "Inter", "Assistant", "JetBrainsMono Nerd Font Mono", sans-serif;
+    color: #F0E7D5;
+}
+
+.control-center {
+    background: rgba(47, 65, 86, 0.88);
+    border: 1px solid #567C8D;
+    border-radius: 8px;
+}
+
+.notification-row {
+    outline: none;
+}
+
+.notification {
+    background: rgba(240, 231, 213, 0.94);
+    border: 1px solid #C8D9E6;
+    border-radius: 8px;
+    color: #2F4156;
+}
+
+.notification-content,
+.summary,
+.body {
+    color: #2F4156;
+}
+
+.time,
+.notification-default-action,
+.close-button {
+    color: #567C8D;
+}
+
+.notification.critical {
+    border-color: #C9856F;
+}
+
+.notification.critical .summary {
+    color: #C9856F;
+}
+
+.control-center .notification {
+    background: rgba(240, 231, 213, 0.92);
+}
+
+.widget-title,
+.widget-dnd,
+.widget-inhibitors {
+    color: #F0E7D5;
+    background: transparent;
+}
+
+button {
+    background: #C8D9E6;
+    color: #2F4156;
+    border: 0;
+    border-radius: 6px;
+    padding: 6px 10px;
+}
+
+button:hover {
+    background: #FFFFFF;
+}
