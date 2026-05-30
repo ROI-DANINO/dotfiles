@@ -124,13 +124,64 @@ sudo dnf install jetbrains-mono-fonts
 
 Used by: kitty, zellij, waybar.
 
-## AI Tools
+## Browsers
+
+### Zen Browser
+Download latest tarball from GitHub releases and extract to `/opt/zen`. `install.sh` handles this automatically.
+
+Manual install:
+```bash
+# install.sh does this — or download from https://zen-browser.app
+ZEN_URL=$(curl -s https://api.github.com/repos/zen-browser/desktop/releases/latest \
+  | grep -o '"browser_download_url":"[^"]*"' \
+  | grep -v aarch64 | grep 'linux.*\.tar\.bz2' | head -1 | cut -d'"' -f4)
+curl -L "$ZEN_URL" -o /tmp/zen.tar.bz2
+sudo mkdir -p /opt/zen && sudo tar -xjf /tmp/zen.tar.bz2 -C /opt/zen --strip-components=1
+```
+
+Set as default browser: `xdg-settings set default-web-browser zen.desktop`
+
+## IDEs
+
+### Zed
+```bash
+curl -f https://zed.dev/install.sh | sh
+# installs to ~/.local/zed.app/, symlink at ~/.local/bin/zed
+```
+
+## Flatpak Apps
 
 ```bash
-# Claude Code
-npm install -g @anthropic-ai/claude-code
+flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 
-# opencode: https://opencode.ai
+flatpak install flathub org.chromium.Chromium
+flatpak install flathub md.obsidian.Obsidian
+flatpak install flathub com.spotify.Client
+flatpak install flathub com.stremio.Stremio
+flatpak install flathub org.localsend.localsend_app
+flatpak install flathub me.proton.Pass
+flatpak install flathub io.podman_desktop.PodmanDesktop
+flatpak install flathub org.kde.kdenlive
+flatpak install flathub com.mattjakeman.ExtensionManager
+```
+
+`install.sh` handles all of the above automatically.
+
+## AI CLI Tools
+
+```bash
+# Claude Code — native binary (do NOT install via npm)
+# Download from https://claude.ai/code or use the native installer
+# Installed at ~/.local/bin/claude
+
+# Gemini CLI
+npm install -g @google/gemini-cli
+
+# OpenAI Codex
+npm install -g @openai/codex
+
+# Hermes (multi-agent framework)
+# See https://github.com/hermesagent/hermes for install instructions
 ```
 
 ## npm Global Path
