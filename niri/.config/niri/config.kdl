@@ -100,7 +100,7 @@ layout {
 
 // Add lines like this to spawn processes at startup.
 // Note that running niri as a session supports xdg-autostart which can be used instead.
-// "alacritty" "-e" "fish"
+// "kitty" "-e" "fish"
 // spawn-at-startup "waybar"
 
 // Uncomment this line to ask the clients to omit their client-side decorations if possible.
@@ -178,7 +178,6 @@ binds {
 
     // App launchers
     Mod+T { spawn "kitty"; }
-    Mod+A { spawn "alacritty"; }
     Mod+W { spawn "zen"; }
     Mod+F { spawn "thunar"; }
     Mod+Slash { spawn "walker"; }
@@ -191,7 +190,7 @@ binds {
 
     // You can also use a shell. Do this if you need pipes, multiple commands, etc.
     // Note: the entire command goes as a single argument in the end.
-    // Mod+T { spawn "bash" "-c" "notify-send hello && exec alacritty"; }
+    // Mod+T { spawn "bash" "-c" "notify-send hello && exec kitty"; }
 
     // Example volume keys mappings for PipeWire & WirePlumber.
     // The allow-when-locked=true property makes them work even when the session is locked.

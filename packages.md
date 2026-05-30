@@ -28,7 +28,7 @@ git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
 ## Terminals
 
 ```bash
-sudo dnf install kitty alacritty
+sudo dnf install kitty
 ```
 
 ## Multiplexer (Rust)
@@ -41,7 +41,7 @@ cargo install --locked zellij
 ## Window Manager — Niri session
 
 ```bash
-sudo dnf install niri waybar SwayNotificationCenter swaylock swayidle wob mako walker elephant
+sudo dnf install niri waybar SwayNotificationCenter swaylock swayidle wob walker elephant
 ```
 
 ### elephant (walker data-provider backend)
@@ -74,12 +74,6 @@ Started via `scripts/.local/bin/wob-daemon` (not raw `wob`). The daemon creates 
 ### swayidle (screen idle / lock)
 
 Managed via `scripts/.local/bin/toggle-idle`. Blanks screen after 5 minutes of inactivity. Uses `swaylock -c 000000` for locking.
-
-## Notifications
-
-```bash
-sudo dnf install mako  # lightweight — used alongside swaync
-```
 
 ## Battery Management
 
@@ -128,7 +122,7 @@ sudo dnf install jetbrains-mono-fonts
 # Unzip to ~/.local/share/fonts/ and run: fc-cache -fv
 ```
 
-Used by: kitty, alacritty, zellij, waybar.
+Used by: kitty, zellij, waybar.
 
 ## AI Tools
 

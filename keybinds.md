@@ -9,9 +9,8 @@
 | Bind | Action |
 |------|--------|
 | `Mod+T` | kitty (terminal) |
-| `Mod+A` | alacritty |
 | `Mod+W` | default browser (zen) |
-| `Mod+F` | cosmic-files (file manager) |
+| `Mod+F` | thunar (GUI file manager) |
 | `Mod+Slash` | walker (app launcher) |
 | `Alt+M` | btm (system monitor) |
 

@@ -28,9 +28,7 @@ done
 PACKAGES=(
   niri
   kitty
-  alacritty
   waybar
-  mako
   swaync
   zellij
   shell

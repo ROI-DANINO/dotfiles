@@ -83,7 +83,7 @@ fi
 # ═════════════════════════════════════════════════════════════════════════════
 hdr "3 · Terminals"
 # ═════════════════════════════════════════════════════════════════════════════
-dnf_install kitty alacritty
+dnf_install kitty
 
 # ═════════════════════════════════════════════════════════════════════════════
 hdr "4 · Window Manager / Niri session"
@@ -95,7 +95,6 @@ dnf_install \
     swaylock \
     swayidle \
     wob \
-    mako \
     walker \
     elephant
 
@@ -170,7 +169,7 @@ dnf_install brightnessctl playerctl light
 # ═════════════════════════════════════════════════════════════════════════════
 hdr "10 · File management & CLI tools"
 # ═════════════════════════════════════════════════════════════════════════════
-dnf_install yazi fzf wl-clipboard bottom
+dnf_install yazi thunar fzf wl-clipboard bottom
 
 # ═════════════════════════════════════════════════════════════════════════════
 hdr "11 · Fonts"

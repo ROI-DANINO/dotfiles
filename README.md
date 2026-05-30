@@ -24,8 +24,7 @@ See `packages.md` for a manual reference of everything that gets installed.
 |-----------|------|-------|
 | Niri | `niri/` | Scrolling tiling WM, primary compositor |
 | Waybar | `waybar/` | Status bar with custom battery.sh (TLP-aware) |
-| Mako | `mako/` | Notification daemon |
-| SwayNC | `swaync/` | Notification center |
+| SwayNC | `swaync/` | Notification daemon + center |
 | Walker | managed by niri startup | App launcher, powered by elephant |
 | Elephant | systemd user service | Walker data-provider backend |
 | swww | `scripts/.local/bin/wallpaper-rotate` | Wallpaper daemon, rotates every 10 min from `~/Pictures/walpapers` in a random no-repeat cycle |
@@ -33,7 +32,6 @@ See `packages.md` for a manual reference of everything that gets installed.
 | wob | `scripts/.local/bin/wob-daemon` | Volume/brightness OSD via FIFO pipe |
 | zsh | `shell/` | env, aliases, zshrc, p10k prompt |
 | Kitty | `kitty/` | Primary terminal |
-| Alacritty | `alacritty/` | Secondary terminal |
 | Zellij | `zellij/` | Terminal multiplexer |
 | Git | `git/` | Global gitconfig |
 | TLP | configured via `/etc/tlp.conf` | Battery charge capped at 85% |
@@ -77,10 +75,8 @@ Idle timeout powers off monitors only — explicit lock is `Mod+Shift+L` (swaylo
 ├── keybinds.md         # quick keybind reference
 ├── niri/               # Niri compositor config
 ├── waybar/             # config.jsonc, style.css, battery.sh
-├── mako/               # notification daemon config
 ├── swaync/             # notification center config
 ├── kitty/
-├── alacritty/
 ├── zellij/             # config + themes + layouts
 ├── shell/              # env, aliases, zshrc, p10k.zsh
 ├── git/

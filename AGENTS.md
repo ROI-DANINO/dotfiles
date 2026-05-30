@@ -97,10 +97,8 @@ Active stow packages (managed by `stow.sh`):
 |---------|-------------|
 | `niri/` | `~/.config/niri/` |
 | `waybar/` | `~/.config/waybar/` |
-| `mako/` | `~/.config/mako/` |
 | `swaync/` | `~/.config/swaync/` |
 | `kitty/` | `~/.config/kitty/` |
-| `alacritty/` | `~/.config/alacritty/` |
 | `zellij/` | `~/.config/zellij/` |
 | `shell/` | `~/.zshrc`, `~/.shell_env`, etc. |
 | `git/` | `~/.gitconfig` |
@@ -210,7 +208,6 @@ It applies CSS class `health-limit` when the battery is sitting at the TLP cap (
 | Bind | Action | Status |
 |------|--------|--------|
 | `Mod+T` | spawn kitty | locked |
-| `Mod+A` | spawn alacritty | locked |
 | `Mod+W` | spawn default browser (Zen) | ✓ |
 | `Mod+F` | spawn thunar | ✓ |
 | `Mod+Slash` | spawn walker (launcher) | locked |
@@ -242,7 +239,7 @@ It applies CSS class `health-limit` when the battery is sitting at the TLP cap (
 | `Alt+M` | spawn bottom (system monitor) | ✓ |
 
 ### Free / available Mod binds
-`Mod+B`, `Mod+E`, `Mod+G`, `Mod+N`, `Mod+O`, `Mod+P`, `Mod+S`, `Mod+V`, `Mod+X`, `Mod+Y`, `Mod+Z`
+`Mod+A`, `Mod+B`, `Mod+E`, `Mod+G`, `Mod+N`, `Mod+O`, `Mod+P`, `Mod+S`, `Mod+V`, `Mod+X`, `Mod+Y`, `Mod+Z`
 
 ---
 
@@ -311,10 +308,8 @@ The following components were purposefully removed due to conflicts, instability
 ├── keybinds.md         # quick keybind reference card
 ├── niri/               # .config/niri/config.kdl
 ├── waybar/             # .config/waybar/ — config.jsonc, style.css, battery.sh
-├── mako/               # .config/mako/
 ├── swaync/             # .config/swaync/
 ├── kitty/              # .config/kitty/
-├── alacritty/          # .config/alacritty/
 ├── zellij/             # .config/zellij/ — config + themes + layouts
 ├── shell/              # .zshrc, .shell_env, .shell_aliases, p10k.zsh
 ├── git/                # .gitconfig
