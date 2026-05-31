@@ -9,17 +9,23 @@
 
 .search-container {
   background: #1E3045;
+  border-radius: 0;
 }
 
 .input {
   color: #F0E7D5;
   caret-color: #C8D9E6;
   background: #1E3045;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
 }
 
 .input:focus,
 .input:active {
   background: #1E3045;
+  border: none;
+  box-shadow: none;
 }
 
 .input placeholder {
