@@ -307,7 +307,9 @@ It applies CSS class `health-limit` when the battery is sitting at the TLP cap (
 
 ---
 
-## What Was Removed (2026-05-30 hygiene pass)
+## What Was Removed
+
+### 2026-05-30 hygiene pass
 
 | Component | Why removed | If re-requested |
 |-----------|------------|-----------------|
@@ -317,6 +319,14 @@ It applies CSS class `health-limit` when the battery is sitting at the TLP cap (
 | `cosmic-settings`, `granite`, `woff2`, `python3-jsonschema` stack | Orphaned COSMIC dependencies with no active consumer | Only relevant if COSMIC DE is reinstalled |
 | `auto-rename-copies.service` | Was crash-looping every 5 seconds; no active use case | Investigate the crash root cause before re-enabling |
 | `anyrun`, `epiphany` | Replaced by walker + Zen browser respectively | Walker is locked as the launcher; confirm user wants to change that first |
+
+### 2026-05-31 hygiene pass
+
+| Component | Why removed | If re-requested |
+|-----------|------------|-----------------|
+| `mako` | Replaced by `swaync` (notification daemon + center); dbus conflict on `org.freedesktop.Notifications` | swaync is already the notification daemon — don't add a second one |
+| `fuzzel`, `wofi` | Replaced by walker; orphaned launchers with no active use | Walker is locked as launcher — confirm user wants to change that first |
+| **IBus** + all input engine deps (anthy, hangul, pinyin, etc.) | Hebrew/English switching is handled natively by Niri xkb (`us,il` + `grp:win_space_toggle`) — IBus was unused and spamming Wayland portal warnings | XKB handles layout switching; only reinstall if a complex input method (CJK, etc.) is needed |
 
 ---
 
