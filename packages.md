@@ -7,6 +7,14 @@ git clone https://github.com/ROI-DANINO/dotfiles ~/dotfiles
 bash ~/dotfiles/install.sh
 ```
 
+## Stow Modules
+
+Dotfiles are managed with GNU Stow. Each directory in `~/dotfiles/` is a stow package that symlinks its contents into `$HOME`. New modules added recently:
+
+- `wob`     — `~/.config/wob/wob.ini`                          (brand palette OSD bar)
+- `walker`  — `~/.config/walker/{config.yaml,style.css}`       (brand palette GTK4 launcher)
+- `zed`     — `~/.config/zed/{settings.json,themes/}`          (Brand Navy editor theme)
+
 ---
 
 ## Core Tools
