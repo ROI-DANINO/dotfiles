@@ -1,47 +1,48 @@
+/* Brand Navy palette — exact colors from Zed Brand Navy theme */
+/* background=#1E3045  surface=#2F4156  border=#567C8D  */
+/* foreground=#F0E7D5  muted=#9FB4C1   accent=#C8D9E6  */
+
 .box-wrapper {
-  background: rgba(30, 48, 69, 0.95);
+  background: #2F4156;
   border: 1px solid #567C8D;
-  border-radius: 12px;
-  box-shadow: 0 19px 38px rgba(0, 0, 0, 0.5), 0 15px 12px rgba(0, 0, 0, 0.3);
 }
 
 .search-container {
-  background: rgba(47, 65, 86, 0.6);
-  border-radius: 8px;
+  background: #1E3045;
 }
 
 .input {
   color: #F0E7D5;
   caret-color: #C8D9E6;
-  background: rgba(47, 65, 86, 0.5);
+  background: #1E3045;
 }
 
 .input:focus,
 .input:active {
-  background: rgba(47, 65, 86, 0.8);
+  background: #1E3045;
 }
 
 .input placeholder {
   color: #9FB4C1;
-  opacity: 0.7;
 }
 
 .list {
+  background: #1E3045;
   color: #9FB4C1;
-}
-
-.item-box {
-  border-radius: 8px;
 }
 
 child:selected .item-box,
 row:selected .item-box {
-  background: rgba(200, 217, 230, 0.15);
+  background: rgba(200, 217, 230, 0.12);
   color: #F0E7D5;
   border-left: 2px solid #C8D9E6;
 }
 
 .item-subtext {
   color: #9FB4C1;
-  opacity: 0.6;
+}
+
+.elephant-hint,
+.placeholder {
+  color: #9FB4C1;
 }
