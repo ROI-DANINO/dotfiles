@@ -34,7 +34,10 @@ See `packages.md` for a manual reference of everything that gets installed.
 | Kitty | `kitty/` | Primary terminal |
 | Zellij | `zellij/` | Terminal multiplexer |
 | Git | `git/` | Global gitconfig |
-| GTK | `gtk/` | Brand palette override for GTK apps |
+| GTK | `gtk/` | Brand palette override for GTK apps (navy/cream/teal on Orchis-Dark) |
+| wob | `wob/` | OSD bar config with brand palette colors |
+| Walker | `walker/` | App launcher config + brand palette theme CSS |
+| Zed | `zed/` | Editor settings + Brand Navy color theme |
 | TLP | configured via `/etc/tlp.conf` | Battery charge capped at 85% |
 | Wallpapers | `wallpapers/` | Stowed into `~/Pictures/walpapers`; image assets are tracked with Git LFS |
 
@@ -81,6 +84,10 @@ Idle timeout powers off monitors only — explicit lock is `Mod+Shift+L` (swaylo
 ├── zellij/             # config + themes + layouts
 ├── shell/              # env, aliases, zshrc, p10k.zsh
 ├── git/
+├── gtk/                # brand palette gtk.css for GTK3 + GTK4 apps
+├── wob/                # brand palette wob OSD config
+├── walker/             # brand palette launcher (config.toml + themes/brand/)
+├── zed/                # Brand Navy editor theme
 ├── scripts/            # .local/bin scripts (wallpaper, wob-daemon, etc.)
 ├── wallpapers/         # Pictures/walpapers via GNU Stow; Git LFS image assets
 └── system/             # manual-only: earlyoom, journald, sysctl, zram

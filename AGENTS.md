@@ -128,6 +128,10 @@ Active stow packages (managed by `stow.sh`):
 | `zellij/` | `~/.config/zellij/` |
 | `shell/` | `~/.zshrc`, `~/.shell_env`, etc. |
 | `git/` | `~/.gitconfig` |
+| `gtk/` | `~/.config/gtk-3.0/gtk.css`, `~/.config/gtk-4.0/gtk.css` |
+| `wob/` | `~/.config/wob/wob.ini` |
+| `walker/` | `~/.config/walker/config.toml`, `~/.config/walker/themes/brand/` |
+| `zed/` | `~/.config/zed/settings.json`, `~/.config/zed/themes/brand.json` |
 | `scripts/` | `~/.local/bin/` scripts |
 | `wallpapers/` | `~/Pictures/walpapers/` image assets, tracked with Git LFS |
 
@@ -347,6 +351,10 @@ It applies CSS class `health-limit` when the battery is sitting at the TLP cap (
 ├── zellij/             # .config/zellij/ — config + themes + layouts
 ├── shell/              # .zshrc, .shell_env, .shell_aliases, p10k.zsh
 ├── git/                # .gitconfig
+├── gtk/                # .config/gtk-3.0/gtk.css + gtk-4.0/gtk.css (brand palette override)
+├── wob/                # .config/wob/wob.ini (brand palette OSD)
+├── walker/             # .config/walker/config.toml + themes/brand/ (brand palette launcher)
+├── zed/                # .config/zed/settings.json + themes/brand.json (Brand Navy theme)
 ├── scripts/            # .local/bin/ — wallpaper-rotate, wob-daemon, toggle-idle, vr-desktop
 ├── system/             # manual-only: earlyoom, journald, sysctl, zram
 └── docs/               # internal docs (superpowers skills, etc.)

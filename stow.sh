@@ -34,6 +34,9 @@ PACKAGES=(
   shell
   git
   gtk
+  wob
+  walker
+  zed
   scripts
   wallpapers
 )
