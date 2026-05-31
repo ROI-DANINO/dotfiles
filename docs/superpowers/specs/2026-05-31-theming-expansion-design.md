@@ -27,7 +27,7 @@ Brand palette reference: `docs/theme/brand-desktop-palette.md`
 
 ## Stow Structure
 
-Four new modules added to `~/dotfiles/`:
+Three new modules added to `~/dotfiles/`:
 
 ```
 wob/
@@ -68,7 +68,7 @@ Config path: `~/.config/wob/wob.ini`
 
 Walker is a GTK4 launcher. Config goes in `~/.config/walker/config.yaml` (providers, behavior) and `~/.config/walker/style.css` (appearance). Style direction: translucent navy window, teal border, sky-blue left-bar on selected row.
 
-**config.yaml** — minimal, enabling application and calculator providers with sensible defaults.
+**config.yaml** — minimal config enabling the `applications` and `calc` providers. No clipboard, websearch, or other providers needed for basic usage.
 
 **style.css token mapping:**
 
@@ -89,7 +89,7 @@ Walker is a GTK4 launcher. Config goes in `~/.config/walker/config.yaml` (provid
 
 Zed supports custom JSON themes under `~/.config/zed/themes/`. `settings.json` is updated to point to the brand theme with `"mode": "dark"`, removing the system-switching behavior.
 
-**settings.json change:**
+**settings.json change** — replaces the existing `theme` block (removes the `"light": "Gruvbox Light"` and `"mode": "system"` keys):
 ```json
 "theme": {
   "mode": "dark",
