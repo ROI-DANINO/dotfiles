@@ -285,7 +285,39 @@ flatpak_install org.kde.kdenlive                     "Kdenlive"
 flatpak_install com.mattjakeman.ExtensionManager     "Extension Manager"
 
 # ═════════════════════════════════════════════════════════════════════════════
-hdr "17 · Stow dotfiles"
+hdr "17 · Claude Code"
+# ═════════════════════════════════════════════════════════════════════════════
+if [[ -x "$HOME/.local/bin/claude" ]]; then
+    ok "Claude Code (already installed)"
+else
+    info "Installing Claude Code native binary"
+    $DRY || curl -fsSL https://claude.ai/install.sh | bash
+    ok "Claude Code"
+fi
+
+# ═════════════════════════════════════════════════════════════════════════════
+hdr "18 · Claude Code plugins"
+# ═════════════════════════════════════════════════════════════════════════════
+claude_plugin_install() {
+    local plugin="$1"
+    if "$HOME/.local/bin/claude" plugin list 2>/dev/null | grep -q "^  ❯ ${plugin}$"; then
+        ok "$plugin (already installed)"
+    else
+        info "Installing plugin: $plugin"
+        $DRY || "$HOME/.local/bin/claude" plugin install "$plugin"
+        ok "$plugin"
+    fi
+}
+
+if [[ -x "$HOME/.local/bin/claude" ]]; then
+    claude_plugin_install "remember@claude-plugins-official"
+    claude_plugin_install "superpowers@claude-plugins-official"
+else
+    info "Claude Code not found — skipping plugins"
+fi
+
+# ═════════════════════════════════════════════════════════════════════════════
+hdr "19 · Stow dotfiles"
 # ═════════════════════════════════════════════════════════════════════════════
 if $DRY; then
     info "Dry-run: would execute $DOTFILES_DIR/stow.sh"
