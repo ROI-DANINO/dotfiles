@@ -24,8 +24,7 @@
 }
 
 window#waybar {
-    background: rgba(47, 65, 86, 0.82);
-    border-radius: 8px;
+    background: rgba(47, 65, 86, 0.95);
     color: #F0E7D5;
 }
 

@@ -1,12 +1,8 @@
 {
-    "layer": "overlay",
-    "exclusive-zone": -1,
+    "layer": "top",
     "position": "top",
     "height": 28,
     "spacing": 0,
-    "margin-top": 4,
-    "margin-left": 8,
-    "margin-right": 8,
 
     "modules-left": ["niri/workspaces", "niri/window", "cpu", "memory"],
     "modules-center": ["clock"],

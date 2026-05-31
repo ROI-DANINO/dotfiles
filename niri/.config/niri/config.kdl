@@ -95,6 +95,8 @@ layout {
     }
 
     struts {
+        top -8
+        bottom -8
     }
 }
 
