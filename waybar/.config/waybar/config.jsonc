@@ -34,7 +34,7 @@
         "interval": 5,
         "format": " {usage}%",
         "tooltip": false,
-        "on-click": "kitty -e btop"
+        "on-click": "kitty -e btm"
     },
 
     "memory": {
