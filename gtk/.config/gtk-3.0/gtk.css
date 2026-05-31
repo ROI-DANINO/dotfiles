@@ -57,8 +57,59 @@ placessidebar row:selected:hover {
   color: #1E3045;
 }
 
-toolbar {
+toolbar,
+.toolbar {
   background-color: #1E3045;
+  color: #F0E7D5;
+}
+
+toolbar button,
+toolbar button label,
+toolbar button image,
+.toolbar button,
+.toolbar button label {
+  color: #F0E7D5;
+}
+
+toolbar entry,
+toolbar .entry,
+.toolbar entry {
+  background-color: #263749;
+  color: #F0E7D5;
+  caret-color: #F0E7D5;
+}
+
+/* Thunar path/breadcrumb bar */
+pathbar,
+.path-bar {
+  background-color: #1E3045;
+}
+
+pathbar button,
+pathbar button label,
+.path-bar button,
+.path-bar button label {
+  background-color: transparent;
+  color: #F0E7D5;
+}
+
+pathbar button:hover,
+.path-bar button:hover {
+  background-color: #2F4156;
+}
+
+pathbar button:checked,
+pathbar button.active,
+.path-bar button:checked {
+  background-color: #263749;
+  color: #C8D9E6;
+}
+
+/* drag-to-select rubber band — semi-transparent */
+rubberband,
+.rubberband {
+  background-color: rgba(200, 217, 230, 0.15);
+  border: 1px solid #C8D9E6;
 }
 
 menubar,
