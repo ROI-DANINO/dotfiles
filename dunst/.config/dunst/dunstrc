@@ -7,7 +7,7 @@
     width = 400
     height = (0, 800)
     origin = top-center
-    offset = (0, 50)
+    offset = (0, 10)
     scale = 0
     notification_limit = 5
 
