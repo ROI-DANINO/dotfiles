@@ -145,6 +145,13 @@ window-rule {
     open-focused false
 }
 
+// OLED screensaver: force fullscreen, no corners
+window-rule {
+    match title="oled-screensaver"
+    open-fullscreen true
+    geometry-corner-radius 0
+}
+
 // Work around WezTerm's initial configure bug
 // by setting an empty default-column-width.
 // window-rule {

@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
-# OLED-safe screensaver: moving clock on pure black background
-# Black = OLED pixels off (saves power). Clock position oscillates to prevent burn-in.
+# OLED-safe screensaver: Pulse design — cream clock + steel date + teal accent lines
+# Black background = OLED pixels off. Content drifts via sin/cos to prevent burn-in.
+# Lines drift at slight phase offset from clock for a parallax layer feel.
 # Designed for Samsung SDC4154 eDP-1 (2880x1800 physical, 1440x900 logical @90Hz).
-#
-# Triggered by swayidle; dismissed via swayidle resume (pkill -f oled-screensaver).
 
 FONT="/home/roking/.local/share/fonts/JetBrainsMono/JetBrainsMonoNerdFont-Regular.ttf"
 MPV_PID=""
@@ -17,24 +16,46 @@ cleanup() {
 }
 trap cleanup EXIT TERM INT
 
-# Hide waybar so mpv fullscreen covers the whole screen
 pkill -USR1 waybar 2>/dev/null
 sleep 0.15
 
-# Moving clock: sin(t/13) and cos(t/17) give irrational-period oscillation
-# so the clock position never exactly repeats within a reasonable timeframe.
-# \\\\: in bash double-quoted → \\: to FFmpeg → literal : in text (not separator)
-FILTER="color=c=black:size=1440x900:rate=1"
-FILTER+=",drawtext=fontfile=${FONT}"
-FILTER+=":text=%H\\\\:%M"
+FILTER="color=c=black:size=1440x900:rate=25"
+
+# Top line 1 — steel blue, slightly offset drift phase (parallax)
+FILTER+=",drawtext=fontfile=${FONT}:text=──────────────────────"
+FILTER+=":fontcolor=0x8AAFC2@0.45:fontsize=14"
+FILTER+=":x=(W-tw)/2+120*sin(t/13+0.4)"
+FILTER+=":y=H/2-120+60*cos(t/17+0.25)"
+
+# Top line 2 — teal, same drift as clock
+FILTER+=",drawtext=fontfile=${FONT}:text=─────────────"
+FILTER+=":fontcolor=0x567C8D@0.55:fontsize=14"
+FILTER+=":x=(W-tw)/2+120*sin(t/13)"
+FILTER+=":y=H/2-104+60*cos(t/17)"
+
+# Clock — cream, large
+FILTER+=",drawtext=fontfile=${FONT}:text=%H\\\\:%M"
 FILTER+=":expansion=strftime"
-FILTER+=":fontcolor=0xF0E7D5@0.6"
-FILTER+=":fontsize=180"
-FILTER+=":x=(W-tw)/2+180*sin(t/13)"
-FILTER+=":y=(H-th)/2+90*cos(t/17)"
+FILTER+=":fontcolor=0xF0E7D5@0.90:fontsize=180"
+FILTER+=":x=(W-tw)/2+120*sin(t/13)"
+FILTER+=":y=H/2-90+60*cos(t/17)"
+
+# Date — steel blue, below clock
+FILTER+=",drawtext=fontfile=${FONT}:text=%A %-d %B"
+FILTER+=":expansion=strftime"
+FILTER+=":fontcolor=0x8AAFC2@0.65:fontsize=38"
+FILTER+=":x=(W-tw)/2+120*sin(t/13)"
+FILTER+=":y=H/2+105+60*cos(t/17)"
+
+# Bottom line — teal, slightly offset drift (parallax)
+FILTER+=",drawtext=fontfile=${FONT}:text=─────────────"
+FILTER+=":fontcolor=0x567C8D@0.45:fontsize=14"
+FILTER+=":x=(W-tw)/2+120*sin(t/13-0.4)"
+FILTER+=":y=H/2+155+60*cos(t/17-0.25)"
 
 mpv \
     --fullscreen \
+    --no-osc \
     --loop=inf \
     --no-audio \
     --osd-level=0 \
