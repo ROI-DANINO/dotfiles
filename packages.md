@@ -185,8 +185,13 @@ flatpak install flathub com.mattjakeman.ExtensionManager
 
 ```bash
 # Claude Code — native binary (do NOT install via npm)
-# Download from https://claude.ai/code or use the native installer
-# Installed at ~/.local/bin/claude
+# install.sh handles this automatically via:
+curl -fsSL https://claude.ai/install.sh | bash
+# Installs to ~/.local/share/claude/versions/<ver>, symlinked at ~/.local/bin/claude
+#
+# Plugins (installed automatically by install.sh after Claude Code):
+#   claude plugin install remember@claude-plugins-official
+#   claude plugin install superpowers@claude-plugins-official
 
 # Gemini CLI
 npm install -g @google/gemini-cli
