@@ -79,9 +79,25 @@ Launched at startup via `scripts/.local/bin/wallpaper-rotate`. Rotates from `~/P
 
 Started via `scripts/.local/bin/wob-daemon` (not raw `wob`). The daemon creates `/tmp/wob.fifo` and keeps the pipe alive with `tail -f` to prevent orphan processes. Write a 0–100 integer to the FIFO to trigger the OSD.
 
-### swayidle (screen idle / lock)
+### swayidle (screen idle / screensaver / power-off)
 
-Managed via `scripts/.local/bin/toggle-idle`. Blanks screen after 5 minutes of inactivity. Uses `swaylock -c 000000` for locking.
+Managed via `scripts/.local/bin/toggle-idle`. Two-phase idle pipeline:
+1. **240 s** → OLED screensaver (`~/.local/bin/oled-screensaver`) — moving cream clock on black
+2. **300 s** → `niri msg action power-off-monitors` — monitor fully powers off
+3. **resume** → kills screensaver + powers monitors back on
+
+### mpv (OLED screensaver engine)
+
+```bash
+sudo dnf install mpv
+```
+
+Used by `scripts/.local/bin/oled-screensaver` to render a moving clock screensaver via
+FFmpeg's `lavfi` filtergraph (`av://lavfi:color=black + drawtext`). Specifically designed
+for the Samsung SDC4154 OLED panel (eDP-1, 2880×1800@90 Hz):
+- Pure black background → OLED pixels fully off
+- Clock position oscillates via `sin(t/13)` / `cos(t/17)` → no static pixel burn-in
+- Waybar is hidden via `SIGUSR1` before launch and restored on exit
 
 ## Battery Management
 

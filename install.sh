@@ -164,7 +164,7 @@ dnf_install network-manager-applet blueman
 # ═════════════════════════════════════════════════════════════════════════════
 hdr "9 · Display & input controls"
 # ═════════════════════════════════════════════════════════════════════════════
-dnf_install brightnessctl playerctl light
+dnf_install brightnessctl playerctl light mpv
 
 # ═════════════════════════════════════════════════════════════════════════════
 hdr "10 · File management & CLI tools"

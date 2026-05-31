@@ -3,7 +3,8 @@ if pgrep -x swayidle > /dev/null; then
     pkill -x swayidle
 else
     swayidle -w \
+        timeout 240 "~/.local/bin/oled-screensaver" \
         timeout 300 "niri msg action power-off-monitors" \
-        resume  "niri msg action power-on-monitors" &
+        resume  "pkill -f oled-screensaver; niri msg action power-on-monitors" &
     niri msg action power-off-monitors
 fi

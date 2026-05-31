@@ -11,7 +11,7 @@ spawn-at-startup "~/.local/bin/wob-daemon"
 spawn-at-startup "nm-applet" "--indicator"
 spawn-at-startup "blueman-applet"
 spawn-at-startup "~/.local/bin/wallpaper-rotate"
-spawn-at-startup "swayidle" "-w" "timeout" "300" "niri msg action power-off-monitors" "resume" "niri msg action power-on-monitors"
+spawn-at-startup "swayidle" "-w" "timeout" "240" "~/.local/bin/oled-screensaver" "timeout" "300" "niri msg action power-off-monitors" "resume" "pkill -f oled-screensaver; niri msg action power-on-monitors"
 
 // Input device configuration.
 // Find the full list of options on the wiki:
@@ -139,6 +139,13 @@ window-rule {
     clip-to-geometry true
 }
 
+
+// OLED screensaver: force fullscreen, no corners
+window-rule {
+    match title="oled-screensaver"
+    open-fullscreen true
+    geometry-corner-radius 0
+}
 
 // Work around WezTerm's initial configure bug
 // by setting an empty default-column-width.
