@@ -4,8 +4,8 @@
     follow = mouse
 
     ### Geometry ###
-    width = 400
-    height = (0, 800)
+    width = 480
+    height = (0, 600)
     origin = top-center
     offset = (0, 10)
     scale = 0
@@ -23,8 +23,8 @@
     indicate_hidden = true
     transparency = 0
     separator_height = 1
-    padding = 14
-    horizontal_padding = 16
+    padding = 10
+    horizontal_padding = 14
     text_icon_padding = 12
     frame_width = 1
     frame_color = "#567C8D"
@@ -80,10 +80,10 @@
     mouse_right_click = close_all
 
 [urgency_low]
-    background = "#1E3045"
-    foreground = "#567C8D"
-    frame_color = "#1E3045"
-    highlight = "#567C8D"
+    background = "#1E304566"
+    foreground = "#F0E7D5"
+    frame_color = "#1E304500"
+    highlight = "#F0E7D5"
     timeout = 4
 
 [urgency_normal]
