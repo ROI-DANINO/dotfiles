@@ -1,0 +1,5 @@
+# Walker launcher config
+# Docs: https://benz.gitbook.io/walker/
+builtins:
+  applications: {}
+  calc: {}

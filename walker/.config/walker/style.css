@@ -1,0 +1,31 @@
+window {
+  background: rgba(47, 65, 86, 0.92);
+  border: 1px solid #567C8D;
+  border-radius: 12px;
+}
+
+entry {
+  color: #F0E7D5;
+  caret-color: #C8D9E6;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 10px 14px;
+}
+
+entry placeholder {
+  color: #9FB4C1;
+}
+
+row {
+  color: #9FB4C1;
+  padding: 6px 14px;
+  border-radius: 0;
+}
+
+row:selected,
+row:focus {
+  background: rgba(200, 217, 230, 0.12);
+  color: #F0E7D5;
+  border-left: 2px solid #C8D9E6;
+}
