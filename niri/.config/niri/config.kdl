@@ -5,7 +5,7 @@
 prefer-no-csd
 
 spawn-at-startup "waybar"
-spawn-at-startup "swaync"
+spawn-at-startup "dunst"
 spawn-at-startup "walker" "--gapplication-service"
 spawn-at-startup "~/.local/bin/wob-daemon"
 spawn-at-startup "nm-applet" "--indicator"
@@ -139,11 +139,6 @@ window-rule {
     clip-to-geometry true
 }
 
-// Prevent swaync from stealing focus on notification
-window-rule {
-    match app-id=r#"^swaync$"#
-    open-focused false
-}
 
 // Work around WezTerm's initial configure bug
 // by setting an empty default-column-width.
