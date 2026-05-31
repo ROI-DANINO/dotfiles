@@ -7,6 +7,15 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "context_servers": {
+    "mcp-server-github": {
+      "enabled": true,
+      "remote": false,
+      "settings": {
+        "github_personal_access_token": "GITHUB_PERSONAL_ACCESS_TOKEN"
+      }
+    }
+  },
   "project_panel": {
     "dock": "left"
   },
@@ -23,8 +32,9 @@
     "dock": "right",
     "default_profile": "ask",
     "default_model": {
-      "provider": "openrouter",
-      "model": "moonshotai/kimi-k2.5",
+      "effort": "medium",
+      "provider": "openai-subscribed",
+      "model": "gpt-5.5",
       "enable_thinking": true
     },
     "favorite_models": [],
@@ -41,6 +51,7 @@
   "buffer_font_size": 15,
   "theme": {
     "mode": "dark",
+    "light": "Brand Navy",
     "dark": "Brand Navy"
   },
 }
