@@ -289,6 +289,14 @@ It applies CSS class `health-limit` when the battery is sitting at the TLP cap (
 
 ---
 
+## Claude Remember Plugin
+
+`.remember/` is runtime memory written by the `remember` Claude Code plugin (installed via `/plugin install`, lives in `~/.claude/plugins/` — not part of this repo). It is gitignored. Do not commit it, stow it, or reference it in `install.sh`.
+
+The plugin hooks into Claude Code's session lifecycle to persist session summaries across conversations. `/remember` writes a handoff note to `.remember/remember.md` for the next session.
+
+---
+
 ## Locked / Do Not Change
 
 - `shell/zshrc` plugins: only `zsh-autosuggestions` + `zsh-syntax-highlighting` (autocomplete intentionally removed)
