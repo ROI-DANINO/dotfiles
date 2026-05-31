@@ -70,6 +70,8 @@ Walker is a GTK4 launcher. Config goes in `~/.config/walker/config.yaml` (provid
 
 **config.yaml** — minimal config enabling the `applications` and `calc` providers. No clipboard, websearch, or other providers needed for basic usage.
 
+**Implementation note:** Walker's actual GTK4 widget selector names must be verified during implementation — either via GTK Inspector or Walker's source. If selectors are wrong, styles apply silently to nothing. Use `GTK_DEBUG=interactive walker` to inspect the widget tree.
+
 **style.css token mapping:**
 
 | Element | Property | Value | Token |
@@ -97,7 +99,9 @@ Zed supports custom JSON themes under `~/.config/zed/themes/`. `settings.json` i
 }
 ```
 
-**themes/brand.json** — a complete Zed theme object named `"Brand Navy"`.
+**themes/brand.json** — a complete Zed theme object named `"Brand Navy"`. Must be built from an existing valid Zed theme as a template (not from scratch) since the format has many required fields and silently falls back on missing keys.
+
+**Implementation note:** The existing `~/.config/zed/settings.json` contains agent panel config, font sizes, keymaps, and other settings that must be preserved. The stow module must be seeded from the current live file — only the `theme` block is changed.
 
 Token mapping:
 
@@ -147,3 +151,4 @@ After implementation:
 - `walker` opens with navy translucent background and teal border on `Mod+Slash`.
 - Zed loads without errors; syntax highlighting uses brand colors; no crash on open.
 - `stow wob walker zed` runs cleanly from `~/dotfiles/`.
+- Walker service restarted after stow (`pkill walker` then niri respawns it, or `walker --close && walker --gapplication-service &`); styled UI confirmed on next `Mod+Slash`.
