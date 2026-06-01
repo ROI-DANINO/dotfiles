@@ -27,9 +27,10 @@ Source spec: `docs/superpowers/specs/2026-05-31-brand-anchored-desktop-theme-des
 
 ## Transparency Defaults
 
-- Kitty: start with `background_opacity 0.86`.
+- Kitty: `background_opacity 0.86` (navy-deep background).
 - Waybar: use translucent Navy/deep Navy surfaces.
-- SwayNC: prefer translucent control-center shell; keep cards readable.
+- Dunst: opaque cards (brand-navy bg, teal frame) — transparency not used.
+- swaylock: navy-ink background, brand-teal ring, brand-sky key-highlight.
 - GTK overlay bars: use translucent Navy.
 
 ## Rules
@@ -37,5 +38,4 @@ Source spec: `docs/superpowers/specs/2026-05-31-brand-anchored-desktop-theme-des
 - Brand colors stay exact when used as brand tokens.
 - No gold as an accent.
 - No neon/electric blue.
-- No Alacritty changes in this pass.
 - Preserve readability over transparency when they conflict.

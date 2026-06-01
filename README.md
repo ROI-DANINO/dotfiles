@@ -24,15 +24,15 @@ See `packages.md` for a manual reference of everything that gets installed.
 |-----------|------|-------|
 | Niri | `niri/` | Scrolling tiling WM, primary compositor |
 | Waybar | `waybar/` | Status bar with custom battery.sh (TLP-aware) |
-| SwayNC | `swaync/` | Notification daemon + center |
+| Dunst | `dunst/` | Notification daemon (brand palette) |
 | Walker | managed by niri startup | App launcher, powered by elephant |
 | Elephant | systemd user service | Walker data-provider backend |
 | swww | `scripts/.local/bin/wallpaper-rotate` | Wallpaper daemon, rotates every 10 min from `~/Pictures/walpapers` in a random no-repeat cycle |
-| swayidle | `scripts/.local/bin/toggle-idle` | Screen blank after 5 min |
+| swayidle | `scripts/.local/bin/toggle-idle` | Blank 5 min → auto-lock 10 min |
+| swaylock | `swaylock/` | Brand palette lock screen |
 | wob | `scripts/.local/bin/wob-daemon` | Volume/brightness OSD via FIFO pipe |
 | zsh | `shell/` | env, aliases, zshrc, p10k prompt |
-| Kitty | `kitty/` | Primary terminal |
-| Zellij | `zellij/` | Terminal multiplexer |
+| Kitty | `kitty/` | Primary terminal (brand Navy palette) |
 | Git | `git/` | Global gitconfig |
 | GTK | `gtk/` | Brand palette override for GTK apps (navy/cream/teal on Orchis-Dark) |
 | wob | `wob/` | OSD bar config with brand palette colors |
@@ -52,16 +52,16 @@ Niri starts eight daemons at login via `spawn-at-startup`, plus one systemd user
 | Daemon | How it runs | Purpose |
 |--------|-------------|---------|
 | waybar | niri direct spawn | status bar |
-| swaync | niri direct spawn | notification daemon + center |
+| dunst | niri direct spawn | notification daemon |
 | walker | niri direct spawn (`--gapplication-service`) | app launcher backend |
 | wob-daemon | niri direct spawn | volume/brightness OSD (FIFO pipe) |
 | nm-applet | niri direct spawn (`--indicator`) | network tray applet |
 | blueman-applet | niri direct spawn | bluetooth tray applet |
 | wallpaper-rotate | niri direct spawn | swww wallpaper rotation (10 min, random no-repeat cycle) |
-| swayidle | niri direct spawn | idle monitor power-off (300s); does NOT lock |
+| swayidle | niri direct spawn | blank monitors at 300s, auto-lock (swaylock) at 600s |
 | elephant | systemd user service | walker data-provider backend |
 
-Idle timeout powers off monitors only — explicit lock is `Mod+Shift+L` (swaylock). Elephant is protected against restart loops via `StartLimitBurst=5` / `StartLimitIntervalSec=60`.
+`Mod+Shift+K` toggles idle on/off. `Mod+Shift+L` locks immediately. Elephant is protected against restart loops via `StartLimitBurst=5` / `StartLimitIntervalSec=60`.
 
 ## System configs
 
@@ -79,17 +79,18 @@ Idle timeout powers off monitors only — explicit lock is `Mod+Shift+L` (swaylo
 ├── keybinds.md         # quick keybind reference
 ├── niri/               # Niri compositor config
 ├── waybar/             # config.jsonc, style.css, battery.sh
-├── swaync/             # notification center config
-├── kitty/
-├── zellij/             # config + themes + layouts
+├── dunst/              # notification daemon (brand palette)
+├── swaylock/           # lock screen (brand palette)
+├── kitty/              # terminal (brand Navy palette)
 ├── shell/              # env, aliases, zshrc, p10k.zsh
 ├── git/
 ├── gtk/                # brand palette gtk.css for GTK3 + GTK4 apps
 ├── wob/                # brand palette wob OSD config
 ├── walker/             # brand palette launcher (config.toml + themes/brand/)
 ├── zed/                # Brand Navy editor theme
-├── scripts/            # .local/bin scripts (wallpaper, wob-daemon, etc.)
+├── scripts/            # .local/bin scripts (wallpaper, wob-daemon, toggle-idle, etc.)
 ├── wallpapers/         # Pictures/walpapers via GNU Stow; Git LFS image assets
+├── archived/           # alacritty, swaync, zellij — preserved, not stowed
 └── system/             # manual-only: earlyoom, journald, sysctl, zram
 ```
 

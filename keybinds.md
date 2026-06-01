@@ -20,10 +20,10 @@
 
 | Bind | Action |
 |------|--------|
-| `Mod+Shift+L` | lock screen (swaylock, black) |
+| `Mod+Shift+L` | lock screen (swaylock, brand theme) |
 | `Mod+Shift+E` | quit niri |
 | `Mod+Shift+P` | power off monitors |
-| `Mod+Shift+K` | toggle idle/screen-blank (on = blanks after 5min, off = stays on for movies) |
+| `Mod+Shift+K` | toggle idle (on = blank 5min → auto-lock 10min; off = never blank) |
 | `Mod+Shift+B` | toggle between waybar and sysbar |
 
 ---
@@ -104,68 +104,6 @@
 |------|--------|
 | `Mod+Shift+Slash` | show hotkey overlay |
 | `Mod+Space` | toggle keyboard language (us/Hebrew) |
-
----
-
-## Zellij — Normal Mode (always active)
-
-| Bind | Action |
-|------|--------|
-| `Ctrl+P` | enter pane mode |
-| `Ctrl+T` | enter tab mode |
-| `Ctrl+N` | enter resize mode |
-| `Ctrl+H` | enter move mode |
-| `Ctrl+S` | enter scroll mode |
-| `Ctrl+O` | enter session mode |
-| `Ctrl+G` | toggle locked mode |
-| `Ctrl+Q` | quit |
-| `Alt+H/J/K/L` | move focus between panes |
-| `Alt+Left/Right/Up/Down` | move focus between panes |
-| `Alt+N` | new pane |
-| `Alt+F` | toggle floating panes |
-| `Alt+[` / `Alt+]` | prev/next swap layout |
-
----
-
-## Zellij — Pane Mode (`Ctrl+P`)
-
-| Bind | Action |
-|------|--------|
-| `h/j/k/l` / arrows | move focus |
-| `n` | new pane |
-| `r` | new pane right |
-| `d` | new pane down |
-| `s` | new stacked pane |
-| `x` | close pane |
-| `f` | toggle fullscreen |
-| `w` | toggle floating |
-| `e` | embed/float toggle |
-| `c` | rename pane |
-
----
-
-## Zellij — Tab Mode (`Ctrl+T`)
-
-| Bind | Action |
-|------|--------|
-| `h/k` / `left/up` | previous tab |
-| `l/j` / `right/down` | next tab |
-| `n` | new tab |
-| `x` | close tab |
-| `r` | rename tab |
-| `1-9` | go to tab N |
-
----
-
-## Zellij — Scroll Mode (`Ctrl+S`)
-
-| Bind | Action |
-|------|--------|
-| `j/k` / `down/up` | scroll down/up |
-| `d` / `u` | half page down/up |
-| `Page_Down` / `Page_Up` | full page |
-| `s` | search |
-| `e` | edit scrollback |
 
 ---
 
