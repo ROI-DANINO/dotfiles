@@ -123,9 +123,9 @@ Active stow packages (managed by `stow.sh`):
 |---------|-------------|
 | `niri/` | `~/.config/niri/` |
 | `waybar/` | `~/.config/waybar/` |
-| `swaync/` | `~/.config/swaync/` |
+| `dunst/` | `~/.config/dunst/` |
+| `swaylock/` | `~/.config/swaylock/` |
 | `kitty/` | `~/.config/kitty/` |
-| `zellij/` | `~/.config/zellij/` |
 | `shell/` | `~/.zshrc`, `~/.shell_env`, etc. |
 | `git/` | `~/.gitconfig` |
 | `gtk/` | `~/.config/gtk-3.0/gtk.css`, `~/.config/gtk-4.0/gtk.css` |
@@ -148,14 +148,16 @@ Niri's `spawn-at-startup` section launches eight direct processes and relies on 
 ```
 niri (compositor)
  ├── spawn-at-startup: waybar
- ├── spawn-at-startup: swaync
+ ├── spawn-at-startup: dunst
  ├── spawn-at-startup: walker --gapplication-service
  ├── spawn-at-startup: ~/.local/bin/wob-daemon
  ├── spawn-at-startup: nm-applet --indicator
  ├── spawn-at-startup: blueman-applet
  ├── spawn-at-startup: ~/.local/bin/wallpaper-rotate
- └── spawn-at-startup: swayidle -w timeout 300 "niri msg action power-off-monitors"
-                                              resume "niri msg action power-on-monitors"
+ └── spawn-at-startup: swayidle -w
+                          timeout 300 "niri msg action power-off-monitors"
+                          timeout 600 "swaylock"
+                          resume  "niri msg action power-on-monitors"
 ```
 
 ### Elephant (walker backend)
@@ -186,9 +188,15 @@ Creates a named FIFO at `/tmp/wob.fifo`, then keeps it alive with `tail -f | wob
 
 ### swayidle
 
-Started directly by Niri at login. On a 300-second idle timeout it runs `niri msg action power-off-monitors` (display blank only — **not a lock**). On resume it runs `power-on-monitors`.
+Started directly by Niri at login. Two-phase idle pipeline:
 
-Explicit lock is separate: `Mod+Shift+L` runs `swaylock -c 000000`.
+1. **300 s** — `niri msg action power-off-monitors`: OLED pixels fully off. Any mouse/key input fires `resume` and powers monitors back on. No password required.
+2. **600 s** — `swaylock`: auto-lock using brand palette config at `~/.config/swaylock/config`. Requires password to unlock.
+3. **resume** — `niri msg action power-on-monitors`.
+
+`~/.local/bin/toggle-idle` is a manual toggle — kills swayidle if running, starts it if not. Bound to `Mod+Shift+K`.
+
+Explicit lock is separate: `Mod+Shift+L` runs `swaylock` (reads brand config).
 
 `~/.local/bin/toggle-idle` is a manual toggle — if swayidle is running it kills it; if not, it starts it with the same power-off behavior and immediately blanks the display.
 
@@ -278,13 +286,13 @@ It applies CSS class `health-limit` when the battery is sitting at the TLP cap (
 | App | Purpose | Managed by |
 |-----|---------|------------|
 | waybar | status bar | niri direct spawn |
-| swaync | notification daemon + center | niri direct spawn |
+| dunst | notification daemon | niri direct spawn |
 | walker | app launcher (`--gapplication-service` mode) | niri direct spawn |
 | wob-daemon | volume/brightness OSD via FIFO | niri direct spawn |
 | nm-applet | network tray applet (`--indicator`) | niri direct spawn |
 | blueman-applet | bluetooth tray applet | niri direct spawn |
 | wallpaper-rotate | swww wallpaper rotation (10 min cycle) | niri direct spawn |
-| swayidle | idle monitor power-off (300s timeout) | niri direct spawn |
+| swayidle | idle: blank at 300s, auto-lock at 600s | niri direct spawn |
 | elephant | walker data-provider backend | systemd user service (not in spawn-at-startup) |
 
 ---
@@ -332,6 +340,15 @@ It applies CSS class `health-limit` when the battery is sitting at the TLP cap (
 | `fuzzel`, `wofi` | Replaced by walker; orphaned launchers with no active use | Walker is locked as launcher — confirm user wants to change that first |
 | **IBus** + all input engine deps (anthy, hangul, pinyin, etc.) | Hebrew/English switching is handled natively by Niri xkb (`us,il` + `grp:win_space_toggle`) — IBus was unused and spamming Wayland portal warnings | XKB handles layout switching; only reinstall if a complex input method (CJK, etc.) is needed |
 
+### 2026-06-01 hygiene pass
+
+| Component | Why archived (`archived/`) | If re-requested |
+|-----------|------------|-----------------|
+| `alacritty/` | Kitty is primary terminal; alacritty config was also hard-wired to launch Zellij (incompatible with AI agent workflows) | `git mv archived/alacritty .` then `stow alacritty` — but reconsider Kitty first |
+| `swaync/` | Replaced by dunst (focus-steal bug fix); dunst is now the active notification daemon | Do NOT re-add without removing dunst first — DBus conflict on `org.freedesktop.Notifications` |
+| `zellij/` | Stopped using: breaks CLI rendering of AI agents (Claude Code, Gemini, Codex) | `git mv archived/zellij .` then add to stow.sh if re-evaluating; check AI agent compat first |
+| **mpv/swayidle OLED screensaver** | mpv captures Wayland input, preventing swayidle from receiving resume events — screen would not dismiss on mouse/key | `oled-screensaver` script kept at `~/.local/bin/oled-screensaver` for manual launch; do not re-add to swayidle chain |
+
 ---
 
 ## Repo Structure
@@ -346,9 +363,9 @@ It applies CSS class `health-limit` when the battery is sitting at the TLP cap (
 ├── keybinds.md         # quick keybind reference card
 ├── niri/               # .config/niri/config.kdl
 ├── waybar/             # .config/waybar/ — config.jsonc, style.css, battery.sh
-├── swaync/             # .config/swaync/
+├── dunst/              # .config/dunst/dunstrc (brand palette notifications)
+├── swaylock/           # .config/swaylock/config (brand palette lock screen)
 ├── kitty/              # .config/kitty/
-├── zellij/             # .config/zellij/ — config + themes + layouts
 ├── shell/              # .zshrc, .shell_env, .shell_aliases, p10k.zsh
 ├── git/                # .gitconfig
 ├── gtk/                # .config/gtk-3.0/gtk.css + gtk-4.0/gtk.css (brand palette override)
@@ -357,5 +374,6 @@ It applies CSS class `health-limit` when the battery is sitting at the TLP cap (
 ├── zed/                # .config/zed/settings.json + themes/brand.json (Brand Navy theme)
 ├── scripts/            # .local/bin/ — wallpaper-rotate, wob-daemon, toggle-idle, vr-desktop
 ├── system/             # manual-only: earlyoom, journald, sysctl, zram
+├── archived/           # archived modules: alacritty, swaync, zellij
 └── docs/               # internal docs (superpowers skills, etc.)
 ```

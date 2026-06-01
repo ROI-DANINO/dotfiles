@@ -29,8 +29,8 @@ PACKAGES=(
   niri
   kitty
   waybar
-  swaync
-  zellij
+  dunst
+  swaylock
   shell
   git
   gtk

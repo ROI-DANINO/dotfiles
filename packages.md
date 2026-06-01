@@ -39,18 +39,23 @@ git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
 sudo dnf install kitty
 ```
 
-## Multiplexer (Rust)
+Kitty config at `~/.config/kitty/kitty.conf` (managed by `kitty/` stow module).
+- Brand Navy palette (`#1E3045` background, brand-cream foreground, `background_opacity 0.86`)
+- `shell_integration enabled` — enables close-confirmation for windows with running processes
+- `confirm_os_window_close -1` — prompts before closing a window that has a running process
 
-```bash
-# via cargo (install.sh handles this):
-cargo install --locked zellij
-```
+## Multiplexer
+
+Zellij is archived (`archived/zellij/`) — it breaks CLI rendering of AI agents (Claude Code,
+Gemini CLI, Codex). For background tasks use systemd user services or `disown` from the shell.
 
 ## Window Manager — Niri session
 
 ```bash
-sudo dnf install niri waybar SwayNotificationCenter swaylock swayidle wob walker elephant
+sudo dnf install niri waybar dunst swaylock swayidle wob walker elephant
 ```
+
+Note: `SwayNotificationCenter` (swaync) is archived — `dunst` is the active notification daemon.
 
 ### elephant (walker data-provider backend)
 Provides search index / application data to walker. Managed as a **systemd user service** — do not spawn it directly from niri `spawn-at-startup`.
@@ -79,25 +84,33 @@ Launched at startup via `scripts/.local/bin/wallpaper-rotate`. Rotates from `~/P
 
 Started via `scripts/.local/bin/wob-daemon` (not raw `wob`). The daemon creates `/tmp/wob.fifo` and keeps the pipe alive with `tail -f` to prevent orphan processes. Write a 0–100 integer to the FIFO to trigger the OSD.
 
-### swayidle (screen idle / screensaver / power-off)
+### swayidle (screen idle / power-off / auto-lock)
 
 Managed via `scripts/.local/bin/toggle-idle`. Two-phase idle pipeline:
-1. **240 s** → OLED screensaver (`~/.local/bin/oled-screensaver`) — moving cream clock on black
-2. **300 s** → `niri msg action power-off-monitors` — monitor fully powers off
-3. **resume** → kills screensaver + powers monitors back on
+1. **300 s** → `niri msg action power-off-monitors` — OLED pixels fully off. Any mouse or key input fires `resume` and brings the display back. **No password required.**
+2. **600 s** → `swaylock` — auto-lock with brand palette. Password required to unlock.
+3. **resume** → `niri msg action power-on-monitors`
 
-### mpv (OLED screensaver engine)
+`Mod+Shift+K` toggles swayidle on/off. `Mod+Shift+L` locks immediately via swaylock.
+
+### swaylock (screen locker)
+
+```bash
+# already installed as part of: sudo dnf install niri waybar SwayNotificationCenter swaylock swayidle wob walker elephant
+```
+
+Brand palette config at `~/.config/swaylock/config` (managed by `swaylock/` stow module).
+Colors: navy-ink background, brand-teal ring, brand-sky key-highlight, brand-cream text.
+
+### mpv (OLED screensaver — manual launch only)
 
 ```bash
 sudo dnf install mpv
 ```
 
-Used by `scripts/.local/bin/oled-screensaver` to render a moving clock screensaver via
-FFmpeg's `lavfi` filtergraph (`av://lavfi:color=black + drawtext`). Specifically designed
-for the Samsung SDC4154 OLED panel (eDP-1, 2880×1800@90 Hz):
-- Pure black background → OLED pixels fully off
-- Clock position oscillates via `sin(t/13)` / `cos(t/17)` → no static pixel burn-in
-- Waybar is hidden via `SIGUSR1` before launch and restored on exit
+`scripts/.local/bin/oled-screensaver` renders a moving brand clock via mpv + FFmpeg lavfi.
+**Not part of the idle chain** (mpv captures Wayland input, preventing swayidle resume).
+Launch manually from a terminal when you want the visual. Exit with Ctrl+C.
 
 ## Battery Management
 

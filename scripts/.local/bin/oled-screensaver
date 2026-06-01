@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+# MANUAL LAUNCH ONLY — not invoked from swayidle idle chain.
+# Run directly from a terminal when you want the OLED clock visual.
+# Exit with Ctrl+C or kill the process. mpv does not respond to Wayland
+# idle-resume events, which is why it was removed from the idle chain.
+#
 # OLED-safe screensaver: Pulse design — cream clock + steel date + teal accent lines
 # Black background = OLED pixels off. Content drifts via sin/cos to prevent burn-in.
 # Lines drift at slight phase offset from clock for a parallax layer feel.

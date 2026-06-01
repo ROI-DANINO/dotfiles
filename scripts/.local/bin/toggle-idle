@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 if pgrep -x swayidle > /dev/null; then
     pkill -x swayidle
-    pkill -f oled-screensaver 2>/dev/null
 else
     swayidle -w \
-        timeout 300 "~/.local/bin/oled-screensaver" \
-        timeout 600 "niri msg action power-off-monitors" \
-        resume  "pkill -f oled-screensaver; niri msg action power-on-monitors" &
+        timeout 300 "niri msg action power-off-monitors" \
+        timeout 600 "swaylock" \
+        resume  "niri msg action power-on-monitors" &
 fi

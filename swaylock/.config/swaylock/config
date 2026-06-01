@@ -1,0 +1,25 @@
+# swaylock — brand palette lock screen
+# Colors from docs/theme/brand-desktop-palette.md
+
+color=081A2F
+
+inside-color=1E304599
+ring-color=567C8D
+key-hl-color=C8D9E6
+bs-hl-color=C9856F
+
+text-color=F0E7D5
+text-caps-lock-color=E0B66C
+wrong-color=C9856F
+wrong-text-color=F0E7D5
+
+caps-lock-key-hl-color=E0B66C
+caps-lock-bs-hl-color=C9856F
+
+separator-color=2F415600
+
+font=JetBrainsMono Nerd Font Mono
+font-size=18
+
+indicator-radius=100
+indicator-thickness=7
