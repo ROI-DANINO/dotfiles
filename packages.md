@@ -91,7 +91,7 @@ Managed via `scripts/.local/bin/toggle-idle`. Two-phase idle pipeline:
 2. **600 s** → `swaylock` — auto-lock with brand palette. Password required to unlock.
 3. **resume** → `niri msg action power-on-monitors`
 
-`Mod+Shift+K` toggles swayidle on/off. `Mod+Shift+L` locks immediately via swaylock.
+`Mod+Shift+K` toggles swayidle on/off. If swayidle is running, it kills it; if not, it starts the idle pipeline and immediately runs `niri msg action power-off-monitors`. `Mod+Shift+L` locks immediately via swaylock.
 
 ### swaylock (screen locker)
 
@@ -149,13 +149,14 @@ sudo dnf install brightnessctl playerctl light
 ## File Management & CLI Tools
 
 ```bash
-sudo dnf install yazi Thunar fzf wl-clipboard bottom
+sudo dnf install yazi Thunar fzf wl-clipboard wtype bottom
 ```
 
 - `yazi` — Rust TUI file manager (primary, alias: `y`)
 - `thunar` — GUI file manager (`Mod+F`)
 - `bottom` — system monitor (`Alt+M`)
 - `wl-clipboard` — Wayland clipboard (`wl-copy`/`wl-paste`)
+- `wtype` — Wayland virtual keyboard input for text-replacement hotkeys
 
 ## Fonts
 

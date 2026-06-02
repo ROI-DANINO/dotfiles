@@ -193,6 +193,7 @@ binds {
     Mod+Slash { spawn "walker"; }
     Mod+Shift+C { spawn "env" "ELECTRON_OZONE_PLATFORM_HINT=auto" "claude-desktop"; }
     Alt+M { spawn "kitty" "-e" "btm"; }
+    Mod+G repeat=false hotkey-overlay-title="Fix Hebrew/English Layout" { spawn "~/.local/bin/layout-fix"; }
     Mod+Shift+B { spawn "~/.local/bin/toggle-bar"; }
     Mod+Shift+K { spawn "~/.local/bin/toggle-idle"; }
     Mod+Shift+L { spawn "swaylock"; }

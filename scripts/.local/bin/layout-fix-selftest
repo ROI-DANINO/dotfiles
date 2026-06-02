@@ -1,0 +1,55 @@
+#!/usr/bin/env python3
+import subprocess
+import sys
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parent
+LAYOUT_FIX = ROOT / "layout-fix"
+
+
+CASES = {
+    "akuo": "שלום",
+    "tbh": "אני",
+    "פךקשדק": "please",
+    "בםגק": "code",
+}
+
+
+def main() -> int:
+    failures = []
+
+    for source, expected in CASES.items():
+        try:
+            result = subprocess.run(
+                [str(LAYOUT_FIX), "--convert", source],
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+        except FileNotFoundError:
+            failures.append(f"{source!r}: layout-fix command does not exist")
+            continue
+
+        if result.returncode != 0:
+            failures.append(
+                f"{source!r}: command failed with {result.returncode}: {result.stderr.strip()}"
+            )
+            continue
+
+        actual = result.stdout.rstrip("\n")
+        if actual != expected:
+            failures.append(f"{source!r}: expected {expected!r}, got {actual!r}")
+
+    if failures:
+        print("layout-fix selftest failed:", file=sys.stderr)
+        for failure in failures:
+            print(f"  - {failure}", file=sys.stderr)
+        return 1
+
+    print(f"layout-fix selftest passed ({len(CASES)} cases)")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -10,8 +10,8 @@ bs-hl-color=C9856F
 
 text-color=F0E7D5
 text-caps-lock-color=E0B66C
-wrong-color=C9856F
-wrong-text-color=F0E7D5
+inside-wrong-color=C9856F
+text-wrong-color=F0E7D5
 
 caps-lock-key-hl-color=E0B66C
 caps-lock-bs-hl-color=C9856F

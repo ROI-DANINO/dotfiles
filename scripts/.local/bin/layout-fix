@@ -1,0 +1,143 @@
+#!/usr/bin/env python3
+import argparse
+import shutil
+import subprocess
+import sys
+import time
+
+
+US_TO_HEBREW = {
+    "`": ";",
+    "q": "/",
+    "w": "'",
+    "e": "ק",
+    "r": "ר",
+    "t": "א",
+    "y": "ט",
+    "u": "ו",
+    "i": "ן",
+    "o": "ם",
+    "p": "פ",
+    "[": "]",
+    "]": "[",
+    "a": "ש",
+    "s": "ד",
+    "d": "ג",
+    "f": "כ",
+    "g": "ע",
+    "h": "י",
+    "j": "ח",
+    "k": "ל",
+    "l": "ך",
+    ";": "ף",
+    "'": ",",
+    "z": "ז",
+    "x": "ס",
+    "c": "ב",
+    "v": "ה",
+    "b": "נ",
+    "n": "מ",
+    "m": "צ",
+    ",": "ת",
+    ".": "ץ",
+    "/": ".",
+}
+
+HEBREW_TO_US = {value: key for key, value in US_TO_HEBREW.items()}
+
+
+def notify(title: str, body: str) -> None:
+    if shutil.which("notify-send"):
+        subprocess.run(["notify-send", title, body], check=False)
+
+
+def has_hebrew(text: str) -> bool:
+    return any("\u0590" <= char <= "\u05ff" for char in text)
+
+
+def has_latin(text: str) -> bool:
+    return any(("a" <= char.lower() <= "z") for char in text)
+
+
+def convert_layout(text: str) -> str:
+    if has_hebrew(text) and not has_latin(text):
+        return "".join(HEBREW_TO_US.get(char, char) for char in text)
+
+    return "".join(US_TO_HEBREW.get(char.lower(), char) if char.lower() in US_TO_HEBREW else char for char in text)
+
+
+def run_text(command: list[str], input_text: str | None = None) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        command,
+        input=input_text,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+    )
+
+
+def require(command: str) -> bool:
+    if shutil.which(command):
+        return True
+    notify("layout-fix", f"Missing dependency: {command}")
+    print(f"layout-fix: missing dependency: {command}", file=sys.stderr)
+    return False
+
+
+def paste_text(text: str) -> None:
+    run_text(["wl-copy", "--type", "text/plain"], text)
+    time.sleep(0.05)
+    subprocess.run(["wtype", "-M", "ctrl", "-k", "v", "-m", "ctrl"], check=False)
+
+
+def clipboard_text() -> str:
+    result = run_text(["wl-paste", "--no-newline", "--type", "text"])
+    return result.stdout if result.returncode == 0 else ""
+
+
+def primary_text() -> str:
+    result = run_text(["wl-paste", "--primary", "--no-newline", "--type", "text"])
+    return result.stdout if result.returncode == 0 else ""
+
+
+def replace_selection() -> int:
+    for command in ("wl-copy", "wl-paste", "wtype"):
+        if not require(command):
+            return 1
+
+    selected = primary_text()
+
+    if not selected:
+        subprocess.run(["wtype", "-M", "ctrl", "-k", "c", "-m", "ctrl"], check=False)
+        time.sleep(0.2)
+        selected = clipboard_text()
+
+
+    if not selected:
+        notify("layout-fix", "No selected text found")
+        return 1
+
+    fixed = convert_layout(selected)
+    if fixed == selected:
+        notify("layout-fix", "Selection did not need layout conversion")
+        return 0
+
+    paste_text(fixed)
+    return 0
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Fix Hebrew/English wrong-keyboard-layout text.")
+    parser.add_argument("--convert", help="Convert text and print the result without touching the clipboard.")
+    args = parser.parse_args()
+
+    if args.convert is not None:
+        print(convert_layout(args.convert))
+        return 0
+
+    return replace_selection()
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

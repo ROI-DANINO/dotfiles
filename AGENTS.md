@@ -194,11 +194,9 @@ Started directly by Niri at login. Two-phase idle pipeline:
 2. **600 s** — `swaylock`: auto-lock using brand palette config at `~/.config/swaylock/config`. Requires password to unlock.
 3. **resume** — `niri msg action power-on-monitors`.
 
-`~/.local/bin/toggle-idle` is a manual toggle — kills swayidle if running, starts it if not. Bound to `Mod+Shift+K`.
+`~/.local/bin/toggle-idle` is a manual toggle — kills swayidle if running; if not, starts swayidle with the same idle pipeline and immediately powers off the monitors. Bound to `Mod+Shift+K`.
 
 Explicit lock is separate: `Mod+Shift+L` runs `swaylock` (reads brand config).
-
-`~/.local/bin/toggle-idle` is a manual toggle — if swayidle is running it kills it; if not, it starts it with the same power-off behavior and immediately blanks the display.
 
 ### wallpaper-rotate
 
@@ -260,6 +258,7 @@ It applies CSS class `health-limit` when the battery is sitting at the TLP cap (
 | `Mod+Shift+Right` | move column right | ✓ (Shift+L reserved for lock) |
 | `Mod+Shift+B` | spawn toggle-bar (waybar ↔ sysbar) | ✓ |
 | `Mod+Shift+C` | spawn claude-desktop | ✓ |
+| `Mod+G` | fix selected Hebrew/English wrong-layout text | ✓ |
 | `Mod+U/I` | focus workspace up/down | ✓ |
 | `Mod+Ctrl+U/I` | move column to workspace up/down | ✓ |
 | `Mod+R` | cycle column width | ✓ |
@@ -277,7 +276,7 @@ It applies CSS class `health-limit` when the battery is sitting at the TLP cap (
 | `Alt+M` | spawn bottom (system monitor) | ✓ |
 
 ### Free / available Mod binds
-`Mod+A`, `Mod+B`, `Mod+E`, `Mod+G`, `Mod+N`, `Mod+O`, `Mod+P`, `Mod+S`, `Mod+V`, `Mod+X`, `Mod+Y`, `Mod+Z`
+`Mod+A`, `Mod+B`, `Mod+E`, `Mod+N`, `Mod+O`, `Mod+P`, `Mod+S`, `Mod+V`, `Mod+X`, `Mod+Y`, `Mod+Z`
 
 ---
 

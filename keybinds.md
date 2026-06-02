@@ -23,7 +23,7 @@
 | `Mod+Shift+L` | lock screen (swaylock, brand theme) |
 | `Mod+Shift+E` | quit niri |
 | `Mod+Shift+P` | power off monitors |
-| `Mod+Shift+K` | toggle idle (on = blank 5min → auto-lock 10min; off = never blank) |
+| `Mod+Shift+K` | toggle idle (off = no idle blank; on = start idle and blank now, then auto-lock at 10min) |
 | `Mod+Shift+B` | toggle between waybar and sysbar |
 
 ---
@@ -104,6 +104,7 @@
 |------|--------|
 | `Mod+Shift+Slash` | show hotkey overlay |
 | `Mod+Space` | toggle keyboard language (us/Hebrew) |
+| `Mod+G` | fix selected Hebrew/English wrong-layout text |
 
 ---
 

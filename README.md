@@ -28,7 +28,7 @@ See `packages.md` for a manual reference of everything that gets installed.
 | Walker | managed by niri startup | App launcher, powered by elephant |
 | Elephant | systemd user service | Walker data-provider backend |
 | swww | `scripts/.local/bin/wallpaper-rotate` | Wallpaper daemon, rotates every 10 min from `~/Pictures/walpapers` in a random no-repeat cycle |
-| swayidle | `scripts/.local/bin/toggle-idle` | Blank 5 min → auto-lock 10 min |
+| swayidle | `scripts/.local/bin/toggle-idle` | Idle: blank 5 min -> auto-lock 10 min; toggle can blank immediately |
 | swaylock | `swaylock/` | Brand palette lock screen |
 | wob | `scripts/.local/bin/wob-daemon` | Volume/brightness OSD via FIFO pipe |
 | zsh | `shell/` | env, aliases, zshrc, p10k prompt |
@@ -61,7 +61,13 @@ Niri starts eight daemons at login via `spawn-at-startup`, plus one systemd user
 | swayidle | niri direct spawn | blank monitors at 300s, auto-lock (swaylock) at 600s |
 | elephant | systemd user service | walker data-provider backend |
 
-`Mod+Shift+K` toggles idle on/off. `Mod+Shift+L` locks immediately. Elephant is protected against restart loops via `StartLimitBurst=5` / `StartLimitIntervalSec=60`.
+`Mod+Shift+K` toggles idle on/off: off kills `swayidle`; on starts it and immediately powers off the monitors while preserving the 300s blank / 600s auto-lock timers. `Mod+Shift+L` locks immediately. Elephant is protected against restart loops via `StartLimitBurst=5` / `StartLimitIntervalSec=60`.
+
+## Text utilities
+
+`scripts/.local/bin/layout-fix` fixes selected Hebrew/English text typed with the wrong keyboard layout. Select text, press `Mod+G`, and the selection is replaced with the exact key-position conversion. It uses `wl-clipboard` to read/write the selection and `wtype` to paste the converted text.
+
+This is layout conversion, not Hebrew spell correction. The script intentionally leaves the converted text on the clipboard after paste; restoring the old clipboard too quickly can make some apps paste the old value instead.
 
 ## System configs
 
