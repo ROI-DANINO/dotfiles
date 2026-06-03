@@ -85,7 +85,8 @@ The correct procedure for any package removal:
 - `Thunar` (capital T) — GUI file manager, `Mod+F` keybind, in `install.sh`. Shares XFCE libs but is NOT an XFCE-only tool.
 - `zenity` — used by scripts; pulled out by autoremove.
 - `swayidle`, `swaync`, `swaybg` — Sway utilities actively used by niri session. Do NOT remove with Sway WM.
-- `swaylock` — NOT a dnf package here. Built from source as the swaylock-effects fork (`/usr/local/bin/swaylock`); requires `/etc/pam.d/swaylock` to exist or all unlocks are denied. See packages.md and install.sh §4b.
+- `hyprlock` — screen locker, from the `sdegler/hyprland` COPR (not in default Fedora repos). Requires `/etc/pam.d/hyprlock` to exist or all unlocks are denied. Config: `hyprlock/` stow module → `~/.config/hypr/hyprlock.conf`. See packages.md and install.sh §4b. Pulls `hypr*` support libs (hyprlang/hyprutils/hyprgraphics) — do not autoremove them.
+- `swaylock` — DECOMMISSIONED 2026-06-04 (replaced by hyprlock). The source-built binary may still linger at `/usr/local/bin/swaylock`; harmless, removable. Module archived at `archived/swaylock/`.
 - `gnome-keyring`, `gnome-keyring-pam` — used system-wide, not GNOME-specific.
 
 **Why this exists:** 2026-05-30 incident — removing XFCE packages silently took Thunar; autoremove took zenity. Both required manual reinstall.
@@ -125,7 +126,7 @@ Active stow packages (managed by `stow.sh`):
 | `niri/` | `~/.config/niri/` |
 | `waybar/` | `~/.config/waybar/` |
 | `dunst/` | `~/.config/dunst/` |
-| `swaylock/` | `~/.config/swaylock/` |
+| `hyprlock/` | `~/.config/hypr/` |
 | `kitty/` | `~/.config/kitty/` |
 | `shell/` | `~/.zshrc`, `~/.shell_env`, etc. |
 | `git/` | `~/.gitconfig` |
@@ -157,7 +158,7 @@ niri (compositor)
  ├── spawn-at-startup: ~/.local/bin/wallpaper-rotate
  └── spawn-at-startup: swayidle -w
                           timeout 300 "niri msg action power-off-monitors"
-                          timeout 600 "swaylock"
+                          timeout 600 "hyprlock"
                           resume  "niri msg action power-on-monitors"
 ```
 
@@ -192,12 +193,12 @@ Creates a named FIFO at `/tmp/wob.fifo`, then keeps it alive with `tail -f | wob
 Started directly by Niri at login. Two-phase idle pipeline:
 
 1. **300 s** — `niri msg action power-off-monitors`: OLED pixels fully off. Any mouse/key input fires `resume` and powers monitors back on. No password required.
-2. **600 s** — `swaylock`: auto-lock using brand palette config at `~/.config/swaylock/config`. Requires password to unlock.
+2. **600 s** — `hyprlock`: auto-lock. Single wallpaper shown as-is (instant, no live blur) with a modern clock/date + password field. Config: `~/.config/hypr/hyprlock.conf`. Requires password to unlock.
 3. **resume** — `niri msg action power-on-monitors`.
 
 `~/.local/bin/toggle-idle` is a manual toggle — kills swayidle if running; if not, starts swayidle with the same idle pipeline and immediately powers off the monitors. Bound to `Mod+Shift+K`.
 
-Explicit lock is separate: `Mod+Shift+L` runs `swaylock` (reads brand config).
+Explicit lock is separate: `Mod+Shift+L` runs `hyprlock`.
 
 ### wallpaper-rotate
 
@@ -249,7 +250,7 @@ It applies CSS class `health-limit` when the battery is sitting at the TLP cap (
 | `Mod+F` | spawn thunar | ✓ |
 | `Mod+Slash` | spawn walker (launcher) | locked |
 | `Mod+Q` | close window | ✓ |
-| `Mod+Shift+L` | swaylock (reads brand config) | locked |
+| `Mod+Shift+L` | hyprlock (modern lock screen) | locked |
 | `Mod+H/L` | focus column left/right | ✓ |
 | `Mod+J/K` | focus window down/up | ✓ |
 | `Mod+Left/Right/Up/Down` | focus (arrow aliases) | ✓ |
@@ -349,6 +350,13 @@ It applies CSS class `health-limit` when the battery is sitting at the TLP cap (
 | `zellij/` | Stopped using: breaks CLI rendering of AI agents (Claude Code, Gemini, Codex) | `git mv archived/zellij .` then add to stow.sh if re-evaluating; check AI agent compat first |
 | **mpv/swayidle OLED screensaver** | mpv captures Wayland input, preventing swayidle from receiving resume events — screen would not dismiss on mouse/key | `oled-screensaver` script kept at `~/.local/bin/oled-screensaver` for manual launch; do not re-add to swayidle chain |
 
+### 2026-06-04 lock screen migration
+
+| Component | Why changed | If re-requested |
+|-----------|------------|-----------------|
+| `swaylock-effects` → **hyprlock** | Wanted a fast, modern lock: swaylock blurred a 4–6 MP wallpaper live on every lock (~2s+ delay) and ties the clock to a cramped indicator ring. hyprlock shows one image as-is (instant) with a big clock, small date, and a styled password field. | swaylock module archived at `archived/swaylock/`; `git mv` it back + re-add to stow.sh/install.sh to revert. hyprlock is from the `sdegler/hyprland` COPR. |
+| swaylock binary `/usr/local/bin/swaylock` | Source build no longer used | Harmless leftover. Optional removal: `sudo rm /usr/local/bin/swaylock /etc/pam.d/swaylock && rm -rf ~/.local/src/swaylock-effects` |
+
 ---
 
 ## Repo Structure
@@ -364,7 +372,7 @@ It applies CSS class `health-limit` when the battery is sitting at the TLP cap (
 ├── niri/               # .config/niri/config.kdl
 ├── waybar/             # .config/waybar/ — config.jsonc, style.css, battery.sh
 ├── dunst/              # .config/dunst/dunstrc (brand palette notifications)
-├── swaylock/           # .config/swaylock/config (brand palette lock screen)
+├── hyprlock/           # .config/hypr/hyprlock.conf (modern lock screen)
 ├── kitty/              # .config/kitty/
 ├── shell/              # .zshrc, .shell_env, .shell_aliases, p10k.zsh
 ├── git/                # .gitconfig
@@ -374,6 +382,6 @@ It applies CSS class `health-limit` when the battery is sitting at the TLP cap (
 ├── zed/                # .config/zed/settings.json + themes/brand.json (Brand Navy theme)
 ├── scripts/            # .local/bin/ — wallpaper-rotate, wob-daemon, toggle-idle, vr-desktop
 ├── system/             # manual-only: earlyoom, journald, sysctl, zram
-├── archived/           # archived modules: alacritty, swaync, zellij
+├── archived/           # archived modules: alacritty, swaync, zellij, swaylock
 └── docs/               # internal docs (superpowers skills, etc.)
 ```

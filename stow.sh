@@ -30,7 +30,7 @@ PACKAGES=(
   kitty
   waybar
   dunst
-  swaylock
+  hyprlock
   shell
   git
   gtk

@@ -30,7 +30,7 @@ Source spec: `docs/superpowers/specs/2026-05-31-brand-anchored-desktop-theme-des
 - Kitty: `background_opacity 0.86` (navy-deep background).
 - Waybar: use translucent Navy/deep Navy surfaces.
 - Dunst: opaque cards (brand-navy bg, teal frame) — transparency not used.
-- swaylock: navy-ink background, brand-teal ring, brand-sky key-highlight.
+- hyprlock: wallpaper shown as-is; cream clock/date with shadow; password field with steel outline, navy fill, gold/terracotta verify/fail states.
 - GTK overlay bars: use translucent Navy.
 
 ## Rules

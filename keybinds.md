@@ -20,7 +20,7 @@
 
 | Bind | Action |
 |------|--------|
-| `Mod+Shift+L` | lock screen (swaylock, brand theme) |
+| `Mod+Shift+L` | lock screen (hyprlock) |
 | `Mod+Shift+E` | quit niri |
 | `Mod+Shift+P` | power off monitors |
 | `Mod+Shift+K` | toggle idle (off = no idle blank; on = start idle and blank now, then auto-lock at 10min) |

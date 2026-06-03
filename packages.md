@@ -56,8 +56,7 @@ sudo dnf install niri waybar dunst swayidle wob walker elephant
 ```
 
 Note: `SwayNotificationCenter` (swaync) is archived — `dunst` is the active notification daemon.
-Note: `swaylock` is **not** a dnf package here — it is built from source as the
-swaylock-effects fork (blur/fade/vignette). See the swaylock section below.
+Note: the screen locker is **hyprlock** (from a COPR, not in default repos). See the hyprlock section below.
 
 ### elephant (walker data-provider backend)
 Provides search index / application data to walker. Managed as a **systemd user service** — do not spawn it directly from niri `spawn-at-startup`.
@@ -90,47 +89,48 @@ Started via `scripts/.local/bin/wob-daemon` (not raw `wob`). The daemon creates 
 
 Managed via `scripts/.local/bin/toggle-idle`. Two-phase idle pipeline:
 1. **300 s** → `niri msg action power-off-monitors` — OLED pixels fully off. Any mouse or key input fires `resume` and brings the display back. **No password required.**
-2. **600 s** → `swaylock` — auto-lock with brand palette. Password required to unlock.
+2. **600 s** → `hyprlock` — auto-lock (instant, single image). Password required to unlock.
 3. **resume** → `niri msg action power-on-monitors`
 
-`Mod+Shift+K` toggles swayidle on/off. If swayidle is running, it kills it; if not, it starts the idle pipeline and immediately runs `niri msg action power-off-monitors`. `Mod+Shift+L` locks immediately via swaylock.
+`Mod+Shift+K` toggles swayidle on/off. If swayidle is running, it kills it; if not, it starts the idle pipeline and immediately runs `niri msg action power-off-monitors`. `Mod+Shift+L` locks immediately via hyprlock.
 
-### swaylock (screen locker — swaylock-effects fork)
+### hyprlock (screen locker — modern, single image)
 
-We use the **swaylock-effects** fork (not Fedora's plain `swaylock`) for blur,
-fade-in, and vignette. It is built from source — `install.sh` section "4b"
-automates all of this, but the manual steps are:
+hyprlock replaced swaylock-effects on 2026-06-04. It shows **one wallpaper as-is**
+(no live blur), so the lock appears **instantly**, with a large clock, a small
+date, and a styled password field. It is not in Fedora's repos — it comes from
+the maintained **`sdegler/hyprland`** COPR. `install.sh` section "4b" automates
+this; the manual steps are:
 
 ```bash
-# Build dependencies
-sudo dnf install meson ninja-build scdoc git \
-    wayland-devel wayland-protocols-devel libxkbcommon-devel \
-    cairo-devel gdk-pixbuf2-devel pango-devel pam-devel
-
-# Clone, build, install (binary → /usr/local/bin/swaylock)
-git clone https://github.com/jirutka/swaylock-effects.git ~/.local/src/swaylock-effects
-cd ~/.local/src/swaylock-effects
-meson setup build && ninja -C build
-sudo ninja -C build install
+sudo dnf copr enable sdegler/hyprland
+sudo dnf install hyprlock
 ```
 
+This pulls a few small Hyprland support libs (`hyprlang`, `hyprutils`,
+`hyprgraphics`). Lightweight at runtime; GPU-rendered.
+
 > ⚠️ **Critical PAM step — skip this and you lock yourself out.**
-> The fork's `meson install` writes its PAM file to `/usr/local/etc/pam.d/swaylock`,
-> a directory PAM **never reads**. With no `/etc/pam.d/swaylock`, PAM falls back to
-> `/etc/pam.d/other` (`pam_deny`) and **every password is silently rejected** — the
-> lock screen appears, your correct password "doesn't work," and you must switch to
-> a TTY to recover. Fix it once:
+> With no `/etc/pam.d/hyprlock`, PAM falls back to `/etc/pam.d/other` (`pam_deny`)
+> and **every password is silently rejected** — the lock screen appears, your
+> correct password "doesn't work," and you must switch to a TTY to recover. Fix it
+> once:
 >
 > ```bash
-> printf '%s\n' '# swaylock PAM config' 'auth include login' \
->     | sudo tee /etc/pam.d/swaylock
+> printf '%s\n' '# hyprlock PAM config' 'auth include login' \
+>     | sudo tee /etc/pam.d/hyprlock
 > ```
 >
-> Verify with `ls -l /etc/pam.d/swaylock` before relying on the lock screen.
+> Verify with `ls -l /etc/pam.d/hyprlock` before relying on the lock screen.
 
-Brand palette config at `~/.config/swaylock/config` (managed by `swaylock/` stow module).
-Colors: navy-ink background, brand-teal ring, brand-sky key-highlight, brand-cream text.
-Effects: `effect-blur=7x5`, `effect-vignette=0.5:0.5`, `fade-in=0.2`.
+Config at `~/.config/hypr/hyprlock.conf` (managed by the `hyprlock/` stow module).
+Swap the wallpaper by editing the `background { path = … }` line to any file in
+`~/Pictures/walpapers/`. Brand palette: cream clock/date with shadow; password
+field with steel outline, navy fill, gold (verifying) / terracotta (fail) states.
+
+Previous locker (swaylock-effects, built from source) is archived at
+`archived/swaylock/`; its leftover binary at `/usr/local/bin/swaylock` is harmless
+and removable (`sudo rm /usr/local/bin/swaylock /etc/pam.d/swaylock`).
 
 ### mpv (OLED screensaver — manual launch only)
 

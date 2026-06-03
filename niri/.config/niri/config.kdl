@@ -11,7 +11,7 @@ spawn-at-startup "~/.local/bin/wob-daemon"
 spawn-at-startup "nm-applet" "--indicator"
 spawn-at-startup "blueman-applet"
 spawn-at-startup "~/.local/bin/wallpaper-rotate"
-spawn-at-startup "swayidle" "-w" "timeout" "300" "niri msg action power-off-monitors" "timeout" "600" "swaylock" "resume" "niri msg action power-on-monitors"
+spawn-at-startup "swayidle" "-w" "timeout" "300" "niri msg action power-off-monitors" "timeout" "600" "hyprlock" "resume" "niri msg action power-on-monitors"
 
 // Input device configuration.
 // Find the full list of options on the wiki:
@@ -196,7 +196,7 @@ binds {
     Mod+G repeat=false hotkey-overlay-title="Fix Hebrew/English Layout" { spawn "~/.local/bin/layout-fix"; }
     Mod+Shift+B { spawn "~/.local/bin/toggle-bar"; }
     Mod+Shift+K { spawn "~/.local/bin/toggle-idle"; }
-    Mod+Shift+L { spawn "swaylock"; }
+    Mod+Shift+L { spawn "hyprlock"; }
 
 
     // You can also use a shell. Do this if you need pipes, multiple commands, etc.
@@ -238,7 +238,7 @@ binds {
     Mod+Shift+Right { move-column-right; }
     Mod+Shift+H     { move-column-left; }
     Mod+Shift+J     { move-window-down; }
-    // Mod+Shift+L is reserved for swaylock
+    // Mod+Shift+L is reserved for hyprlock
     // Mod+Space: toggle keyboard language (us/Hebrew) — handled by xkb grp:win_space_toggle
 
     // Alternative commands that move across workspaces when reaching

@@ -29,7 +29,7 @@ See `packages.md` for a manual reference of everything that gets installed.
 | Elephant | systemd user service | Walker data-provider backend |
 | swww | `scripts/.local/bin/wallpaper-rotate` | Wallpaper daemon, rotates every 10 min from `~/Pictures/walpapers` in a random no-repeat cycle |
 | swayidle | `scripts/.local/bin/toggle-idle` | Idle: blank 5 min -> auto-lock 10 min; toggle can blank immediately |
-| swaylock | `swaylock/` | Brand palette lock screen (swaylock-effects fork — blur/fade; built from source, see packages.md) |
+| hyprlock | `hyprlock/` | Modern lock screen — single wallpaper as-is (instant), big clock + date, styled password field (from `sdegler/hyprland` COPR, see packages.md) |
 | wob | `scripts/.local/bin/wob-daemon` | Volume/brightness OSD via FIFO pipe |
 | zsh | `shell/` | env, aliases, zshrc, p10k prompt |
 | Kitty | `kitty/` | Primary terminal (brand Navy palette) |
@@ -58,7 +58,7 @@ Niri starts eight daemons at login via `spawn-at-startup`, plus one systemd user
 | nm-applet | niri direct spawn (`--indicator`) | network tray applet |
 | blueman-applet | niri direct spawn | bluetooth tray applet |
 | wallpaper-rotate | niri direct spawn | swww wallpaper rotation (10 min, random no-repeat cycle) |
-| swayidle | niri direct spawn | blank monitors at 300s, auto-lock (swaylock) at 600s |
+| swayidle | niri direct spawn | blank monitors at 300s, auto-lock (hyprlock) at 600s |
 | elephant | systemd user service | walker data-provider backend |
 
 `Mod+Shift+K` toggles idle on/off: off kills `swayidle`; on starts it and immediately powers off the monitors while preserving the 300s blank / 600s auto-lock timers. `Mod+Shift+L` locks immediately. Elephant is protected against restart loops via `StartLimitBurst=5` / `StartLimitIntervalSec=60`.
@@ -91,7 +91,7 @@ This is layout conversion, not Hebrew spell correction. The script intentionally
 ├── niri/               # Niri compositor config
 ├── waybar/             # config.jsonc, style.css, battery.sh
 ├── dunst/              # notification daemon (brand palette)
-├── swaylock/           # lock screen (brand palette)
+├── hyprlock/           # lock screen (modern, single image)
 ├── kitty/              # terminal (brand Navy palette)
 ├── shell/              # env, aliases, zshrc, p10k.zsh
 ├── git/
@@ -101,7 +101,7 @@ This is layout conversion, not Hebrew spell correction. The script intentionally
 ├── zed/                # Brand Navy editor theme
 ├── scripts/            # .local/bin scripts (wallpaper, wob-daemon, toggle-idle, etc.)
 ├── wallpapers/         # Pictures/walpapers via GNU Stow; Git LFS image assets
-├── archived/           # alacritty, swaync, zellij — preserved, not stowed
+├── archived/           # alacritty, swaync, zellij, swaylock — preserved, not stowed
 └── system/             # manual-only: earlyoom, journald, sysctl, zram
 ```
 
