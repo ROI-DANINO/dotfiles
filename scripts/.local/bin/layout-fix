@@ -4,6 +4,7 @@ import shutil
 import subprocess
 import sys
 import time
+import glob
 
 
 US_TO_HEBREW = {
@@ -45,25 +46,92 @@ US_TO_HEBREW = {
 
 HEBREW_TO_US = {value: key for key, value in US_TO_HEBREW.items()}
 
+# Characters unambiguously from the US layout
+US_OUTPUT = set(US_TO_HEBREW.keys()) | {c.upper() for c in US_TO_HEBREW.keys() if c.isalpha()}
+# Characters unambiguously from the Hebrew layout
+HEB_OUTPUT = set(HEBREW_TO_US.keys())
+
+# Characters that can be produced by both layouts natively (e.g. '.', ',', '/', ';', "'", '[', ']')
+AMBIGUOUS = US_OUTPUT.intersection(HEB_OUTPUT)
+
 
 def notify(title: str, body: str) -> None:
     if shutil.which("notify-send"):
         subprocess.run(["notify-send", title, body], check=False)
 
 
-def has_hebrew(text: str) -> bool:
-    return any("\u0590" <= char <= "\u05ff" for char in text)
+def is_us_only(char: str) -> bool:
+    return char in US_OUTPUT and char not in AMBIGUOUS
 
 
-def has_latin(text: str) -> bool:
-    return any(("a" <= char.lower() <= "z") for char in text)
+def is_heb_only(char: str) -> bool:
+    return char in HEB_OUTPUT and char not in AMBIGUOUS
+
+
+def check_caps_lock() -> bool:
+    """Reads the system LED status to determine if Caps Lock is currently ON."""
+    try:
+        for path in glob.glob("/sys/class/leds/*capslock/brightness"):
+            with open(path, "r") as f:
+                if f.read().strip() == "1":
+                    return True
+    except Exception:
+        pass
+    return False
 
 
 def convert_layout(text: str) -> str:
-    if has_hebrew(text) and not has_latin(text):
-        return "".join(HEBREW_TO_US.get(char, char) for char in text)
+    caps_on = check_caps_lock()
+    states = []
+    current_state = 0  # 1 = US->Heb, -1 = Heb->US, 2 = US->US
 
-    return "".join(US_TO_HEBREW.get(char.lower(), char) if char.lower() in US_TO_HEBREW else char for char in text)
+    # Forward pass to detect state for unambiguous characters
+    for char in text:
+        if not caps_on and char.isupper() and char in US_OUTPUT:
+            current_state = 2
+        elif is_us_only(char):
+            current_state = 1
+        elif is_heb_only(char):
+            current_state = -1
+        states.append(current_state)
+
+    # Backward pass to fill initial ambiguous characters
+    current_state = 0
+    for i in range(len(text) - 1, -1, -1):
+        if not caps_on and text[i].isupper() and text[i] in US_OUTPUT:
+            current_state = 2
+        elif is_us_only(text[i]):
+            current_state = 1
+        elif is_heb_only(text[i]):
+            current_state = -1
+        
+        if states[i] == 0:
+            states[i] = current_state
+
+    # Default remaining fully ambiguous text (e.g. just commas) to US
+    for i in range(len(states)):
+        if states[i] == 0:
+            states[i] = 1
+
+    result = []
+    for i, char in enumerate(text):
+        if states[i] == 2:
+            # Typed in US, intended US (Shift was held)
+            result.append(char)
+        elif states[i] == 1:
+            # Typed in US layout, intended Hebrew
+            lower_char = char.lower()
+            mapped = US_TO_HEBREW.get(lower_char, char)
+            result.append(mapped)
+        else:
+            # Typed in Hebrew layout, intended US
+            mapped = HEBREW_TO_US.get(char, char)
+            # If they had caps lock on while typing Hebrew, uppercase the English output
+            if caps_on and mapped.isalpha():
+                mapped = mapped.upper()
+            result.append(mapped)
+
+    return "".join(result)
 
 
 def run_text(command: list[str], input_text: str | None = None) -> subprocess.CompletedProcess[str]:
@@ -85,10 +153,26 @@ def require(command: str) -> bool:
     return False
 
 
-def paste_text(text: str) -> None:
+def paste_text(text: str, is_terminal: bool, selection_len: int) -> None:
     run_text(["wl-copy", "--type", "text/plain"], text)
-    time.sleep(0.05)
-    subprocess.run(["wtype", "-M", "ctrl", "-k", "v", "-m", "ctrl"], check=False)
+    
+    # Wait slightly to ensure the user has physically released the Mod+G keys.
+    # If Mod is still held down, it can interfere with terminal bracketed paste sequences!
+    time.sleep(0.4)
+    
+    if is_terminal:
+        # In terminals, pasting doesn't replace the highlighted selection.
+        # Assuming the cursor is at the end of the text they just typed,
+        # we can delete it by pressing Backspace for each character selected.
+        if selection_len > 0:
+            for _ in range(selection_len):
+                subprocess.run(["wtype", "-k", "BackSpace"], check=False)
+            time.sleep(0.05)
+            
+        # Terminals (like Kitty) require Shift for paste
+        subprocess.run(["wtype", "-M", "ctrl", "-M", "shift", "-k", "v", "-m", "shift", "-m", "ctrl"], check=False)
+    else:
+        subprocess.run(["wtype", "-M", "ctrl", "-k", "v", "-m", "ctrl"], check=False)
 
 
 def clipboard_text() -> str:
@@ -102,17 +186,25 @@ def primary_text() -> str:
 
 
 def replace_selection() -> int:
-    for command in ("wl-copy", "wl-paste", "wtype"):
+    for command in ("wl-copy", "wl-paste", "wtype", "niri"):
         if not require(command):
             return 1
 
+    is_terminal = False
+    focused = subprocess.run(["niri", "msg", "focused-window"], stdout=subprocess.PIPE, text=True, check=False)
+    if focused.returncode == 0 and 'App ID: "kitty"' in focused.stdout:
+        is_terminal = True
+
     selected = primary_text()
 
+    # If primary selection is empty, fallback to simulating Ctrl+C
     if not selected:
-        subprocess.run(["wtype", "-M", "ctrl", "-k", "c", "-m", "ctrl"], check=False)
+        if is_terminal:
+            subprocess.run(["wtype", "-M", "ctrl", "-M", "shift", "-k", "c", "-m", "shift", "-m", "ctrl"], check=False)
+        else:
+            subprocess.run(["wtype", "-M", "ctrl", "-k", "c", "-m", "ctrl"], check=False)
         time.sleep(0.2)
         selected = clipboard_text()
-
 
     if not selected:
         notify("layout-fix", "No selected text found")
@@ -123,7 +215,7 @@ def replace_selection() -> int:
         notify("layout-fix", "Selection did not need layout conversion")
         return 0
 
-    paste_text(fixed)
+    paste_text(fixed, is_terminal, len(selected))
     return 0
 
 
