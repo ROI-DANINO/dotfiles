@@ -29,7 +29,7 @@ See `packages.md` for a manual reference of everything that gets installed.
 | Elephant | systemd user service | Walker data-provider backend |
 | swww | `scripts/.local/bin/wallpaper-rotate` | Wallpaper daemon, rotates every 10 min from `~/Pictures/walpapers` in a random no-repeat cycle |
 | swayidle | `scripts/.local/bin/toggle-idle` | Idle: blank 5 min -> auto-lock 10 min; toggle can blank immediately |
-| hyprlock | `hyprlock/` | Modern lock screen — single wallpaper as-is (instant), big clock + date, styled password field (from `sdegler/hyprland` COPR, see packages.md) |
+| hyprlock | `hyprlock/` | Modern lock screen — random OLED gradient each lock (instant), big clock + date, gradient-border password field (from `sdegler/hyprland` COPR, see packages.md) |
 | wob | `scripts/.local/bin/wob-daemon` | Volume/brightness OSD via FIFO pipe |
 | zsh | `shell/` | env, aliases, zshrc, p10k prompt |
 | Kitty | `kitty/` | Primary terminal (brand Navy palette) |
@@ -91,7 +91,7 @@ This is layout conversion, not Hebrew spell correction. The script intentionally
 ├── niri/               # Niri compositor config
 ├── waybar/             # config.jsonc, style.css, battery.sh
 ├── dunst/              # notification daemon (brand palette)
-├── hyprlock/           # lock screen (modern, single image)
+├── hyprlock/           # lock screen (hyprlock.conf + OLED gradient backgrounds/)
 ├── kitty/              # terminal (brand Navy palette)
 ├── shell/              # env, aliases, zshrc, p10k.zsh
 ├── git/

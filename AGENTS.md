@@ -158,7 +158,7 @@ niri (compositor)
  ├── spawn-at-startup: ~/.local/bin/wallpaper-rotate
  └── spawn-at-startup: swayidle -w
                           timeout 300 "niri msg action power-off-monitors"
-                          timeout 600 "hyprlock"
+                          timeout 600 "~/.local/bin/lock-screen"
                           resume  "niri msg action power-on-monitors"
 ```
 
@@ -193,12 +193,12 @@ Creates a named FIFO at `/tmp/wob.fifo`, then keeps it alive with `tail -f | wob
 Started directly by Niri at login. Two-phase idle pipeline:
 
 1. **300 s** — `niri msg action power-off-monitors`: OLED pixels fully off. Any mouse/key input fires `resume` and powers monitors back on. No password required.
-2. **600 s** — `hyprlock`: auto-lock. Single wallpaper shown as-is (instant, no live blur) with a modern clock/date + password field. Config: `~/.config/hypr/hyprlock.conf`. Requires password to unlock.
+2. **600 s** — `~/.local/bin/lock-screen`: auto-lock. Picks a random OLED gradient from `~/.config/hypr/backgrounds/`, points `~/.cache/hyprlock/bg.png` at it, then launches `hyprlock` (instant, no live blur) — modern clock/date + gradient-border password field. Config: `~/.config/hypr/hyprlock.conf`. Requires password to unlock.
 3. **resume** — `niri msg action power-on-monitors`.
 
 `~/.local/bin/toggle-idle` is a manual toggle — kills swayidle if running; if not, starts swayidle with the same idle pipeline and immediately powers off the monitors. Bound to `Mod+Shift+K`.
 
-Explicit lock is separate: `Mod+Shift+L` runs `hyprlock`.
+Explicit lock is separate: `Mod+Shift+L` runs `~/.local/bin/lock-screen` (random gradient → hyprlock).
 
 ### wallpaper-rotate
 

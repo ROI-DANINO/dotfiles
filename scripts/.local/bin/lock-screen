@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# lock-screen — pick a random OLED gradient and launch hyprlock with it, so a
+# fresh background shows on every lock. hyprlock's background path is static
+# (~/.cache/hyprlock/bg.png in hyprlock.conf), so we just repoint that symlink
+# at a random file from ~/.config/hypr/backgrounds/ before locking.
+#
+# If no gradients are found, hyprlock falls back to its config `color` (black).
+set -uo pipefail
+
+BG_DIR="$HOME/.config/hypr/backgrounds"
+CACHE="$HOME/.cache/hyprlock"
+mkdir -p "$CACHE"
+
+mapfile -t bgs < <(find -L "$BG_DIR" -maxdepth 1 -type f \
+    \( -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' \) 2>/dev/null)
+
+if (( ${#bgs[@]} > 0 )); then
+    ln -sf "${bgs[RANDOM % ${#bgs[@]}]}" "$CACHE/bg.png"
+fi
+
+exec hyprlock

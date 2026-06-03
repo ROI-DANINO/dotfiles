@@ -5,7 +5,7 @@ if pgrep -x swayidle > /dev/null; then
 else
     niri msg action spawn -- swayidle -w \
         timeout 300 "niri msg action power-off-monitors" \
-        timeout 600 "hyprlock" \
+        timeout 600 "~/.local/bin/lock-screen" \
         resume  "niri msg action power-on-monitors"
     niri msg action power-off-monitors
 fi

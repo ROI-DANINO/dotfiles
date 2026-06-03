@@ -89,18 +89,18 @@ Started via `scripts/.local/bin/wob-daemon` (not raw `wob`). The daemon creates 
 
 Managed via `scripts/.local/bin/toggle-idle`. Two-phase idle pipeline:
 1. **300 s** → `niri msg action power-off-monitors` — OLED pixels fully off. Any mouse or key input fires `resume` and brings the display back. **No password required.**
-2. **600 s** → `hyprlock` — auto-lock (instant, single image). Password required to unlock.
+2. **600 s** → `~/.local/bin/lock-screen` — auto-lock (instant; random OLED gradient → hyprlock). Password required to unlock.
 3. **resume** → `niri msg action power-on-monitors`
 
 `Mod+Shift+K` toggles swayidle on/off. If swayidle is running, it kills it; if not, it starts the idle pipeline and immediately runs `niri msg action power-off-monitors`. `Mod+Shift+L` locks immediately via hyprlock.
 
-### hyprlock (screen locker — modern, single image)
+### hyprlock (screen locker — modern, rotating OLED gradients)
 
-hyprlock replaced swaylock-effects on 2026-06-04. It shows **one wallpaper as-is**
-(no live blur), so the lock appears **instantly**, with a large clock, a small
-date, and a styled password field. It is not in Fedora's repos — it comes from
-the maintained **`sdegler/hyprland`** COPR. `install.sh` section "4b" automates
-this; the manual steps are:
+hyprlock replaced swaylock-effects on 2026-06-04. It shows a **gradient image
+as-is** (no live blur), so the lock appears **instantly**, with a large clock, a
+small date, and a gradient-border password field. It is not in Fedora's repos —
+it comes from the maintained **`sdegler/hyprland`** COPR. `install.sh` section
+"4b" automates this; the manual steps are:
 
 ```bash
 sudo dnf copr enable sdegler/hyprland
@@ -124,9 +124,17 @@ This pulls a few small Hyprland support libs (`hyprlang`, `hyprutils`,
 > Verify with `ls -l /etc/pam.d/hyprlock` before relying on the lock screen.
 
 Config at `~/.config/hypr/hyprlock.conf` (managed by the `hyprlock/` stow module).
-Swap the wallpaper by editing the `background { path = … }` line to any file in
-`~/Pictures/walpapers/`. Brand palette: cream clock/date with shadow; password
-field with steel outline, navy fill, gold (verifying) / terracotta (fail) states.
+
+**Rotating background:** `~/.local/bin/lock-screen` (the wrapper all lock triggers
+call) picks a random gradient from `~/.config/hypr/backgrounds/` on each lock and
+symlinks `~/.cache/hyprlock/bg.png` to it; `hyprlock.conf` points its `background`
+at that symlink. Add/remove gradients in the `hyprlock/.config/hypr/backgrounds/`
+stow dir to change the rotation. Three ship by default (radial / aurora / horizon),
+generated with ImageMagick and tuned for OLED (true-black regions = pixels off).
+hyprlock can't animate the background natively, so rotation is per-lock.
+
+Brand palette: cream clock/date with shadow; password field with a steel→teal
+gradient border, navy fill, gold (verifying) / terracotta (fail) states.
 
 Previous locker (swaylock-effects, built from source) is archived at
 `archived/swaylock/`; its leftover binary at `/usr/local/bin/swaylock` is harmless
