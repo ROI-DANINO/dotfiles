@@ -52,10 +52,12 @@ Gemini CLI, Codex). For background tasks use systemd user services or `disown` f
 ## Window Manager — Niri session
 
 ```bash
-sudo dnf install niri waybar dunst swaylock swayidle wob walker elephant
+sudo dnf install niri waybar dunst swayidle wob walker elephant
 ```
 
 Note: `SwayNotificationCenter` (swaync) is archived — `dunst` is the active notification daemon.
+Note: `swaylock` is **not** a dnf package here — it is built from source as the
+swaylock-effects fork (blur/fade/vignette). See the swaylock section below.
 
 ### elephant (walker data-provider backend)
 Provides search index / application data to walker. Managed as a **systemd user service** — do not spawn it directly from niri `spawn-at-startup`.
@@ -93,14 +95,42 @@ Managed via `scripts/.local/bin/toggle-idle`. Two-phase idle pipeline:
 
 `Mod+Shift+K` toggles swayidle on/off. If swayidle is running, it kills it; if not, it starts the idle pipeline and immediately runs `niri msg action power-off-monitors`. `Mod+Shift+L` locks immediately via swaylock.
 
-### swaylock (screen locker)
+### swaylock (screen locker — swaylock-effects fork)
+
+We use the **swaylock-effects** fork (not Fedora's plain `swaylock`) for blur,
+fade-in, and vignette. It is built from source — `install.sh` section "4b"
+automates all of this, but the manual steps are:
 
 ```bash
-# already installed as part of: sudo dnf install niri waybar SwayNotificationCenter swaylock swayidle wob walker elephant
+# Build dependencies
+sudo dnf install meson ninja-build scdoc git \
+    wayland-devel wayland-protocols-devel libxkbcommon-devel \
+    cairo-devel gdk-pixbuf2-devel pango-devel pam-devel
+
+# Clone, build, install (binary → /usr/local/bin/swaylock)
+git clone https://github.com/jirutka/swaylock-effects.git ~/.local/src/swaylock-effects
+cd ~/.local/src/swaylock-effects
+meson setup build && ninja -C build
+sudo ninja -C build install
 ```
+
+> ⚠️ **Critical PAM step — skip this and you lock yourself out.**
+> The fork's `meson install` writes its PAM file to `/usr/local/etc/pam.d/swaylock`,
+> a directory PAM **never reads**. With no `/etc/pam.d/swaylock`, PAM falls back to
+> `/etc/pam.d/other` (`pam_deny`) and **every password is silently rejected** — the
+> lock screen appears, your correct password "doesn't work," and you must switch to
+> a TTY to recover. Fix it once:
+>
+> ```bash
+> printf '%s\n' '# swaylock PAM config' 'auth include login' \
+>     | sudo tee /etc/pam.d/swaylock
+> ```
+>
+> Verify with `ls -l /etc/pam.d/swaylock` before relying on the lock screen.
 
 Brand palette config at `~/.config/swaylock/config` (managed by `swaylock/` stow module).
 Colors: navy-ink background, brand-teal ring, brand-sky key-highlight, brand-cream text.
+Effects: `effect-blur=7x5`, `effect-vignette=0.5:0.5`, `fade-in=0.2`.
 
 ### mpv (OLED screensaver — manual launch only)
 

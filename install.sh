@@ -92,11 +92,59 @@ dnf_install \
     niri \
     waybar \
     SwayNotificationCenter \
-    swaylock \
     swayidle \
     wob \
     walker \
     elephant
+# NOTE: swaylock is intentionally NOT installed here — we build the
+# swaylock-effects fork from source in the next section. Installing the
+# packaged `swaylock` would shadow/overwrite it.
+
+# ═════════════════════════════════════════════════════════════════════════════
+hdr "4b · Lock screen (swaylock-effects — source build)"
+# ═════════════════════════════════════════════════════════════════════════════
+# Fedora's packaged `swaylock` has no blur/fade/vignette, so we build the
+# swaylock-effects fork from source. Gotcha: the fork's `meson install` drops
+# its PAM file under /usr/local/etc/pam.d/ — a directory PAM NEVER reads — so we
+# must also place /etc/pam.d/swaylock by hand. Without it, PAM falls through to
+# /etc/pam.d/other (pam_deny) and every unlock attempt is silently rejected,
+# locking you out of your own session.
+SWAYLOCK_SRC="$HOME/.local/src/swaylock-effects"
+if cmd_exists swaylock && swaylock --help 2>&1 | grep -q -- '--effect-blur'; then
+    ok "swaylock-effects (already installed)"
+else
+    info "Installing swaylock-effects build dependencies"
+    dnf_install meson ninja-build scdoc git \
+        wayland-devel wayland-protocols-devel libxkbcommon-devel \
+        cairo-devel gdk-pixbuf2-devel pango-devel pam-devel
+    if ! $DRY; then
+        if [[ ! -d "$SWAYLOCK_SRC" ]]; then
+            info "Cloning swaylock-effects → $SWAYLOCK_SRC"
+            git clone https://github.com/jirutka/swaylock-effects.git "$SWAYLOCK_SRC"
+        fi
+        info "Building swaylock-effects"
+        if [[ -d "$SWAYLOCK_SRC/build" ]]; then
+            meson setup --reconfigure "$SWAYLOCK_SRC/build" "$SWAYLOCK_SRC"
+        else
+            meson setup "$SWAYLOCK_SRC/build" "$SWAYLOCK_SRC"
+        fi
+        ninja -C "$SWAYLOCK_SRC/build"
+        info "Installing swaylock-effects (sudo)"
+        sudo ninja -C "$SWAYLOCK_SRC/build" install
+    fi
+    ok "swaylock-effects"
+fi
+
+# PAM service file — MUST live in /etc/pam.d (not /usr/local/etc) or unlocks fail.
+if [[ -f /etc/pam.d/swaylock ]]; then
+    ok "/etc/pam.d/swaylock (present)"
+else
+    info "Installing /etc/pam.d/swaylock (sudo) — required or all unlocks are denied"
+    $DRY || printf '%s\n' \
+        '# swaylock PAM config — installed by dotfiles install.sh' \
+        'auth include login' | sudo tee /etc/pam.d/swaylock >/dev/null
+    ok "/etc/pam.d/swaylock"
+fi
 
 # ═════════════════════════════════════════════════════════════════════════════
 hdr "5 · Wallpaper (swww — Rust, via cargo)"

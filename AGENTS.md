@@ -84,7 +84,8 @@ The correct procedure for any package removal:
 **Known gotchas on this system:**
 - `Thunar` (capital T) — GUI file manager, `Mod+F` keybind, in `install.sh`. Shares XFCE libs but is NOT an XFCE-only tool.
 - `zenity` — used by scripts; pulled out by autoremove.
-- `swaylock`, `swayidle`, `swaync`, `swaybg` — Sway utilities actively used by niri session. Do NOT remove with Sway WM.
+- `swayidle`, `swaync`, `swaybg` — Sway utilities actively used by niri session. Do NOT remove with Sway WM.
+- `swaylock` — NOT a dnf package here. Built from source as the swaylock-effects fork (`/usr/local/bin/swaylock`); requires `/etc/pam.d/swaylock` to exist or all unlocks are denied. See packages.md and install.sh §4b.
 - `gnome-keyring`, `gnome-keyring-pam` — used system-wide, not GNOME-specific.
 
 **Why this exists:** 2026-05-30 incident — removing XFCE packages silently took Thunar; autoremove took zenity. Both required manual reinstall.
@@ -248,7 +249,7 @@ It applies CSS class `health-limit` when the battery is sitting at the TLP cap (
 | `Mod+F` | spawn thunar | ✓ |
 | `Mod+Slash` | spawn walker (launcher) | locked |
 | `Mod+Q` | close window | ✓ |
-| `Mod+Shift+L` | swaylock -c 000000 | locked |
+| `Mod+Shift+L` | swaylock (reads brand config) | locked |
 | `Mod+H/L` | focus column left/right | ✓ |
 | `Mod+J/K` | focus window down/up | ✓ |
 | `Mod+Left/Right/Up/Down` | focus (arrow aliases) | ✓ |

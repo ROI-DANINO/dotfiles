@@ -29,7 +29,7 @@ See `packages.md` for a manual reference of everything that gets installed.
 | Elephant | systemd user service | Walker data-provider backend |
 | swww | `scripts/.local/bin/wallpaper-rotate` | Wallpaper daemon, rotates every 10 min from `~/Pictures/walpapers` in a random no-repeat cycle |
 | swayidle | `scripts/.local/bin/toggle-idle` | Idle: blank 5 min -> auto-lock 10 min; toggle can blank immediately |
-| swaylock | `swaylock/` | Brand palette lock screen |
+| swaylock | `swaylock/` | Brand palette lock screen (swaylock-effects fork — blur/fade; built from source, see packages.md) |
 | wob | `scripts/.local/bin/wob-daemon` | Volume/brightness OSD via FIFO pipe |
 | zsh | `shell/` | env, aliases, zshrc, p10k prompt |
 | Kitty | `kitty/` | Primary terminal (brand Navy palette) |
