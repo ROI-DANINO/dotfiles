@@ -385,3 +385,16 @@ It applies CSS class `health-limit` when the battery is sitting at the TLP cap (
 ├── archived/           # archived modules: alacritty, swaync, zellij, swaylock
 └── docs/               # internal docs (superpowers skills, etc.)
 ```
+
+---
+
+## Current phase
+
+This repo is managed with the **RDW** workflow spine — project-local `/rdw-start`,
+`/rdw-end`, `/rdw-init` commands in `.claude/commands/`, over the superpowers + remember
+plugins.
+
+- Machine-readable phase state: `journal/ops/phase.md`
+- Current-phase tasks: `journal/ops/tasks.md`
+- Source-of-truth map for every doc surface: `journal/docs-map.md`
+  (if two docs disagree, the one named there wins — "leave the docs true").
