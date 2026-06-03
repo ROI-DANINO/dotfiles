@@ -11,8 +11,8 @@
 - [x] Extract detailed agent reference docs.
 - [x] Rewrite `AGENTS.md` as a lean read-first index.
 - [x] Register `docs/agent-reference/` in `journal/docs-map.md`.
-- [ ] Verify docs-map drift, preservation terms, stow dry-run, and whitespace.
-- [ ] Commit Phase 5 AGENTS.md reference split.
+- [x] Verify docs-map drift, preservation terms, stow dry-run, and whitespace.
+- [x] Commit Phase 5 AGENTS.md reference split.
 
 ## Ideas
 - Use the RDW flow itself to drive Phase 5 as the first real dogfood pass.
