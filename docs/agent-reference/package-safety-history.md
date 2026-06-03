@@ -4,7 +4,8 @@
 
 - `Thunar` (capital T) — GUI file manager, `Mod+F` keybind, in `install.sh`. Shares XFCE libs but is NOT an XFCE-only tool.
 - `zenity` — used by scripts; pulled out by autoremove.
-- `swayidle`, `swaync`, `swaybg` — Sway utilities actively used by niri session. Do NOT remove with Sway WM.
+- `swayidle`, `swaybg` — Sway utilities actively used by the niri session. Do NOT remove with Sway WM.
+- `swaync` — archived/replaced by `dunst`; do not re-add without removing `dunst` first because notification daemons conflict on `org.freedesktop.Notifications`.
 - `hyprlock` — screen locker, from the `sdegler/hyprland` COPR (not in default Fedora repos). Requires `/etc/pam.d/hyprlock` to exist or all unlocks are denied. Config: `hyprlock/` stow module → `~/.config/hypr/hyprlock.conf`. See packages.md and install.sh §4b. Pulls `hypr*` support libs (hyprlang/hyprutils/hyprgraphics) — do not autoremove them.
 - `swaylock` — DECOMMISSIONED 2026-06-04 (replaced by hyprlock). The source-built binary may still linger at `/usr/local/bin/swaylock`; harmless, removable. Module archived at `archived/swaylock/`.
 - `gnome-keyring`, `gnome-keyring-pam` — used system-wide, not GNOME-specific.
@@ -28,7 +29,7 @@
 
 | Component | Why removed | If re-requested |
 |-----------|------------|-----------------|
-| `mako` | Replaced by `swaync` (notification daemon + center); dbus conflict on `org.freedesktop.Notifications` | swaync is already the notification daemon — don't add a second one |
+| `mako` | Replaced by `swaync` (notification daemon + center); dbus conflict on `org.freedesktop.Notifications` | `dunst` is now the active notification daemon — do not add a second provider for `org.freedesktop.Notifications` |
 | `fuzzel`, `wofi` | Replaced by walker; orphaned launchers with no active use | Walker is locked as launcher — confirm user wants to change that first |
 | **IBus** + all input engine deps (anthy, hangul, pinyin, etc.) | Hebrew/English switching is handled natively by Niri xkb (`us,il` + `grp:win_space_toggle`) — IBus was unused and spamming Wayland portal warnings | XKB handles layout switching; only reinstall if a complex input method (CJK, etc.) is needed |
 
