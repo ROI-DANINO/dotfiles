@@ -12,7 +12,7 @@ named here wins; fix the other. **Every phase ends by reconciling these to reali
 
 | File | Source of truth for |
 |------|---------------------|
-| AGENTS.md | Operational protocols, mission, current-phase pointer. Read first. |
+| AGENTS.md | Lean read-first operating contract for agents. |
 | README.md | Human-facing overview / quick start. |
 | ROADMAP.md | Destination, phase list, milestones, exit criteria. |
 | PROGRESS.md | What is done / in progress now; open questions. |
@@ -23,5 +23,6 @@ named here wins; fix the other. **Every phase ends by reconciling these to reali
 | docs/superpowers/specs/ | Design specs / ADRs. |
 | docs/superpowers/plans/ | Implementation plans derived from specs. |
 | docs/superpowers/handoffs/ | Session handoffs. |
+| docs/agent-reference/ | Detailed agent reference: protocols, stow architecture, keybinds, daemons, package history, machine notes. |
 | blog/ | First-person build-log; the "why". |
 | .remember/remember.md | Short handoff to the very next session. |

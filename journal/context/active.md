@@ -1,21 +1,18 @@
-## Active — RDW scaffold checkpointed
+## Active — Phase 5 AGENTS reference split
 
-**Resume here:** RDW Phase 1 is scaffolded and pushed on branch `rdw-dotfiles-scaffold`.
-Spec: docs/superpowers/specs/2026-06-04-rdw-dotfiles-integration-design.md.
+**Resume here:** Phase 5 is implementing the approved lean `AGENTS.md` +
+`docs/agent-reference/` split.
+
+Spec: `docs/superpowers/specs/2026-06-04-lean-agents-reference-docs-design.md`.
+Plan: `docs/superpowers/plans/2026-06-04-lean-agents-reference-docs.md`.
 
 ## Next
-- [ ] Open/review the PR for `rdw-dotfiles-scaffold`.
-- [ ] Start Phase 5 with `/rdw-start`: slim `AGENTS.md` into a lean index and extract the
-      large protocol/keybind/daemon sections into reference docs registered in
-      `journal/docs-map.md`.
+- [ ] Run preservation and drift verification.
+- [ ] Commit the Phase 5 docs split.
 
 ## Done
-- Design brainstormed and approved; spec written and committed.
-- Project-local `/rdw-start`, `/rdw-end`, and `/rdw-init` commands copied into
-  `.claude/commands/`.
-- RDW instance scaffold created: `ROADMAP.md`, `PROGRESS.md`, `journal/`, and `blog/`.
-- Current-phase pointer appended to `AGENTS.md`.
-- Stow hygiene updated for `journal`, `blog`, `.claude`, `ROADMAP.md`, and `PROGRESS.md`.
-- Verification passed: docs-map paths exist, `CLAUDE_PLUGIN_ROOT` count is `0`, and
-  `./stow.sh --dry-run` exits cleanly.
-- Branch `rdw-dotfiles-scaffold` pushed to `origin`.
+- Phase 4 RDW scaffold committed and pushed on branch `rdw-dotfiles-scaffold`.
+- Lean AGENTS design researched, approved, written, and committed.
+- Phase 5 implementation plan written.
+- Detailed reference docs extracted under `docs/agent-reference/`.
+- Root `AGENTS.md` rewritten as a lean read-first index.
