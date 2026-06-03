@@ -13,6 +13,9 @@ CASES = {
     "tbh": "אני",
     "פךקשדק": "please",
     "בםגק": "code",
+    "ert t, veuc. AGENTS.צג ub,j tu,u": "קרא את הקובץ AGENTS.md ונתח אותו",
+    "veuc.": "הקובץ",
+    "AGENTS.צג": "AGENTS.md",
 }
 
 

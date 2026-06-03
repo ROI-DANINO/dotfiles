@@ -65,7 +65,12 @@ Niri starts eight daemons at login via `spawn-at-startup`, plus one systemd user
 
 ## Text utilities
 
-`scripts/.local/bin/layout-fix` fixes selected Hebrew/English text typed with the wrong keyboard layout. Select text, press `Mod+G`, and the selection is replaced with the exact key-position conversion. It uses `wl-clipboard` to read/write the selection and `wtype` to paste the converted text.
+`scripts/.local/bin/layout-fix` fixes selected Hebrew/English text typed with the wrong keyboard layout. Select text, press `Mod+G`, and the selection is magically inverted to the correct layout. 
+
+Features:
+- **Smart Mixed-Language:** Correctly handles sentences with mixed layouts by tracking context character-by-character.
+- **Terminal Native:** Automatically detects Kitty and uses `Ctrl+Shift+C/V` (along with simulated Backspaces) to replace text cleanly in the terminal without bracketed paste glitches.
+- **Caps Lock Aware:** Reads your keyboard's Caps Lock LED to accurately convert mistyped Hebrew back into uppercase English characters.
 
 This is layout conversion, not Hebrew spell correction. The script intentionally leaves the converted text on the clipboard after paste; restoring the old clipboard too quickly can make some apps paste the old value instead.
 
