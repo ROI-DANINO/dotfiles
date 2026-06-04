@@ -140,9 +140,11 @@ def convert_layout(text: str) -> str:
     return "".join(result)
 
 
-def target_language(text: str) -> str | None:
+def target_language(text: str, caps_on: bool | None = None) -> str | None:
     """Dominant intended language of text: 'heb', 'eng', or None on tie/empty."""
-    states = compute_states(text, check_caps_lock())
+    if caps_on is None:
+        caps_on = check_caps_lock()
+    states = compute_states(text, caps_on)
     heb = sum(1 for s in states if s == 1)
     eng = sum(1 for s in states if s in (-1, 2))
     if heb > eng:
