@@ -6,6 +6,7 @@ First-person build-in-public journal and decision history — the *why* behind t
 | # | Entry | Date | Milestone |
 |---|-------|------|-----------|
 | 0001 | [The 400-line file my agents kept ignoring](0001-lean-agents.md) | 2026-06-04 | Phase 5 — lean AGENTS.md |
+| 0002 | [The cursor was the wrong thing to trust](0002-always-backspace.md) | 2026-06-04 | layout-fix terminal-replace redesign |
 
 ## Style guardrails
 - First-person, honest over polished; hero's-journey framing.
