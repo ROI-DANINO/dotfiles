@@ -28,3 +28,4 @@ PROGRESS\.md
 .*\.save\.[0-9]+
 .*\.pyc
 __pycache__
+\.agents
