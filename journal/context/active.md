@@ -1,18 +1,16 @@
-## Active — Phase 5 complete (PR open)
+## Active — between phases (Phases 4+5 shipped)
 
-**Resume here:** Phases 4 + 5 are done and bundled in **PR #1**
-(`rdw-dotfiles-scaffold` → `master`). Next session reviews/merges that PR, then picks
-the next roadmap direction.
-
-PR: https://github.com/ROI-DANINO/dotfiles/pull/1
+**Resume here:** PR #1 is merged. `master` carries the RDW workflow spine and the lean
+`AGENTS.md` split (79-line index + 8 `docs/agent-reference/` docs). Working tree clean,
+feature branch deleted. No phase is currently active — next session picks the next
+roadmap direction.
 
 ## Next
-- [ ] Review and merge PR #1.
-- [ ] Decide on `M shell/.zshrc` and untracked `.agents/` (unrelated to the PR).
+- [ ] Choose the next roadmap phase / goal.
+- [ ] (Optional) Dogfood the RDW flow on the next real desktop change.
 
 ## Done
-- Phase 4 RDW scaffold committed and pushed on `rdw-dotfiles-scaffold`.
-- Phase 5: `AGENTS.md` slimmed to a 79-line lean index; detail extracted into 8
-  `docs/agent-reference/` docs.
-- RDW state reconciled; preservation/stow/whitespace verification passed.
-- Branch pushed; PR #1 opened against `master`.
+- Phases 4 (RDW spine) + 5 (lean AGENTS.md) merged to `master` via PR #1 (`ee8c5b6`).
+- Local `master` synced; `rdw-dotfiles-scaffold` deleted local + remote.
+- Cleaned working tree: discarded redundant `.zshrc` secrets block; ignored generated
+  `.agents/` skills (`8b675f5`).
