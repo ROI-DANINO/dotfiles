@@ -1,10 +1,18 @@
 #!/usr/bin/env python3
 import argparse
+import re
 import shutil
 import subprocess
 import sys
 import time
 import glob
+
+
+MOD_RELEASE_WAIT = 0.4        # let the user physically release Mod+G
+PASTE_SETTLE_WAIT = 0.15      # after paste, before restoring the clipboard
+CLIPBOARD_POLL_TIMEOUT = 0.5  # max wait for wl-copy to propagate
+BACKSPACE_SETTLE = 0.05       # after terminal backspaces, before paste
+KITTY_SOCKET = "unix:@layout-fix-kitty"
 
 
 US_TO_HEBREW = {
@@ -173,26 +181,126 @@ def require(command: str) -> bool:
     return False
 
 
-def paste_text(text: str, is_terminal: bool, selection_len: int) -> None:
+def set_clipboard(text: str) -> None:
     run_text(["wl-copy", "--type", "text/plain"], text)
-    
-    # Wait slightly to ensure the user has physically released the Mod+G keys.
-    # If Mod is still held down, it can interfere with terminal bracketed paste sequences!
-    time.sleep(0.4)
-    
-    if is_terminal:
-        # In terminals, pasting doesn't replace the highlighted selection.
-        # Assuming the cursor is at the end of the text they just typed,
-        # we can delete it by pressing Backspace for each character selected.
-        if selection_len > 0:
-            for _ in range(selection_len):
-                subprocess.run(["wtype", "-k", "BackSpace"], check=False)
-            time.sleep(0.05)
-            
-        # Terminals (like Kitty) require Shift for paste
+
+
+def wait_for_clipboard(expected: str, timeout: float) -> bool:
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        if clipboard_text() == expected:
+            return True
+        time.sleep(0.02)
+    return False
+
+
+def save_clipboard() -> tuple[str, bool]:
+    """Return (text, restorable). restorable=False => clipboard held non-text data."""
+    result = run_text(["wl-paste", "--no-newline", "--type", "text"])
+    if result.returncode == 0:
+        return result.stdout, True
+    if "nothing is copied" in result.stderr.lower():
+        return "", True  # empty clipboard; restore by clearing
+    return "", False     # non-text content (e.g. an image)
+
+
+def restore_clipboard(saved: str, restorable: bool) -> None:
+    if not restorable:
+        notify("layout-fix", "Clipboard held non-text data; not restored")
+        return
+    if saved == "":
+        subprocess.run(["wl-copy", "--clear"], check=False)
+    else:
+        set_clipboard(saved)
+
+
+def paste_combo(shift: bool) -> None:
+    if shift:
         subprocess.run(["wtype", "-M", "ctrl", "-M", "shift", "-k", "v", "-m", "shift", "-m", "ctrl"], check=False)
     else:
         subprocess.run(["wtype", "-M", "ctrl", "-k", "v", "-m", "ctrl"], check=False)
+
+
+def copy_combo(is_terminal: bool) -> None:
+    if is_terminal:
+        subprocess.run(["wtype", "-M", "ctrl", "-M", "shift", "-k", "c", "-m", "shift", "-m", "ctrl"], check=False)
+    else:
+        subprocess.run(["wtype", "-M", "ctrl", "-k", "c", "-m", "ctrl"], check=False)
+
+
+def focused_is_kitty() -> bool:
+    focused = subprocess.run(["niri", "msg", "focused-window"], stdout=subprocess.PIPE, text=True, check=False)
+    return focused.returncode == 0 and 'App ID: "kitty"' in focused.stdout
+
+
+def get_selection(is_terminal: bool) -> str:
+    selected = primary_text()
+    if not selected:
+        # No primary selection: fall back to simulating Ctrl+C.
+        copy_combo(is_terminal)
+        time.sleep(0.2)
+        selected = clipboard_text()
+    return selected
+
+
+def kitty_selection_at_cursor(selection: str) -> bool | None:
+    """True if the selection is the text immediately before the kitty cursor,
+    False if it is not, None if it cannot be determined."""
+    result = run_text(["kitten", "@", "--to", KITTY_SOCKET, "get-text", "--extent=screen", "--add-cursor"])
+    if result.returncode != 0 or not result.stdout:
+        return None
+    cursor = None
+    for cursor in re.finditer(r"\x1b\[(\d+);(\d+)H", result.stdout):
+        pass
+    if cursor is None:
+        return None
+    row, col = int(cursor.group(1)), int(cursor.group(2))
+    plain = re.sub(r"\x1b\[[0-9;?]*[A-Za-z]", "", result.stdout)
+    lines = plain.split("\n")
+    if row - 1 >= len(lines):
+        return None
+    before_cursor = lines[row - 1][: col - 1]
+    return before_cursor.endswith(selection)
+
+
+def switch_layout_for(lang: str | None) -> None:
+    name_needle = {"heb": "hebrew", "eng": "english"}.get(lang or "")
+    if not name_needle:
+        return
+    result = run_text(["niri", "msg", "keyboard-layouts"])
+    if result.returncode != 0:
+        return
+    for line in result.stdout.splitlines():
+        parts = line.lstrip(" *").split(None, 1)
+        if len(parts) == 2 and parts[0].isdigit() and name_needle in parts[1].lower():
+            subprocess.run(["niri", "msg", "action", "switch-layout", parts[0]], check=False)
+            return
+
+
+def do_replace(fixed: str, selected: str, is_terminal: bool) -> None:
+    set_clipboard(fixed)
+    if not wait_for_clipboard(fixed, CLIPBOARD_POLL_TIMEOUT):
+        notify("layout-fix", "Clipboard sync slow")
+
+    # Wait for the user to physically release Mod+G; a held Mod key can
+    # corrupt terminal bracketed-paste sequences.
+    time.sleep(MOD_RELEASE_WAIT)
+
+    if not is_terminal:
+        paste_combo(shift=False)
+        return
+
+    # Terminals: pasting does not replace the mouse selection, so the original
+    # must be deleted by hand. Only delete when we can confirm the selection is
+    # the text right before the cursor — otherwise we would eat unselected text.
+    if kitty_selection_at_cursor(selected) is True:
+        for _ in range(len(selected)):
+            subprocess.run(["wtype", "-k", "BackSpace"], check=False)
+        time.sleep(BACKSPACE_SETTLE)
+        paste_combo(shift=True)
+    else:
+        paste_combo(shift=True)
+        notify("layout-fix", "Original left in place — delete it manually")
 
 
 def clipboard_text() -> str:
@@ -210,32 +318,26 @@ def replace_selection() -> int:
         if not require(command):
             return 1
 
-    is_terminal = False
-    focused = subprocess.run(["niri", "msg", "focused-window"], stdout=subprocess.PIPE, text=True, check=False)
-    if focused.returncode == 0 and 'App ID: "kitty"' in focused.stdout:
-        is_terminal = True
+    is_terminal = focused_is_kitty()
+    saved, restorable = save_clipboard()
 
-    selected = primary_text()
+    try:
+        selected = get_selection(is_terminal)
+        if not selected:
+            notify("layout-fix", "No selected text found")
+            return 1
 
-    # If primary selection is empty, fallback to simulating Ctrl+C
-    if not selected:
-        if is_terminal:
-            subprocess.run(["wtype", "-M", "ctrl", "-M", "shift", "-k", "c", "-m", "shift", "-m", "ctrl"], check=False)
-        else:
-            subprocess.run(["wtype", "-M", "ctrl", "-k", "c", "-m", "ctrl"], check=False)
-        time.sleep(0.2)
-        selected = clipboard_text()
+        fixed = convert_layout(selected)
+        if fixed == selected:
+            notify("layout-fix", "Selection did not need layout conversion")
+            return 0
 
-    if not selected:
-        notify("layout-fix", "No selected text found")
-        return 1
+        do_replace(fixed, selected, is_terminal)
+        time.sleep(PASTE_SETTLE_WAIT)
+    finally:
+        restore_clipboard(saved, restorable)
 
-    fixed = convert_layout(selected)
-    if fixed == selected:
-        notify("layout-fix", "Selection did not need layout conversion")
-        return 0
-
-    paste_text(fixed, is_terminal, len(selected))
+    switch_layout_for(target_language(selected))
     return 0
 
 
