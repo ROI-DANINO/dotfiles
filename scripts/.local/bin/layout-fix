@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import argparse
 import fcntl
-import re
 import shutil
 import subprocess
 import sys
@@ -13,7 +12,6 @@ MOD_RELEASE_WAIT = 0.4        # let the user physically release Mod+G
 PASTE_SETTLE_WAIT = 0.15      # after paste, before restoring the clipboard
 CLIPBOARD_POLL_TIMEOUT = 0.5  # max wait for wl-copy to propagate
 BACKSPACE_SETTLE = 0.05       # after terminal backspaces, before paste
-KITTY_SOCKET = "unix:@layout-fix-kitty"
 LOCK_PATH = "/tmp/layout-fix.lock"
 DEFAULT_TIMEOUT = 2.0     # bound for clipboard / niri / paste calls
 BACKSPACE_TIMEOUT = 3.0   # bound for the bulk-backspace wtype call
@@ -238,6 +236,16 @@ def paste_combo(shift: bool) -> None:
         run_quiet(["wtype", "-M", "ctrl", "-k", "v", "-m", "ctrl"])
 
 
+def backspace(count: int) -> None:
+    """Send `count` BackSpace presses in a single wtype invocation."""
+    if count <= 0:
+        return
+    args = ["wtype"]
+    for _ in range(count):
+        args += ["-k", "BackSpace"]
+    run_quiet(args, timeout=BACKSPACE_TIMEOUT)
+
+
 def copy_combo(is_terminal: bool) -> None:
     if is_terminal:
         run_quiet(["wtype", "-M", "ctrl", "-M", "shift", "-k", "c", "-m", "shift", "-m", "ctrl"])
@@ -257,40 +265,12 @@ def focused_is_kitty() -> bool:
 
 def get_selection(is_terminal: bool) -> str:
     selected = primary_text()
-    dbg("primary_text", selected)
     if not selected:
         # No primary selection: fall back to simulating Ctrl+C.
-        dbg("primary empty -> Ctrl+C fallback (is_terminal)", is_terminal)
         copy_combo(is_terminal)
         time.sleep(0.2)
         selected = clipboard_text()
-        dbg("clipboard after Ctrl+C fallback", selected)
     return selected
-
-
-def kitty_selection_at_cursor(selection: str) -> bool | None:
-    """True if the selection is the text immediately before the kitty cursor,
-    False if it is not, None if it cannot be determined."""
-    result = run_text(["kitten", "@", "--to", KITTY_SOCKET, "get-text", "--extent=screen", "--add-cursor"])
-    if result.returncode != 0 or not result.stdout:
-        return None
-    cursor = None
-    for cursor in re.finditer(r"\x1b\[(\d+);(\d+)H", result.stdout):
-        pass
-    if cursor is None:
-        return None
-    row, col = int(cursor.group(1)), int(cursor.group(2))
-    # Strip OSC sequences (e.g. powerlevel10k window-title / hyperlinks) first,
-    # then CSI, so neither shifts the column arithmetic below.
-    plain = re.sub(r"\x1b\].*?(?:\x07|\x1b\\)", "", result.stdout, flags=re.DOTALL)
-    plain = re.sub(r"\x1b\[[0-9;?]*[A-Za-z]", "", plain)
-    lines = plain.split("\n")
-    if row - 1 >= len(lines):
-        return None
-    # row/col are screen coordinates; if the typed text wraps across screen
-    # rows the selection won't match here and we fall back to non-destructive.
-    before_cursor = lines[row - 1][: col - 1]
-    return before_cursor.endswith(selection)
 
 
 def switch_layout_for(lang: str | None) -> None:
@@ -317,20 +297,16 @@ def do_replace(fixed: str, selected: str, is_terminal: bool) -> None:
     time.sleep(MOD_RELEASE_WAIT)
 
     if not is_terminal:
+        # GUI apps: paste replaces the selection natively.
         paste_combo(shift=False)
         return
 
-    # Terminals: pasting does not replace the mouse selection, so the original
-    # must be deleted by hand. Only delete when we can confirm the selection is
-    # the text right before the cursor — otherwise we would eat unselected text.
-    if kitty_selection_at_cursor(selected) is True:
-        for _ in range(len(selected)):
-            run_quiet(["wtype", "-k", "BackSpace"])
-        time.sleep(BACKSPACE_SETTLE)
-        paste_combo(shift=True)
-    else:
-        paste_combo(shift=True)
-        notify("layout-fix", "Original left in place — delete it manually")
+    # Terminals (kitty TUI apps): the OS does not replace the selection, so
+    # delete the original by sending one BackSpace per selected character
+    # (layout conversion is 1:1, so len(fixed) == len(selected)), then paste.
+    backspace(len(selected))
+    time.sleep(BACKSPACE_SETTLE)
+    paste_combo(shift=True)
 
 
 def clipboard_text() -> str:
@@ -341,19 +317,6 @@ def clipboard_text() -> str:
 def primary_text() -> str:
     result = run_text(["wl-paste", "--primary", "--no-newline", "--type", "text"])
     return result.stdout if result.returncode == 0 else ""
-
-
-def dbg(label: str, value=None) -> None:
-    """TEMPORARY boundary logging for debugging selection capture. Remove later."""
-    try:
-        with open("/tmp/layout-fix.log", "a") as f:
-            ts = time.monotonic()
-            if value is None:
-                f.write(f"{ts:.3f}  {label}\n")
-            else:
-                f.write(f"{ts:.3f}  {label}: {value!r}\n")
-    except Exception:
-        pass
 
 
 def acquire_single_instance_lock():
@@ -378,33 +341,24 @@ def replace_selection() -> int:
         if not require(command):
             return 1
 
-    dbg("=== run start ===")
     is_terminal = focused_is_kitty()
-    dbg("is_terminal", is_terminal)
     saved, restorable = save_clipboard()
-    dbg("saved clipboard", saved)
-    dbg("restorable", restorable)
 
     try:
         selected = get_selection(is_terminal)
-        dbg("selected (final)", selected)
         if not selected:
             notify("layout-fix", "No selected text found")
             return 1
 
         fixed = convert_layout(selected)
-        dbg("fixed", fixed)
         if fixed == selected:
             notify("layout-fix", "Selection did not need layout conversion")
             return 0
 
-        dbg("before do_replace")
         do_replace(fixed, selected, is_terminal)
-        dbg("after do_replace (pasted)")
         time.sleep(PASTE_SETTLE_WAIT)
     finally:
         restore_clipboard(saved, restorable)
-        dbg("=== run end (clipboard restored) ===")
 
     switch_layout_for(target_language(selected))
     return 0
