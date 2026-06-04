@@ -255,10 +255,15 @@ def kitty_selection_at_cursor(selection: str) -> bool | None:
     if cursor is None:
         return None
     row, col = int(cursor.group(1)), int(cursor.group(2))
-    plain = re.sub(r"\x1b\[[0-9;?]*[A-Za-z]", "", result.stdout)
+    # Strip OSC sequences (e.g. powerlevel10k window-title / hyperlinks) first,
+    # then CSI, so neither shifts the column arithmetic below.
+    plain = re.sub(r"\x1b\].*?(?:\x07|\x1b\\)", "", result.stdout, flags=re.DOTALL)
+    plain = re.sub(r"\x1b\[[0-9;?]*[A-Za-z]", "", plain)
     lines = plain.split("\n")
     if row - 1 >= len(lines):
         return None
+    # row/col are screen coordinates; if the typed text wraps across screen
+    # rows the selection won't match here and we fall back to non-destructive.
     before_cursor = lines[row - 1][: col - 1]
     return before_cursor.endswith(selection)
 
