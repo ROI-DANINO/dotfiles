@@ -5,6 +5,7 @@ First-person build-in-public journal and decision history — the *why* behind t
 ## Entries
 | # | Entry | Date | Milestone |
 |---|-------|------|-----------|
+| 0001 | [The 400-line file my agents kept ignoring](0001-lean-agents.md) | 2026-06-04 | Phase 5 — lean AGENTS.md |
 
 ## Style guardrails
 - First-person, honest over polished; hero's-journey framing.

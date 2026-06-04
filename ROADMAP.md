@@ -12,9 +12,10 @@ through the RDW workflow spine (AGENTS.md → journal → blog).
 - [x] Phase 2: **Brand theming** — Navy/cream/terracotta palette across kitty, gtk, dunst,
       waybar, walker, wob, zed.
 - [x] Phase 3: **Lockscreen** — swaylock → hyprlock (instant lock, OLED gradient backgrounds).
-- [ ] Phase 4: **RDW workflow spine** — project-local /rdw-* commands + journal/blog/roadmap
+- [x] Phase 4: **RDW workflow spine** — project-local /rdw-* commands + journal/blog/roadmap
       scaffold over the installed superpowers + remember plugins.
       Exit: scaffold committed; docs-map drift-clean; commands load.
-- [ ] Phase 5: **Slim AGENTS.md** — extract protocols / keybind map / daemon architecture into
+- [x] Phase 5: **Slim AGENTS.md** — extract protocols / keybind map / daemon architecture into
       reference docs; leave AGENTS.md a lean read-first index that links to them.
       Exit: AGENTS.md is an index; reference docs registered in docs-map; nothing lost.
+      Delivered in PR #1 (with Phase 4).

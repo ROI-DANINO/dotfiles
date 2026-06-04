@@ -1,18 +1,18 @@
-## Active — Phase 5 AGENTS reference split
+## Active — Phase 5 complete (PR open)
 
-**Resume here:** Phase 5 is implementing the approved lean `AGENTS.md` +
-`docs/agent-reference/` split.
+**Resume here:** Phases 4 + 5 are done and bundled in **PR #1**
+(`rdw-dotfiles-scaffold` → `master`). Next session reviews/merges that PR, then picks
+the next roadmap direction.
 
-Spec: `docs/superpowers/specs/2026-06-04-lean-agents-reference-docs-design.md`.
-Plan: `docs/superpowers/plans/2026-06-04-lean-agents-reference-docs.md`.
+PR: https://github.com/ROI-DANINO/dotfiles/pull/1
 
 ## Next
-- [x] Run preservation and drift verification.
-- [x] Commit the Phase 5 docs split.
+- [ ] Review and merge PR #1.
+- [ ] Decide on `M shell/.zshrc` and untracked `.agents/` (unrelated to the PR).
 
 ## Done
-- Phase 4 RDW scaffold committed and pushed on branch `rdw-dotfiles-scaffold`.
-- Lean AGENTS design researched, approved, written, and committed.
-- Phase 5 implementation plan written.
-- Detailed reference docs extracted under `docs/agent-reference/`.
-- Root `AGENTS.md` rewritten as a lean read-first index.
+- Phase 4 RDW scaffold committed and pushed on `rdw-dotfiles-scaffold`.
+- Phase 5: `AGENTS.md` slimmed to a 79-line lean index; detail extracted into 8
+  `docs/agent-reference/` docs.
+- RDW state reconciled; preservation/stow/whitespace verification passed.
+- Branch pushed; PR #1 opened against `master`.
