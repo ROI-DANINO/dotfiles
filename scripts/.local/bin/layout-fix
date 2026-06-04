@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import fcntl
 import re
 import shutil
 import subprocess
@@ -13,6 +14,7 @@ PASTE_SETTLE_WAIT = 0.15      # after paste, before restoring the clipboard
 CLIPBOARD_POLL_TIMEOUT = 0.5  # max wait for wl-copy to propagate
 BACKSPACE_SETTLE = 0.05       # after terminal backspaces, before paste
 KITTY_SOCKET = "unix:@layout-fix-kitty"
+LOCK_PATH = "/tmp/layout-fix.lock"
 
 
 US_TO_HEBREW = {
@@ -235,11 +237,14 @@ def focused_is_kitty() -> bool:
 
 def get_selection(is_terminal: bool) -> str:
     selected = primary_text()
+    dbg("primary_text", selected)
     if not selected:
         # No primary selection: fall back to simulating Ctrl+C.
+        dbg("primary empty -> Ctrl+C fallback (is_terminal)", is_terminal)
         copy_combo(is_terminal)
         time.sleep(0.2)
         selected = clipboard_text()
+        dbg("clipboard after Ctrl+C fallback", selected)
     return selected
 
 
@@ -318,29 +323,68 @@ def primary_text() -> str:
     return result.stdout if result.returncode == 0 else ""
 
 
+def dbg(label: str, value=None) -> None:
+    """TEMPORARY boundary logging for debugging selection capture. Remove later."""
+    try:
+        with open("/tmp/layout-fix.log", "a") as f:
+            ts = time.monotonic()
+            if value is None:
+                f.write(f"{ts:.3f}  {label}\n")
+            else:
+                f.write(f"{ts:.3f}  {label}: {value!r}\n")
+    except Exception:
+        pass
+
+
+def acquire_single_instance_lock():
+    """Return an open fd holding an exclusive lock, or None if another run holds it.
+    Keep the returned fd alive for the process lifetime; the lock releases on exit."""
+    fd = open(LOCK_PATH, "w")
+    try:
+        fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except BlockingIOError:
+        fd.close()
+        return None
+    return fd
+
+
 def replace_selection() -> int:
+    lock_fd = acquire_single_instance_lock()
+    if lock_fd is None:
+        notify("layout-fix", "already running")
+        return 0
+
     for command in ("wl-copy", "wl-paste", "wtype", "niri"):
         if not require(command):
             return 1
 
+    dbg("=== run start ===")
     is_terminal = focused_is_kitty()
+    dbg("is_terminal", is_terminal)
     saved, restorable = save_clipboard()
+    dbg("saved clipboard", saved)
+    dbg("restorable", restorable)
 
     try:
         selected = get_selection(is_terminal)
+        dbg("selected (final)", selected)
         if not selected:
             notify("layout-fix", "No selected text found")
             return 1
 
         fixed = convert_layout(selected)
+        dbg("fixed", fixed)
         if fixed == selected:
             notify("layout-fix", "Selection did not need layout conversion")
             return 0
 
+        dbg("before do_replace")
         do_replace(fixed, selected, is_terminal)
+        dbg("after do_replace (pasted)")
         time.sleep(PASTE_SETTLE_WAIT)
     finally:
         restore_clipboard(saved, restorable)
+        dbg("=== run end (clipboard restored) ===")
 
     switch_layout_for(target_language(selected))
     return 0
