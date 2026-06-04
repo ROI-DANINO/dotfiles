@@ -80,9 +80,8 @@ def check_caps_lock() -> bool:
     return False
 
 
-def convert_layout(text: str) -> str:
-    caps_on = check_caps_lock()
-    states = []
+def compute_states(text: str, caps_on: bool) -> list[int]:
+    states: list[int] = []
     current_state = 0  # 1 = US->Heb, -1 = Heb->US, 2 = US->US
 
     # Forward pass to detect state for unambiguous characters
@@ -104,7 +103,7 @@ def convert_layout(text: str) -> str:
             current_state = 1
         elif is_heb_only(text[i]):
             current_state = -1
-        
+
         if states[i] == 0:
             states[i] = current_state
 
@@ -112,6 +111,13 @@ def convert_layout(text: str) -> str:
     for i in range(len(states)):
         if states[i] == 0:
             states[i] = 1
+
+    return states
+
+
+def convert_layout(text: str) -> str:
+    caps_on = check_caps_lock()
+    states = compute_states(text, caps_on)
 
     result = []
     for i, char in enumerate(text):
@@ -132,6 +138,18 @@ def convert_layout(text: str) -> str:
             result.append(mapped)
 
     return "".join(result)
+
+
+def target_language(text: str) -> str | None:
+    """Dominant intended language of text: 'heb', 'eng', or None on tie/empty."""
+    states = compute_states(text, check_caps_lock())
+    heb = sum(1 for s in states if s == 1)
+    eng = sum(1 for s in states if s in (-1, 2))
+    if heb > eng:
+        return "heb"
+    if eng > heb:
+        return "eng"
+    return None
 
 
 def run_text(command: list[str], input_text: str | None = None) -> subprocess.CompletedProcess[str]:
@@ -222,10 +240,15 @@ def replace_selection() -> int:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Fix Hebrew/English wrong-keyboard-layout text.")
     parser.add_argument("--convert", help="Convert text and print the result without touching the clipboard.")
+    parser.add_argument("--detect-language", help="Print target language (heb/eng/none) without side effects.")
     args = parser.parse_args()
 
     if args.convert is not None:
         print(convert_layout(args.convert))
+        return 0
+
+    if args.detect_language is not None:
+        print(target_language(args.detect_language) or "none")
         return 0
 
     return replace_selection()
