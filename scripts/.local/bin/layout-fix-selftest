@@ -16,6 +16,20 @@ CASES = {
     "ert t, veuc. AGENTS.צג ub,j tu,u": "קרא את הקובץ AGENTS.md ונתח אותו",
     "veuc.": "הקובץ",
     "AGENTS.צג": "AGENTS.md",
+    # Edge-case regression entries
+    "": "",          # empty string round-trips unchanged
+    "12345": "12345",  # digits pass through unchanged
+    "code": "בםגק",  # lowercase US → Hebrew conversion
+    "ab.cd": "שנץבג",  # mixed letters + punctuation conversion
+}
+
+DETECT_CASES = {
+    "akuo": "heb",
+    "בםגק": "eng",
+    "פךקשדק": "eng",
+    "ert t, veuc. AGENTS.צג ub,j tu,u": "heb",
+    "": "none",
+    "aב": "none",
 }
 
 
@@ -44,13 +58,34 @@ def main() -> int:
         if actual != expected:
             failures.append(f"{source!r}: expected {expected!r}, got {actual!r}")
 
+    for source, expected in DETECT_CASES.items():
+        try:
+            result = subprocess.run(
+                [str(LAYOUT_FIX), "--detect-language", source],
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+        except FileNotFoundError:
+            failures.append(f"detect {source!r}: layout-fix command does not exist")
+            continue
+
+        if result.returncode != 0:
+            failures.append(
+                f"detect {source!r}: command failed with {result.returncode}: {result.stderr.strip()}"
+            )
+            continue
+        actual = result.stdout.rstrip("\n")
+        if actual != expected:
+            failures.append(f"detect {source!r}: expected {expected!r}, got {actual!r}")
+
     if failures:
         print("layout-fix selftest failed:", file=sys.stderr)
         for failure in failures:
             print(f"  - {failure}", file=sys.stderr)
         return 1
 
-    print(f"layout-fix selftest passed ({len(CASES)} cases)")
+    print(f"layout-fix selftest passed ({len(CASES) + len(DETECT_CASES)} cases)")
     return 0
 
 

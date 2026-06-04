@@ -35,7 +35,7 @@ Read this before changing any Niri bind. Preserve both arrow and hjkl bindings.
 | `Mod+Shift+Right` | move column right | ✓ (Shift+L reserved for lock) |
 | `Mod+Shift+B` | spawn toggle-bar (waybar ↔ sysbar) | ✓ |
 | `Mod+Shift+C` | spawn claude-desktop | ✓ |
-| `Mod+G` | fix selected Hebrew/English wrong-layout text | ✓ |
+| `Mod+G` | fix selected Hebrew/English wrong-layout text, then switch keyboard layout to the corrected language | ✓ |
 | `Mod+U/I` | focus workspace up/down | ✓ |
 | `Mod+Ctrl+U/I` | move column to workspace up/down | ✓ |
 | `Mod+R` | cycle column width | ✓ |
