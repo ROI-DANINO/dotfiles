@@ -15,6 +15,11 @@ stow\.sh
 docs
 system
 possible_upgrades
+journal
+blog
+\.claude
+ROADMAP\.md
+PROGRESS\.md
 
 # Editor and test artifacts
 \.pytest_cache
