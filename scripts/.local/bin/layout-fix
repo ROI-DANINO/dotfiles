@@ -15,6 +15,8 @@ CLIPBOARD_POLL_TIMEOUT = 0.5  # max wait for wl-copy to propagate
 BACKSPACE_SETTLE = 0.05       # after terminal backspaces, before paste
 KITTY_SOCKET = "unix:@layout-fix-kitty"
 LOCK_PATH = "/tmp/layout-fix.lock"
+DEFAULT_TIMEOUT = 2.0     # bound for clipboard / niri / paste calls
+BACKSPACE_TIMEOUT = 3.0   # bound for the bulk-backspace wtype call
 
 
 US_TO_HEBREW = {
@@ -164,15 +166,28 @@ def target_language(text: str, caps_on: bool | None = None) -> str | None:
     return None
 
 
-def run_text(command: list[str], input_text: str | None = None) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(
-        command,
-        input=input_text,
-        text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        check=False,
-    )
+def run_text(command: list[str], input_text: str | None = None,
+             timeout: float = DEFAULT_TIMEOUT) -> subprocess.CompletedProcess[str]:
+    try:
+        return subprocess.run(
+            command,
+            input=input_text,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+            timeout=timeout,
+        )
+    except subprocess.TimeoutExpired:
+        return subprocess.CompletedProcess(command, returncode=124, stdout="", stderr="timeout")
+
+
+def run_quiet(command: list[str], timeout: float = DEFAULT_TIMEOUT) -> None:
+    """Run a side-effecting command, ignoring failures and bounding by timeout."""
+    try:
+        subprocess.run(command, check=False, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        pass
 
 
 def require(command: str) -> bool:
@@ -211,27 +226,32 @@ def restore_clipboard(saved: str, restorable: bool) -> None:
         notify("layout-fix", "Clipboard held non-text data; not restored")
         return
     if saved == "":
-        subprocess.run(["wl-copy", "--clear"], check=False)
+        run_quiet(["wl-copy", "--clear"])
     else:
         set_clipboard(saved)
 
 
 def paste_combo(shift: bool) -> None:
     if shift:
-        subprocess.run(["wtype", "-M", "ctrl", "-M", "shift", "-k", "v", "-m", "shift", "-m", "ctrl"], check=False)
+        run_quiet(["wtype", "-M", "ctrl", "-M", "shift", "-k", "v", "-m", "shift", "-m", "ctrl"])
     else:
-        subprocess.run(["wtype", "-M", "ctrl", "-k", "v", "-m", "ctrl"], check=False)
+        run_quiet(["wtype", "-M", "ctrl", "-k", "v", "-m", "ctrl"])
 
 
 def copy_combo(is_terminal: bool) -> None:
     if is_terminal:
-        subprocess.run(["wtype", "-M", "ctrl", "-M", "shift", "-k", "c", "-m", "shift", "-m", "ctrl"], check=False)
+        run_quiet(["wtype", "-M", "ctrl", "-M", "shift", "-k", "c", "-m", "shift", "-m", "ctrl"])
     else:
-        subprocess.run(["wtype", "-M", "ctrl", "-k", "c", "-m", "ctrl"], check=False)
+        run_quiet(["wtype", "-M", "ctrl", "-k", "c", "-m", "ctrl"])
 
 
 def focused_is_kitty() -> bool:
-    focused = subprocess.run(["niri", "msg", "focused-window"], stdout=subprocess.PIPE, text=True, check=False)
+    try:
+        focused = subprocess.run(["niri", "msg", "focused-window"],
+                                 stdout=subprocess.PIPE, text=True, check=False,
+                                 timeout=DEFAULT_TIMEOUT)
+    except subprocess.TimeoutExpired:
+        return False
     return focused.returncode == 0 and 'App ID: "kitty"' in focused.stdout
 
 
@@ -283,7 +303,7 @@ def switch_layout_for(lang: str | None) -> None:
     for line in result.stdout.splitlines():
         parts = line.lstrip(" *").split(None, 1)
         if len(parts) == 2 and parts[0].isdigit() and name_needle in parts[1].lower():
-            subprocess.run(["niri", "msg", "action", "switch-layout", parts[0]], check=False)
+            run_quiet(["niri", "msg", "action", "switch-layout", parts[0]])
             return
 
 
@@ -305,7 +325,7 @@ def do_replace(fixed: str, selected: str, is_terminal: bool) -> None:
     # the text right before the cursor — otherwise we would eat unselected text.
     if kitty_selection_at_cursor(selected) is True:
         for _ in range(len(selected)):
-            subprocess.run(["wtype", "-k", "BackSpace"], check=False)
+            run_quiet(["wtype", "-k", "BackSpace"])
         time.sleep(BACKSPACE_SETTLE)
         paste_combo(shift=True)
     else:
