@@ -16,19 +16,23 @@ project isn't set up and to run `/rdw-init`. Stop.
 1. Read the manifest `journal/docs-map.md` and the surfaces it names:
    `AGENTS.md`, `journal/ops/phase.md`, `journal/ops/tasks.md`,
    `journal/context/active.md`, and the last ~20 lines of `journal/log.md`.
-2. **Drift detection (read-only).** Compare the manifest to reality:
+2. **Bridge check (read-only).** If `journal/context/next.md` exists with pending
+   `/rdw-next` entries, read it as the freshest short-term bridge between chats:
+   - If it agrees with `active.md`, treat it as the freshest confirmation.
+   - If they conflict, report the conflict explicitly and ask which is current — do not guess.
+3. **Drift detection (read-only).** Compare the manifest to reality:
    - Each desk in `desks:` should have `journal/work/<desk>/context.md`.
    - Each file named in the source-of-truth table should exist.
    Report any mismatch. If the drift is **structural** (missing desk dirs, renamed/removed
    surfaces), say: "Structural drift detected — consider `/rdw-init` to re-tune."
-3. Report, concisely:
+4. Report, concisely:
    - **Last phase** and what `phase.md` `note` shows was done.
    - **Current state / next** (`phase.md` `next`, and the active `plan`/`step` if set).
    - **Files needed** to execute that next step.
    - If `phase.md` `detour` is non-empty: report the open detour.
-4. **Arm the session:** invoke `superpowers:using-superpowers` — do not name a specific
+5. **Arm the session:** invoke `superpowers:using-superpowers` — do not name a specific
    skill; let Claude select what this session needs.
-5. Ask the user to confirm before doing any work: "Ready to continue here, or start elsewhere?"
+6. Ask the user to confirm before doing any work: "Ready to continue here, or start elsewhere?"
 
 ## Mid-plan brainstorm (guidance, not a command)
 
