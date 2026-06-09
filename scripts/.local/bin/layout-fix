@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import fcntl
+import os
 import shutil
 import subprocess
 import sys
@@ -12,7 +13,7 @@ MOD_RELEASE_WAIT = 0.4        # let the user physically release Mod+G
 PASTE_SETTLE_WAIT = 0.15      # after paste, before restoring the clipboard
 CLIPBOARD_POLL_TIMEOUT = 0.5  # max wait for wl-copy to propagate
 BACKSPACE_SETTLE = 0.05       # after terminal backspaces, before paste
-LOCK_PATH = "/tmp/layout-fix.lock"
+LOCK_PATH = os.path.join(os.environ.get("XDG_RUNTIME_DIR") or "/tmp", "layout-fix.lock")
 DEFAULT_TIMEOUT = 2.0     # bound for clipboard / niri / paste calls
 BACKSPACE_TIMEOUT = 3.0   # bound for the bulk-backspace wtype call
 
