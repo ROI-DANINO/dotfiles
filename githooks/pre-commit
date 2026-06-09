@@ -1,0 +1,84 @@
+#!/bin/bash
+#
+# pre-commit: block secret-looking values in STAGED (added) lines.
+#
+# Scans only `+` lines of `git diff --cached` (not context, not removals).
+# Real secrets belong in ~/.secrets (sourced by shell/.shell_env), never in
+# tracked files. Bypass for false positives: git commit --no-verify
+
+set -u
+
+# Collect added lines as "file:lineno:content" (lineno = line in new file).
+# This hook's own file is excluded: it contains the patterns as literals.
+added_lines=$(git diff --cached --no-color | awk '
+    /^\+\+\+ / {
+        file = substr($0, 5)          # strip "+++ "
+        sub(/^"?b\//, "", file)       # strip "b/" prefix
+        next
+    }
+    file == "githooks/pre-commit" { next }
+    /^@@/ {                           # hunk header: @@ -a,b +c,d @@
+        n = $3
+        sub(/^\+/, "", n)
+        sub(/,.*/, "", n)
+        lineno = n + 0
+        next
+    }
+    /^\\/  { next }                   # "\ No newline at end of file"
+    /^-/   { next }                   # removed line
+    /^\+/  {
+        if (file != "" && file != "/dev/null")
+            printf "%s:%d:%s\n", file, lineno, substr($0, 2)
+        lineno++
+        next
+    }
+    { lineno++ }                      # context line
+')
+
+[ -z "$added_lines" ] && exit 0
+
+fail=0
+
+report() {   # $1 = pattern description, $2 = matching "file:line:content" lines
+    echo "pre-commit: possible secret (pattern: $1):" >&2
+    printf '%s\n' "$2" | sed 's/^/    /' >&2
+    fail=1
+}
+
+# 1) Secret-ish variable assigned a real quoted value (8+ chars).
+#    Name part matched case-insensitively. Placeholder values such as
+#    TOKEN="$MY_TOKEN", TOKEN="${MY_TOKEN}" or TOKEN="ALL_CAPS_ENV_NAME"
+#    are allowed (references, not secrets).
+assign='(API_KEY|APIKEY|SECRET|TOKEN|PASSWORD|PRIVATE_KEY)[A-Z_]*[[:space:]]*=[[:space:]]*['\''"][^'\''"]{8,}'
+placeholder='=[[:space:]]*['\''"](\$|[A-Z0-9_]+['\''"])'
+m=$(printf '%s\n' "$added_lines" | grep -E -i "$assign" | grep -E -v "$placeholder" || true)
+[ -n "$m" ] && report "secret-like assignment" "$m"
+
+# 2) Known credential prefixes anywhere in an added line (case-sensitive).
+while IFS='	' read -r name regex; do
+    [ -z "$name" ] && continue
+    m=$(printf '%s\n' "$added_lines" | grep -E -e "$regex" || true)
+    [ -n "$m" ] && report "$name" "$m"
+done <<'EOF'
+Google OAuth-style token	AQ\.[A-Za-z0-9_-]{20,}
+OpenAI-style key	sk-[A-Za-z0-9_-]{20,}
+Anthropic key	sk-ant-
+GitHub PAT	ghp_[A-Za-z0-9]{20,}
+GitHub fine-grained PAT	github_pat_
+Google API key	AIza[0-9A-Za-z_-]{30,}
+Slack token	xox[bpoa]-
+AWS access key ID	AKIA[0-9A-Z]{16}
+Private key block	-----BEGIN .*PRIVATE KEY
+EOF
+
+if [ "$fail" -ne 0 ]; then
+    cat >&2 <<'MSG'
+
+Commit blocked: a staged line looks like a real secret.
+Remove it from the tracked file and move it to ~/.secrets (sourced by shell/.shell_env).
+False positive? Bypass with: git commit --no-verify
+MSG
+    exit 1
+fi
+
+exit 0

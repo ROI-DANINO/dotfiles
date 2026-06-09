@@ -355,6 +355,16 @@ else
 fi
 
 # ═════════════════════════════════════════════════════════════════════════════
+hdr "20 · Git hooks"
+# ═════════════════════════════════════════════════════════════════════════════
+if $DRY; then
+    info "Dry-run: would set core.hooksPath to githooks"
+else
+    git -C "$DOTFILES_DIR" config core.hooksPath githooks
+    ok "pre-commit secrets guard (githooks/)"
+fi
+
+# ═════════════════════════════════════════════════════════════════════════════
 echo ""
 echo -e "  ${GRN}Installation complete.${NC}"
 echo ""
