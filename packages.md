@@ -187,7 +187,7 @@ sudo dnf install brightnessctl playerctl light
 ## File Management & CLI Tools
 
 ```bash
-sudo dnf install yazi Thunar fzf wl-clipboard wtype bottom
+sudo dnf install yazi Thunar fzf wl-clipboard wtype bottom wf-recorder
 ```
 
 - `yazi` — Rust TUI file manager (primary, alias: `y`)
@@ -195,6 +195,7 @@ sudo dnf install yazi Thunar fzf wl-clipboard wtype bottom
 - `bottom` — system monitor (`Alt+M`)
 - `wl-clipboard` — Wayland clipboard (`wl-copy`/`wl-paste`)
 - `wtype` — Wayland virtual keyboard input for text-replacement hotkeys
+- `wf-recorder` — Wayland screen recorder (alias: `record`)
 
 ## Fonts
 

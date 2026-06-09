@@ -198,7 +198,7 @@ dnf_install brightnessctl playerctl light mpv
 # ═════════════════════════════════════════════════════════════════════════════
 hdr "10 · File management & CLI tools"
 # ═════════════════════════════════════════════════════════════════════════════
-dnf_install yazi Thunar fzf wl-clipboard wtype bottom
+dnf_install yazi Thunar fzf wl-clipboard wtype bottom wf-recorder
 
 # ═════════════════════════════════════════════════════════════════════════════
 hdr "11 · Fonts"
