@@ -48,3 +48,4 @@ journal/raw/*
 journal/raw/_inbox/*
 !journal/raw/_inbox/.gitkeep
 docs/superpowers/handoffs/
+docs/superpowers/specs/audit-data/
