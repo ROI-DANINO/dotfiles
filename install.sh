@@ -3,8 +3,6 @@
 # Usage: bash install.sh [--dry-run] [--all] [--minimal]
 #   --all      install every optional extra without asking
 #   --minimal  core desktop only, skip all optional extras
-# Exception: greetd autologin (§4c) is wizard-only — it removes the boot password
-# prompt and disables GDM, so it is never enabled by --all or non-interactive runs.
 # With no flags on a terminal, a short wizard asks about the optional extras
 # (browser, IDE, flatpak apps, …) up front, then runs unattended.
 set -euo pipefail
@@ -96,13 +94,6 @@ ask "Zed IDE?"                                     Y && WANT_ZED=true     || WAN
 ask "Claude Code + plugins?"                       Y && WANT_CLAUDE=true  || WANT_CLAUDE=false
 ask "Zellij multiplexer? (config is archived)"     N && WANT_ZELLIJ=true  || WANT_ZELLIJ=false
 
-# Wizard-only (see header): never auto-enabled by --all / non-interactive runs.
-WANT_AUTOLOGIN=false
-if [[ "$EXTRAS" == ask ]]; then
-    ask "greetd login? (autologin into niri + TUI fallback picker — disables GDM, no boot password)" N \
-        && WANT_AUTOLOGIN=true || WANT_AUTOLOGIN=false
-fi
-
 # Flatpak apps: all / pick one-by-one / skip
 FLATPAK_MODE=all
 if [[ "$EXTRAS" == ask ]]; then
@@ -188,57 +179,6 @@ else
         'auth include login' | sudo tee /etc/pam.d/hyprlock >/dev/null
     ok "/etc/pam.d/hyprlock"
 fi
-
-# ═════════════════════════════════════════════════════════════════════════════
-hdr "4c · Login — SDDM + Chili theme (Brand: Navy/Cream/Teal)"
-# ═════════════════════════════════════════════════════════════════════════════
-# SDDM provides a modern graphical "face" for the login screen.
-# We use the minimalist 'chili' theme skinned with brand colors.
-dnf_install sddm git
-
-CHILI_DIR="/usr/share/sddm/themes/chili"
-if [[ -d "$CHILI_DIR" ]]; then
-    ok "SDDM Chili theme (already installed)"
-else
-    info "Cloning SDDM Chili theme (sudo)"
-    $DRY || sudo git clone --depth 1 https://github.com/MarianArlt/sddm-chili.git "$CHILI_DIR"
-    ok "SDDM Chili theme"
-fi
-
-info "Configuring SDDM branding (sudo)"
-$DRY || sudo mkdir -p /etc/sddm.conf.d
-$DRY || sudo tee /etc/sddm.conf.d/branding.conf >/dev/null <<EOF
-[Theme]
-Current=chili
-EOF
-
-info "Applying brand palette to Chili theme (sudo QML patches)"
-if [[ ! $DRY ]]; then
-    sudo sed -i 's/property string generalFontColor: "white"/property string generalFontColor: "#F0E7D5"/' "$CHILI_DIR/Main.qml"
-    sudo sed -i '/Repeater {/,/    }/c\    Rectangle {\n        anchors.fill: parent\n        color: "#2F4156"\n    }' "$CHILI_DIR/Main.qml"
-    sudo sed -i 's/border.color: "white"/border.color: "#567C8D"/' "$CHILI_DIR/components/LoginForm.qml"
-    sudo sed -i 's/color: passwordFieldOutlined ? "transparent" : "white"/color: passwordFieldOutlined ? "transparent" : "#F0E7D5"/' "$CHILI_DIR/components/LoginForm.qml"
-    sudo sed -i 's/textColor: passwordFieldOutlined ? "white" : "black"/textColor: "#2F4156"/' "$CHILI_DIR/components/LoginForm.qml"
-    sudo sed -i 's/placeholderTextColor: passwordFieldOutlined ? "white" : "black"/placeholderTextColor: "#2F4156"/' "$CHILI_DIR/components/LoginForm.qml"
-fi
-ok "SDDM branding"
-
-if systemctl is-enabled --quiet sddm 2>/dev/null; then
-    ok "SDDM (already enabled)"
-else
-    info "Enabling SDDM (takes effect next boot)"
-    $DRY || sudo systemctl enable sddm
-    ok "SDDM enabled"
-fi
-
-# Cleanup old display managers
-for dm in ly@tty1.service greetd gdm; do
-    if systemctl is-enabled --quiet "$dm" 2>/dev/null; then
-        info "Disabling $dm"
-        $DRY || sudo systemctl disable "$dm"
-        ok "$dm disabled"
-    fi
-done
 
 # ═════════════════════════════════════════════════════════════════════════════
 hdr "5 · Wallpaper (swww — Rust, via cargo)"

@@ -48,9 +48,3 @@
 |-----------|------------|-----------------|
 | `swaylock-effects` → **hyprlock** | Wanted a fast, modern lock: swaylock blurred a 4–6 MP wallpaper live on every lock (~2s+ delay) and ties the clock to a cramped indicator ring. hyprlock shows one image as-is (instant) with a big clock, small date, and a styled password field. | swaylock module archived at `archived/swaylock/`; `git mv` it back + re-add to stow.sh/install.sh to revert. hyprlock is from the `sdegler/hyprland` COPR. |
 | swaylock binary `/usr/local/bin/swaylock` | Source build no longer used | Harmless leftover. Optional removal: `sudo rm /usr/local/bin/swaylock /etc/pam.d/swaylock && rm -rf ~/.local/src/swaylock-effects` |
-
-### 2026-06-10 login manager migration
-
-| Component | Why changed | If re-requested |
-|-----------|------------|-----------------|
-| `Ly` → **SDDM + Chili** | User preference for a graphical KDE-style "face" with brand colors (Navy/Cream/Teal). | Revert in `install.sh` (§4c), `packages.md`, and `README.md`. Ly configuration: `/etc/ly/config.ini`. |

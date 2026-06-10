@@ -58,21 +58,6 @@ sudo dnf install niri waybar dunst swayidle wob walker elephant
 Note: `SwayNotificationCenter` (swaync) is archived — `dunst` is the active notification daemon.
 Note: the screen locker is **hyprlock** (from a COPR, not in default repos). See the hyprlock section below.
 
-### SDDM graphical login manager (with brand-themed Chili)
-
-SDDM provides a modern, graphical "face" for the login screen. We use the minimalist **Chili** theme, skinned with the official brand Navy background and Cream text via QML patches. No autologin is configured by default.
-
-```bash
-# install.sh handles this:
-sudo dnf install sddm git
-sudo git clone --depth 1 https://github.com/MarianArlt/sddm-chili.git /usr/share/sddm/themes/chili
-# (Configuration in /etc/sddm.conf.d/branding.conf and Chili QML patches)
-sudo systemctl enable sddm
-sudo systemctl disable ly@tty1.service
-```
-
-To revert: `sudo systemctl disable ly@tty1.service && sudo systemctl enable gdm`.
-
 ### elephant (walker data-provider backend)
 Provides search index / application data to walker. Managed as a **systemd user service** — do not spawn it directly from niri `spawn-at-startup`.
 
