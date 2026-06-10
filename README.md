@@ -32,7 +32,7 @@ See `packages.md` for a manual reference of everything that gets installed.
 | hyprlock | `hyprlock/` | Modern lock screen — random OLED gradient each lock (instant), big clock + date, gradient-border password field (from `sdegler/hyprland` COPR, see packages.md) |
 | wob | `scripts/.local/bin/wob-daemon` | Volume/brightness OSD via FIFO pipe |
 | zsh | `shell/` | env, aliases, zshrc, p10k prompt |
-| greetd | `/etc/greetd/config.toml` (install.sh §4c) | Autologin into niri; tuigreet TUI fallback picker |
+| Ly | `/etc/ly/config.ini` (install.sh §4c) | Autologin into niri; TUI logout screen with fire animation |
 | Kitty | `kitty/` | Primary terminal (brand Navy palette) |
 | Git | `git/` | Global gitconfig |
 | GTK | `gtk/` | Brand palette override for GTK apps (navy/cream/teal on Orchis-Dark) |
@@ -42,13 +42,13 @@ See `packages.md` for a manual reference of everything that gets installed.
 | TLP | configured via `/etc/tlp.conf` | Battery charge capped at 85% |
 | Wallpapers | `wallpapers/` | Stowed into `~/Pictures/walpapers`; image assets are tracked with Git LFS |
 
-## Login — greetd + tuigreet (optional)
+## Login — Ly TUI manager (optional)
 
-The install wizard offers greetd as the display manager (replacing GDM): `initial_session` boots straight into niri — no password prompt, no greeter overhead. If niri ever exits or crashes, **tuigreet** appears: a fast TUI session picker where the GNOME emergency session is one arrow key away. Config: `/etc/greetd/config.toml` (written by install.sh §4c).
+The install wizard offers Ly as the display manager (replacing GDM/greetd): `auto_login_user` boots straight into niri — no password prompt, no greeter overhead. If you log out, the **Ly** TUI appears: a fast terminal-style login with a fire animation and username memory. Config: `/etc/ly/config.ini` (written by install.sh §4c).
 
 Opt-in and wizard-only (never enabled by `--all` or non-interactive runs) because it removes the boot password prompt — physical access means a full session. hyprlock still guards lock/idle; TTYs and SSH are unaffected.
 
-**Rescue path if niri breaks**: quit/crash drops you into tuigreet → pick GNOME → Enter. If even greetd is broken: `Ctrl+Alt+F2`, log in, `sudo systemctl start gdm`.
+**Rescue path if niri breaks**: log out (or crash) to Ly → use `F1` or the session menu to pick GNOME → Enter. If even Ly is broken: `Ctrl+Alt+F2`, log in, `sudo systemctl start gdm`.
 
 ## Power management
 

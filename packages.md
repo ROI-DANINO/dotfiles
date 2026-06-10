@@ -58,35 +58,26 @@ sudo dnf install niri waybar dunst swayidle wob walker elephant
 Note: `SwayNotificationCenter` (swaync) is archived — `dunst` is the active notification daemon.
 Note: the screen locker is **hyprlock** (from a COPR, not in default repos). See the hyprlock section below.
 
-### greetd + tuigreet login (optional, replaces GDM)
+### Ly TUI login manager (optional, replaces greetd/GDM)
 
-greetd boots straight into niri via `initial_session` (no password prompt, no greeter
-overhead); when niri exits or crashes, tuigreet appears — a TUI session picker with
-the GNOME emergency session in the list. The install wizard offers this opt-in; it is
-**never** enabled by `--all` or non-interactive runs, because it removes the boot
-password prompt (physical access = full session) and disables GDM. hyprlock still
-guards lock/idle; TTYs and SSH are unaffected.
+Ly boots straight into niri via `auto_login_user` (no password prompt). When niri exits, Ly appears — a polished TUI with username memory and a fire animation.
 
 ```bash
 # install.sh wizard handles this:
-sudo dnf install greetd tuigreet
-sudo tee /etc/greetd/config.toml << 'EOF'
-[terminal]
-vt = 1
-
-[default_session]
-command = "tuigreet --time --remember --remember-session --asterisks --sessions /usr/share/wayland-sessions"
-user = "greetd"
-
-[initial_session]
-command = "niri-session"
-user = "<user>"
+sudo dnf install ly
+sudo tee /etc/ly/config.ini << 'EOF'
+[config]
+auto_login_user = <user>
+auto_login_session = niri
+save = true
+animate = true
+service = ly
 EOF
-sudo systemctl enable greetd
-sudo systemctl disable gdm
+sudo systemctl enable ly
+sudo systemctl disable greetd
 ```
 
-To revert: `sudo systemctl disable greetd && sudo systemctl enable gdm`.
+To revert: `sudo systemctl disable ly && sudo systemctl enable gdm`.
 
 ### elephant (walker data-provider backend)
 Provides search index / application data to walker. Managed as a **systemd user service** — do not spawn it directly from niri `spawn-at-startup`.
