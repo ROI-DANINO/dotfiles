@@ -10,7 +10,14 @@
 @define-color headerbar_bg_color       #1E3045;
 @define-color headerbar_fg_color       #F0E7D5;
 @define-color sidebar_bg_color         #1E3045;
+@define-color sidebar_fg_color         #F0E7D5;
+@define-color sidebar_backdrop_color   #263749;
+@define-color secondary_sidebar_bg_color #1E3045;
+@define-color secondary_sidebar_fg_color #F0E7D5;
+@define-color dialog_bg_color          #2F4156;
+@define-color dialog_fg_color          #F0E7D5;
 @define-color popover_bg_color         #2F4156;
+@define-color popover_fg_color         #F0E7D5;
 
 /* GTK4 also checks these legacy names */
 @define-color theme_bg_color           #2F4156;
@@ -18,3 +25,23 @@
 @define-color theme_fg_color           #F0E7D5;
 @define-color theme_selected_bg_color  #C8D9E6;
 @define-color theme_selected_fg_color  #1E3045;
+
+/* File chooser (portal) places sidebar — theme may hardcode dark text */
+placessidebar,
+.sidebar {
+  background-color: #1E3045;
+  color: #F0E7D5;
+}
+
+placessidebar row,
+placessidebar row label,
+.sidebar row label {
+  color: #F0E7D5;
+}
+
+placessidebar row:selected,
+placessidebar row:selected label,
+.sidebar row:selected {
+  background-color: #C8D9E6;
+  color: #1E3045;
+}
