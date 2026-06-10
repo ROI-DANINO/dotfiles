@@ -3,7 +3,7 @@
 # Usage: bash install.sh [--dry-run] [--all] [--minimal]
 #   --all      install every optional extra without asking
 #   --minimal  core desktop only, skip all optional extras
-# Exception: TTY1 autologin (§4c) is wizard-only — it removes the boot password
+# Exception: greetd autologin (§4c) is wizard-only — it removes the boot password
 # prompt and disables GDM, so it is never enabled by --all or non-interactive runs.
 # With no flags on a terminal, a short wizard asks about the optional extras
 # (browser, IDE, flatpak apps, …) up front, then runs unattended.
@@ -99,7 +99,7 @@ ask "Zellij multiplexer? (config is archived)"     N && WANT_ZELLIJ=true  || WAN
 # Wizard-only (see header): never auto-enabled by --all / non-interactive runs.
 WANT_AUTOLOGIN=false
 if [[ "$EXTRAS" == ask ]]; then
-    ask "TTY1 autologin? (boot straight into niri — disables GDM, no boot password)" N \
+    ask "greetd login? (autologin into niri + TUI fallback picker — disables GDM, no boot password)" N \
         && WANT_AUTOLOGIN=true || WANT_AUTOLOGIN=false
 fi
 
@@ -190,33 +190,56 @@ else
 fi
 
 # ═════════════════════════════════════════════════════════════════════════════
-hdr "4c · Login — TTY1 autologin (no display manager)"
+hdr "4c · Login — greetd autologin into niri, tuigreet fallback"
 # ═════════════════════════════════════════════════════════════════════════════
-# shell/.zprofile (stowed in §19) execs niri-session when logging in on TTY1;
-# the getty override below makes that login automatic, so boot goes straight
-# into niri with zero display-manager overhead. Opt-in only: it removes the
-# boot password prompt (physical access = full session) and disables GDM.
-# hyprlock still guards lock/idle. Other TTYs and SSH are unaffected.
+# greetd boots straight into niri (initial_session — no password prompt, no
+# display-manager overhead). If niri ever exits or crashes, tuigreet appears:
+# a fast TUI session picker, so the GNOME emergency session stays reachable
+# without TTY commands. Opt-in only: removes the boot password prompt
+# (physical access = full session) and disables GDM. hyprlock still guards
+# lock/idle.
+GREETD_CONF="/etc/greetd/config.toml"
 GETTY_OVERRIDE="/etc/systemd/system/getty@tty1.service.d/autologin.conf"
 if ! $WANT_AUTOLOGIN; then
-    info "TTY1 autologin — skipped (opt-in, wizard only)"
-elif [[ -f "$GETTY_OVERRIDE" ]] && grep -q -- "--autologin $USER" "$GETTY_OVERRIDE"; then
-    ok "TTY1 autologin (already configured)"
+    info "greetd login — skipped (opt-in, wizard only)"
 else
-    info "Writing $GETTY_OVERRIDE (sudo)"
-    if ! $DRY; then
-        sudo mkdir -p /etc/systemd/system/getty@tty1.service.d
-        printf '%s\n' '[Service]' 'ExecStart=' \
-            "ExecStart=-/sbin/agetty --autologin $USER --noclear %I \$TERM" \
-            | sudo tee "$GETTY_OVERRIDE" >/dev/null
-        sudo systemctl daemon-reload
+    dnf_install greetd tuigreet
+    if [[ -f "$GREETD_CONF" ]] && grep -q "initial_session" "$GREETD_CONF"; then
+        ok "greetd config (already configured)"
+    else
+        info "Writing $GREETD_CONF (sudo)"
+        $DRY || sudo tee "$GREETD_CONF" >/dev/null <<EOF
+[terminal]
+vt = 1
+
+[default_session]
+command = "tuigreet --time --remember --remember-session --asterisks --sessions /usr/share/wayland-sessions"
+user = "greetd"
+
+[initial_session]
+command = "niri-session"
+user = "$USER"
+EOF
+        ok "greetd config"
     fi
-    ok "TTY1 autologin override"
-fi
-if $WANT_AUTOLOGIN && systemctl is-enabled --quiet gdm 2>/dev/null; then
-    info "Disabling GDM (niri now starts from TTY1)"
-    $DRY || sudo systemctl disable gdm
-    ok "GDM disabled"
+    # Clean up the earlier getty@tty1 autologin approach if present
+    if [[ -f "$GETTY_OVERRIDE" ]]; then
+        info "Removing old getty@tty1 autologin override (sudo)"
+        $DRY || { sudo rm "$GETTY_OVERRIDE"; sudo systemctl daemon-reload; }
+        ok "getty override removed"
+    fi
+    if systemctl is-enabled --quiet greetd 2>/dev/null; then
+        ok "greetd (already enabled)"
+    else
+        info "Enabling greetd (takes effect next boot)"
+        $DRY || sudo systemctl enable greetd
+        ok "greetd enabled"
+    fi
+    if systemctl is-enabled --quiet gdm 2>/dev/null; then
+        info "Disabling GDM (greetd is the display manager now)"
+        $DRY || sudo systemctl disable gdm
+        ok "GDM disabled"
+    fi
 fi
 
 # ═════════════════════════════════════════════════════════════════════════════
