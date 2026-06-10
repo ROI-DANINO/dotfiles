@@ -190,53 +190,41 @@ else
 fi
 
 # ═════════════════════════════════════════════════════════════════════════════
-hdr "4c · Login — greetd autologin into niri, tuigreet fallback"
+hdr "4c · Login — Ly TUI login manager (autologin into niri)"
 # ═════════════════════════════════════════════════════════════════════════════
-# greetd boots straight into niri (initial_session — no password prompt, no
-# display-manager overhead). If niri ever exits or crashes, tuigreet appears:
-# a fast TUI session picker, so the GNOME emergency session stays reachable
-# without TTY commands. Opt-in only: removes the boot password prompt
-# (physical access = full session) and disables GDM. hyprlock still guards
-# lock/idle.
-GREETD_CONF="/etc/greetd/config.toml"
-GETTY_OVERRIDE="/etc/systemd/system/getty@tty1.service.d/autologin.conf"
+# Ly boots straight into niri (auto_login_user — no password prompt).
+# If niri ever exits, Ly appears with username memory and fire animation.
+LY_CONF="/etc/ly/config.ini"
 if ! $WANT_AUTOLOGIN; then
-    info "greetd login — skipped (opt-in, wizard only)"
+    info "Ly login — skipped (opt-in, wizard only)"
 else
-    dnf_install greetd tuigreet
-    if [[ -f "$GREETD_CONF" ]] && grep -q "initial_session" "$GREETD_CONF"; then
-        ok "greetd config (already configured)"
-    else
-        info "Writing $GREETD_CONF (sudo)"
-        $DRY || sudo tee "$GREETD_CONF" >/dev/null <<EOF
-[terminal]
-vt = 1
-
-[default_session]
-command = "tuigreet --time --remember --remember-session --asterisks --sessions /usr/share/wayland-sessions"
-user = "greetd"
-
-[initial_session]
-command = "niri-session"
-user = "$USER"
+    dnf_install ly
+    info "Writing $LY_CONF (sudo)"
+    $DRY || sudo tee "$LY_CONF" >/dev/null <<EOF
+[config]
+auto_login_user = $USER
+auto_login_session = niri
+save = true
+animate = true
+bigclock = true
+service = ly
 EOF
-        ok "greetd config"
-    fi
-    # Clean up the earlier getty@tty1 autologin approach if present
-    if [[ -f "$GETTY_OVERRIDE" ]]; then
-        info "Removing old getty@tty1 autologin override (sudo)"
-        $DRY || { sudo rm "$GETTY_OVERRIDE"; sudo systemctl daemon-reload; }
-        ok "getty override removed"
+    ok "Ly config"
+
+    if systemctl is-enabled --quiet ly 2>/dev/null; then
+        ok "Ly (already enabled)"
+    else
+        info "Enabling Ly (takes effect next boot)"
+        $DRY || sudo systemctl enable ly
+        ok "Ly enabled"
     fi
     if systemctl is-enabled --quiet greetd 2>/dev/null; then
-        ok "greetd (already enabled)"
-    else
-        info "Enabling greetd (takes effect next boot)"
-        $DRY || sudo systemctl enable greetd
-        ok "greetd enabled"
+        info "Disabling greetd (Ly is the display manager now)"
+        $DRY || sudo systemctl disable greetd
+        ok "greetd disabled"
     fi
     if systemctl is-enabled --quiet gdm 2>/dev/null; then
-        info "Disabling GDM (greetd is the display manager now)"
+        info "Ensuring GDM is disabled"
         $DRY || sudo systemctl disable gdm
         ok "GDM disabled"
     fi
