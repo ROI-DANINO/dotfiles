@@ -31,7 +31,7 @@ See `packages.md` for a manual reference of everything that gets installed.
 | swayidle | `scripts/.local/bin/toggle-idle` | Idle: blank 5 min -> auto-lock 10 min; toggle can blank immediately |
 | hyprlock | `hyprlock/` | Modern lock screen — random OLED gradient each lock (instant), big clock + date, gradient-border password field (from `sdegler/hyprland` COPR, see packages.md) |
 | wob | `scripts/.local/bin/wob-daemon` | Volume/brightness OSD via FIFO pipe |
-| zsh | `shell/` | env, aliases, zshrc, p10k prompt |
+| zsh | `shell/` | env, aliases, zshrc, p10k prompt, `.zprofile` (TTY1 → niri autostart) |
 | Kitty | `kitty/` | Primary terminal (brand Navy palette) |
 | Git | `git/` | Global gitconfig |
 | GTK | `gtk/` | Brand palette override for GTK apps (navy/cream/teal on Orchis-Dark) |
@@ -40,6 +40,10 @@ See `packages.md` for a manual reference of everything that gets installed.
 | Zed | `zed/` | Editor settings + Brand Navy color theme |
 | TLP | configured via `/etc/tlp.conf` | Battery charge capped at 85% |
 | Wallpapers | `wallpapers/` | Stowed into `~/Pictures/walpapers`; image assets are tracked with Git LFS |
+
+## Login — no display manager (optional)
+
+The install wizard offers TTY1 autologin: a `getty@tty1` systemd override logs in automatically at boot, and `shell/.zprofile` execs `niri-session` on TTY1 — boot lands straight in niri with zero greeter overhead (GDM is disabled). It's opt-in and wizard-only (never enabled by `--all` or non-interactive runs) because it removes the boot password prompt — physical access means a full session. hyprlock still guards lock/idle, and other TTYs and SSH are unaffected.
 
 ## Power management
 

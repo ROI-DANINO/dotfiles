@@ -3,6 +3,8 @@
 # Usage: bash install.sh [--dry-run] [--all] [--minimal]
 #   --all      install every optional extra without asking
 #   --minimal  core desktop only, skip all optional extras
+# Exception: TTY1 autologin (§4c) is wizard-only — it removes the boot password
+# prompt and disables GDM, so it is never enabled by --all or non-interactive runs.
 # With no flags on a terminal, a short wizard asks about the optional extras
 # (browser, IDE, flatpak apps, …) up front, then runs unattended.
 set -euo pipefail
@@ -94,6 +96,13 @@ ask "Zed IDE?"                                     Y && WANT_ZED=true     || WAN
 ask "Claude Code + plugins?"                       Y && WANT_CLAUDE=true  || WANT_CLAUDE=false
 ask "Zellij multiplexer? (config is archived)"     N && WANT_ZELLIJ=true  || WANT_ZELLIJ=false
 
+# Wizard-only (see header): never auto-enabled by --all / non-interactive runs.
+WANT_AUTOLOGIN=false
+if [[ "$EXTRAS" == ask ]]; then
+    ask "TTY1 autologin? (boot straight into niri — disables GDM, no boot password)" N \
+        && WANT_AUTOLOGIN=true || WANT_AUTOLOGIN=false
+fi
+
 # Flatpak apps: all / pick one-by-one / skip
 FLATPAK_MODE=all
 if [[ "$EXTRAS" == ask ]]; then
@@ -178,6 +187,36 @@ else
         '# hyprlock PAM config — installed by dotfiles install.sh' \
         'auth include login' | sudo tee /etc/pam.d/hyprlock >/dev/null
     ok "/etc/pam.d/hyprlock"
+fi
+
+# ═════════════════════════════════════════════════════════════════════════════
+hdr "4c · Login — TTY1 autologin (no display manager)"
+# ═════════════════════════════════════════════════════════════════════════════
+# shell/.zprofile (stowed in §19) execs niri-session when logging in on TTY1;
+# the getty override below makes that login automatic, so boot goes straight
+# into niri with zero display-manager overhead. Opt-in only: it removes the
+# boot password prompt (physical access = full session) and disables GDM.
+# hyprlock still guards lock/idle. Other TTYs and SSH are unaffected.
+GETTY_OVERRIDE="/etc/systemd/system/getty@tty1.service.d/autologin.conf"
+if ! $WANT_AUTOLOGIN; then
+    info "TTY1 autologin — skipped (opt-in, wizard only)"
+elif [[ -f "$GETTY_OVERRIDE" ]] && grep -q -- "--autologin $USER" "$GETTY_OVERRIDE"; then
+    ok "TTY1 autologin (already configured)"
+else
+    info "Writing $GETTY_OVERRIDE (sudo)"
+    if ! $DRY; then
+        sudo mkdir -p /etc/systemd/system/getty@tty1.service.d
+        printf '%s\n' '[Service]' 'ExecStart=' \
+            "ExecStart=-/sbin/agetty --autologin $USER --noclear %I \$TERM" \
+            | sudo tee "$GETTY_OVERRIDE" >/dev/null
+        sudo systemctl daemon-reload
+    fi
+    ok "TTY1 autologin override"
+fi
+if $WANT_AUTOLOGIN && systemctl is-enabled --quiet gdm 2>/dev/null; then
+    info "Disabling GDM (niri now starts from TTY1)"
+    $DRY || sudo systemctl disable gdm
+    ok "GDM disabled"
 fi
 
 # ═════════════════════════════════════════════════════════════════════════════

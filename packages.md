@@ -58,6 +58,26 @@ sudo dnf install niri waybar dunst swayidle wob walker elephant
 Note: `SwayNotificationCenter` (swaync) is archived — `dunst` is the active notification daemon.
 Note: the screen locker is **hyprlock** (from a COPR, not in default repos). See the hyprlock section below.
 
+### TTY1 autologin — no display manager (optional)
+
+Skips GDM entirely: a `getty@tty1` override autologs in at boot, and `shell/.zprofile`
+(stowed) execs `niri-session` on TTY1. The install wizard offers this opt-in; it is
+**never** enabled by `--all` or non-interactive runs, because it removes the boot
+password prompt (physical access = full session) and disables GDM. hyprlock still
+guards lock/idle; other TTYs and SSH are unaffected.
+
+```bash
+# install.sh wizard handles this:
+sudo mkdir -p /etc/systemd/system/getty@tty1.service.d
+printf '%s\n' '[Service]' 'ExecStart=' \
+    'ExecStart=-/sbin/agetty --autologin <user> --noclear %I $TERM' \
+    | sudo tee /etc/systemd/system/getty@tty1.service.d/autologin.conf
+sudo systemctl daemon-reload
+sudo systemctl disable gdm
+```
+
+To revert: `sudo rm /etc/systemd/system/getty@tty1.service.d/autologin.conf && sudo systemctl daemon-reload && sudo systemctl enable gdm`.
+
 ### elephant (walker data-provider backend)
 Provides search index / application data to walker. Managed as a **systemd user service** — do not spawn it directly from niri `spawn-at-startup`.
 
