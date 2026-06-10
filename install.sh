@@ -190,46 +190,55 @@ else
 fi
 
 # ═════════════════════════════════════════════════════════════════════════════
-hdr "4c · Login — Ly TUI login manager (autologin into niri)"
+hdr "4c · Login — SDDM + Chili theme (Brand: Navy/Cream/Teal)"
 # ═════════════════════════════════════════════════════════════════════════════
-# Ly boots straight into niri (auto_login_user — no password prompt).
-# If niri ever exits, Ly appears with username memory and fire animation.
-LY_CONF="/etc/ly/config.ini"
-if ! $WANT_AUTOLOGIN; then
-    info "Ly login — skipped (opt-in, wizard only)"
-else
-    dnf_install ly
-    info "Writing $LY_CONF (sudo)"
-    $DRY || sudo tee "$LY_CONF" >/dev/null <<EOF
-[config]
-auto_login_user = $USER
-auto_login_session = niri
-save = true
-animate = true
-bigclock = true
-service = ly
-EOF
-    ok "Ly config"
+# SDDM provides a modern graphical "face" for the login screen.
+# We use the minimalist 'chili' theme skinned with brand colors.
+dnf_install sddm git
 
-    # Fedora ships only the templated unit ly@.service — plain `enable ly` fails.
-    if systemctl is-enabled --quiet ly@tty1.service 2>/dev/null; then
-        ok "Ly (already enabled)"
-    else
-        info "Enabling Ly (takes effect next boot)"
-        $DRY || sudo systemctl enable ly@tty1.service
-        ok "Ly enabled"
-    fi
-    if systemctl is-enabled --quiet greetd 2>/dev/null; then
-        info "Disabling greetd (Ly is the display manager now)"
-        $DRY || sudo systemctl disable greetd
-        ok "greetd disabled"
-    fi
-    if systemctl is-enabled --quiet gdm 2>/dev/null; then
-        info "Ensuring GDM is disabled"
-        $DRY || sudo systemctl disable gdm
-        ok "GDM disabled"
-    fi
+CHILI_DIR="/usr/share/sddm/themes/chili"
+if [[ -d "$CHILI_DIR" ]]; then
+    ok "SDDM Chili theme (already installed)"
+else
+    info "Cloning SDDM Chili theme (sudo)"
+    $DRY || sudo git clone --depth 1 https://github.com/MarianArlt/sddm-chili.git "$CHILI_DIR"
+    ok "SDDM Chili theme"
 fi
+
+info "Configuring SDDM branding (sudo)"
+$DRY || sudo mkdir -p /etc/sddm.conf.d
+$DRY || sudo tee /etc/sddm.conf.d/branding.conf >/dev/null <<EOF
+[Theme]
+Current=chili
+EOF
+
+info "Applying brand palette to Chili theme (sudo QML patches)"
+if [[ ! $DRY ]]; then
+    sudo sed -i 's/property string generalFontColor: "white"/property string generalFontColor: "#F0E7D5"/' "$CHILI_DIR/Main.qml"
+    sudo sed -i '/Repeater {/,/    }/c\    Rectangle {\n        anchors.fill: parent\n        color: "#2F4156"\n    }' "$CHILI_DIR/Main.qml"
+    sudo sed -i 's/border.color: "white"/border.color: "#567C8D"/' "$CHILI_DIR/components/LoginForm.qml"
+    sudo sed -i 's/color: passwordFieldOutlined ? "transparent" : "white"/color: passwordFieldOutlined ? "transparent" : "#F0E7D5"/' "$CHILI_DIR/components/LoginForm.qml"
+    sudo sed -i 's/textColor: passwordFieldOutlined ? "white" : "black"/textColor: "#2F4156"/' "$CHILI_DIR/components/LoginForm.qml"
+    sudo sed -i 's/placeholderTextColor: passwordFieldOutlined ? "white" : "black"/placeholderTextColor: "#2F4156"/' "$CHILI_DIR/components/LoginForm.qml"
+fi
+ok "SDDM branding"
+
+if systemctl is-enabled --quiet sddm 2>/dev/null; then
+    ok "SDDM (already enabled)"
+else
+    info "Enabling SDDM (takes effect next boot)"
+    $DRY || sudo systemctl enable sddm
+    ok "SDDM enabled"
+fi
+
+# Cleanup old display managers
+for dm in ly@tty1.service greetd gdm; do
+    if systemctl is-enabled --quiet "$dm" 2>/dev/null; then
+        info "Disabling $dm"
+        $DRY || sudo systemctl disable "$dm"
+        ok "$dm disabled"
+    fi
+done
 
 # ═════════════════════════════════════════════════════════════════════════════
 hdr "5 · Wallpaper (swww — Rust, via cargo)"
