@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import importlib.machinery
+import importlib.util
 import subprocess
 import sys
 from pathlib import Path
@@ -6,6 +8,14 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 LAYOUT_FIX = ROOT / "layout-fix"
+
+
+def load_layout_fix_module():
+    loader = importlib.machinery.SourceFileLoader("layout_fix", str(LAYOUT_FIX))
+    spec = importlib.util.spec_from_loader("layout_fix", loader)
+    module = importlib.util.module_from_spec(spec)
+    loader.exec_module(module)
+    return module
 
 
 CASES = {
@@ -31,6 +41,19 @@ DETECT_CASES = {
     "": "none",
     "aב": "none",
 }
+
+NIRI_LAYOUTS = {"names": ["English (US)", "Hebrew"], "current_idx": 0}
+NIRI_LAYOUTS_HEB = {"names": ["English (US)", "Hebrew"], "current_idx": 1}
+
+# (layouts json, target lang, expected index or None when no switch is needed)
+PICK_LAYOUT_CASES = [
+    (NIRI_LAYOUTS, "heb", 1),       # on English, Hebrew wanted -> switch to 1
+    (NIRI_LAYOUTS, "eng", None),    # already on English -> no switch
+    (NIRI_LAYOUTS_HEB, "eng", 0),   # on Hebrew, English wanted -> switch to 0
+    (NIRI_LAYOUTS_HEB, "heb", None),  # already on Hebrew -> no switch
+    (NIRI_LAYOUTS, None, None),     # undetermined language -> no switch
+    ({}, "heb", None),              # malformed/empty IPC reply -> no switch
+]
 
 
 def main() -> int:
@@ -79,13 +102,27 @@ def main() -> int:
         if actual != expected:
             failures.append(f"detect {source!r}: expected {expected!r}, got {actual!r}")
 
+    try:
+        layout_fix = load_layout_fix_module()
+        for layouts, lang, expected in PICK_LAYOUT_CASES:
+            actual = layout_fix.pick_layout_index(layouts, lang)
+            if actual != expected:
+                failures.append(
+                    f"pick_layout_index({layouts!r}, {lang!r}): expected {expected!r}, got {actual!r}"
+                )
+    except Exception as exc:
+        failures.append(f"pick_layout_index: failed to load/run: {exc}")
+
     if failures:
         print("layout-fix selftest failed:", file=sys.stderr)
         for failure in failures:
             print(f"  - {failure}", file=sys.stderr)
         return 1
 
-    print(f"layout-fix selftest passed ({len(CASES) + len(DETECT_CASES)} cases)")
+    print(
+        f"layout-fix selftest passed "
+        f"({len(CASES) + len(DETECT_CASES) + len(PICK_LAYOUT_CASES)} cases)"
+    )
     return 0
 
 

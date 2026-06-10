@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import fcntl
+import json
 import os
 import shutil
 import subprocess
@@ -9,9 +10,12 @@ import time
 import glob
 
 
-MOD_RELEASE_WAIT = 0.4        # let the user physically release Mod+G
-PASTE_SETTLE_WAIT = 0.15      # after paste, before restoring the clipboard
+RELEASE_DEADLINE = 0.55       # seconds since launch before synthetic key events;
+                              # a held Mod turns Ctrl+C/V into Super+Ctrl+C/V
+PASTE_SETTLE_WAIT = 0.35      # after paste, before restoring the clipboard; runs
+                              # after the user-visible work, so it costs no latency
 CLIPBOARD_POLL_TIMEOUT = 0.5  # max wait for wl-copy to propagate
+COPY_POLL_TIMEOUT = 0.6       # max wait for a simulated Ctrl+C to produce content
 BACKSPACE_SETTLE = 0.05       # after terminal backspaces, before paste
 LOCK_PATH = os.path.join(os.environ.get("XDG_RUNTIME_DIR") or "/tmp", "layout-fix.lock")
 DEFAULT_TIMEOUT = 2.0     # bound for clipboard / niri / paste calls
@@ -126,10 +130,7 @@ def compute_states(text: str, caps_on: bool) -> list[int]:
     return states
 
 
-def convert_layout(text: str) -> str:
-    caps_on = check_caps_lock()
-    states = compute_states(text, caps_on)
-
+def apply_states(text: str, states: list[int], caps_on: bool) -> str:
     result = []
     for i, char in enumerate(text):
         if states[i] == 2:
@@ -151,11 +152,8 @@ def convert_layout(text: str) -> str:
     return "".join(result)
 
 
-def target_language(text: str, caps_on: bool | None = None) -> str | None:
-    """Dominant intended language of text: 'heb', 'eng', or None on tie/empty."""
-    if caps_on is None:
-        caps_on = check_caps_lock()
-    states = compute_states(text, caps_on)
+def dominant_language(states: list[int]) -> str | None:
+    """Dominant intended language: 'heb', 'eng', or None on tie/empty."""
     heb = sum(1 for s in states if s == 1)
     eng = sum(1 for s in states if s in (-1, 2))
     if heb > eng:
@@ -163,6 +161,18 @@ def target_language(text: str, caps_on: bool | None = None) -> str | None:
     if eng > heb:
         return "eng"
     return None
+
+
+def convert_layout(text: str) -> str:
+    caps_on = check_caps_lock()
+    return apply_states(text, compute_states(text, caps_on), caps_on)
+
+
+def target_language(text: str, caps_on: bool | None = None) -> str | None:
+    """Dominant intended language of text: 'heb', 'eng', or None on tie/empty."""
+    if caps_on is None:
+        caps_on = check_caps_lock()
+    return dominant_language(compute_states(text, caps_on))
 
 
 def run_text(command: list[str], input_text: str | None = None,
@@ -230,6 +240,12 @@ def restore_clipboard(saved: str, restorable: bool) -> None:
         set_clipboard(saved)
 
 
+def wait_for_release(start: float) -> None:
+    """Sleep out the remainder of the Mod+G release window. Work already done
+    since launch counts toward the deadline, so this costs only what is left."""
+    time.sleep(max(0.0, start + RELEASE_DEADLINE - time.monotonic()))
+
+
 def paste_combo(shift: bool) -> None:
     if shift:
         run_quiet(["wtype", "-M", "ctrl", "-M", "shift", "-k", "v", "-m", "shift", "-m", "ctrl"])
@@ -255,47 +271,71 @@ def copy_combo(is_terminal: bool) -> None:
 
 
 def focused_is_kitty() -> bool:
-    try:
-        focused = subprocess.run(["niri", "msg", "focused-window"],
-                                 stdout=subprocess.PIPE, text=True, check=False,
-                                 timeout=DEFAULT_TIMEOUT)
-    except subprocess.TimeoutExpired:
+    result = run_text(["niri", "msg", "--json", "focused-window"])
+    if result.returncode != 0:
         return False
-    return focused.returncode == 0 and 'App ID: "kitty"' in focused.stdout
+    try:
+        return json.loads(result.stdout).get("app_id") == "kitty"
+    except (json.JSONDecodeError, AttributeError):
+        return False
 
 
-def get_selection(is_terminal: bool) -> str:
+def get_selection(is_terminal: bool, start: float) -> str:
     selected = primary_text()
-    if not selected:
-        # No primary selection: fall back to simulating Ctrl+C.
-        copy_combo(is_terminal)
-        time.sleep(0.2)
+    if selected:
+        return selected
+
+    # No primary selection: fall back to simulating Ctrl+C. Clear the clipboard
+    # first (it is already saved) so a failed copy yields "no selection" instead
+    # of silently handing us stale clipboard content, and wait out the Mod+G
+    # release so the synthetic Ctrl+C is not swallowed as Super+Ctrl+C.
+    run_quiet(["wl-copy", "--clear"])
+    wait_for_release(start)
+    copy_combo(is_terminal)
+
+    deadline = time.monotonic() + COPY_POLL_TIMEOUT
+    while time.monotonic() < deadline:
         selected = clipboard_text()
-    return selected
+        if selected:
+            return selected
+        time.sleep(0.03)
+    return ""
+
+
+def pick_layout_index(layouts: dict, lang: str | None) -> int | None:
+    """Index to switch to for `lang` given niri's keyboard-layouts JSON,
+    or None when no switch is needed (unknown lang, already active, no match)."""
+    name_needle = {"heb": "hebrew", "eng": "english"}.get(lang or "")
+    if not name_needle:
+        return None
+    names = layouts.get("names") or []
+    for index, name in enumerate(names):
+        if name_needle in name.lower():
+            return None if index == layouts.get("current_idx") else index
+    return None
 
 
 def switch_layout_for(lang: str | None) -> None:
-    name_needle = {"heb": "hebrew", "eng": "english"}.get(lang or "")
-    if not name_needle:
-        return
-    result = run_text(["niri", "msg", "keyboard-layouts"])
+    result = run_text(["niri", "msg", "--json", "keyboard-layouts"])
     if result.returncode != 0:
         return
-    for line in result.stdout.splitlines():
-        parts = line.lstrip(" *").split(None, 1)
-        if len(parts) == 2 and parts[0].isdigit() and name_needle in parts[1].lower():
-            run_quiet(["niri", "msg", "action", "switch-layout", parts[0]])
-            return
+    try:
+        layouts = json.loads(result.stdout)
+    except json.JSONDecodeError:
+        return
+    index = pick_layout_index(layouts, lang)
+    if index is not None:
+        run_quiet(["niri", "msg", "action", "switch-layout", str(index)])
 
 
-def do_replace(fixed: str, selected: str, is_terminal: bool) -> None:
+def do_replace(fixed: str, selected: str, is_terminal: bool, start: float) -> None:
     set_clipboard(fixed)
     if not wait_for_clipboard(fixed, CLIPBOARD_POLL_TIMEOUT):
         notify("layout-fix", "Clipboard sync slow")
 
     # Wait for the user to physically release Mod+G; a held Mod key can
     # corrupt terminal bracketed-paste sequences.
-    time.sleep(MOD_RELEASE_WAIT)
+    wait_for_release(start)
 
     if not is_terminal:
         # GUI apps: paste replaces the selection natively.
@@ -333,6 +373,8 @@ def acquire_single_instance_lock():
 
 
 def replace_selection() -> int:
+    start = time.monotonic()
+
     lock_fd = acquire_single_instance_lock()
     if lock_fd is None:
         notify("layout-fix", "already running")
@@ -346,22 +388,28 @@ def replace_selection() -> int:
     saved, restorable = save_clipboard()
 
     try:
-        selected = get_selection(is_terminal)
+        selected = get_selection(is_terminal, start)
         if not selected:
             notify("layout-fix", "No selected text found")
             return 1
 
-        fixed = convert_layout(selected)
+        caps_on = check_caps_lock()
+        states = compute_states(selected, caps_on)
+        fixed = apply_states(selected, states, caps_on)
         if fixed == selected:
             notify("layout-fix", "Selection did not need layout conversion")
             return 0
 
-        do_replace(fixed, selected, is_terminal)
+        # Switch the layout before replacing the text: it does not depend on
+        # the paste (wtype carries its own keymap), and sequencing it last is
+        # what made the language flip feel laggy.
+        switch_layout_for(dominant_language(states))
+
+        do_replace(fixed, selected, is_terminal, start)
         time.sleep(PASTE_SETTLE_WAIT)
     finally:
         restore_clipboard(saved, restorable)
 
-    switch_layout_for(target_language(selected))
     return 0
 
 
