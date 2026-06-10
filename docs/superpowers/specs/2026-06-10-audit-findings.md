@@ -41,6 +41,18 @@ Every change gets its revert command logged here when applied.
 | C5 | **orca screen-reader autostart** — accessibility; exits quickly if unused. | one launch per login | Harmless to keep; removal is cosmetic cleanliness only |
 | C6 | **atd** — runs `at` one-shot scheduled jobs; almost nobody uses it. | 1 tiny service | Disable for cleanliness or keep; negligible either way |
 
+## Applied — 2026-06-10 (Group A, disable-only, no packages removed)
+
+| ID | Action taken | Revert |
+|----|--------------|--------|
+| A1, A3, A4, A7 | `Hidden=true` override files in `~/.config/autostart/` for vboxclient, vmware-user, spice-vdagent, sealertauto, org.freedesktop.problems.applet, imsettings-start | `rm ~/.config/autostart/<name>.desktop` |
+| A2 | `systemctl disable --now rsyslog` | `sudo systemctl enable --now rsyslog` |
+| A5 | `systemctl disable --now switcheroo-control` | `sudo systemctl enable --now switcheroo-control` |
+| A6 | `systemctl disable --now sssd-kcm.socket sssd-kcm.service gssproxy` | `sudo systemctl enable --now sssd-kcm.socket gssproxy` |
+
+Status: B and C pending owner go-ahead after a healthy reboot. C3 (plymouth)
+to be re-measured under greetd: `systemd-analyze blame | head` after reboot.
+
 ## Explicitly KEEP (verified, not touched)
 
 asusd (ASUS hardware control), bolt (Thunderbolt), iio-sensor-proxy (your
