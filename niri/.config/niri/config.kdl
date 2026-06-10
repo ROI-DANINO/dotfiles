@@ -22,6 +22,8 @@ input {
             layout "us,il"
             options "grp:win_space_toggle"
         }
+        // Remember layout per window: new windows (incl. kitty) start in English
+        track-layout "window"
     }
 
     // Next sections include libinput settings.
