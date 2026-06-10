@@ -211,11 +211,12 @@ service = ly
 EOF
     ok "Ly config"
 
-    if systemctl is-enabled --quiet ly 2>/dev/null; then
+    # Fedora ships only the templated unit ly@.service — plain `enable ly` fails.
+    if systemctl is-enabled --quiet ly@tty1.service 2>/dev/null; then
         ok "Ly (already enabled)"
     else
         info "Enabling Ly (takes effect next boot)"
-        $DRY || sudo systemctl enable ly
+        $DRY || sudo systemctl enable ly@tty1.service
         ok "Ly enabled"
     fi
     if systemctl is-enabled --quiet greetd 2>/dev/null; then

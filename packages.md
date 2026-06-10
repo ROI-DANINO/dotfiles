@@ -73,11 +73,11 @@ save = true
 animate = true
 service = ly
 EOF
-sudo systemctl enable ly
+sudo systemctl enable ly@tty1.service   # Fedora ships only the templated ly@.service
 sudo systemctl disable greetd
 ```
 
-To revert: `sudo systemctl disable ly && sudo systemctl enable gdm`.
+To revert: `sudo systemctl disable ly@tty1.service && sudo systemctl enable gdm`.
 
 ### elephant (walker data-provider backend)
 Provides search index / application data to walker. Managed as a **systemd user service** — do not spawn it directly from niri `spawn-at-startup`.
