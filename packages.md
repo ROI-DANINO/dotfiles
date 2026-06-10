@@ -58,23 +58,17 @@ sudo dnf install niri waybar dunst swayidle wob walker elephant
 Note: `SwayNotificationCenter` (swaync) is archived — `dunst` is the active notification daemon.
 Note: the screen locker is **hyprlock** (from a COPR, not in default repos). See the hyprlock section below.
 
-### Ly TUI login manager (optional, replaces greetd/GDM)
+### SDDM graphical login manager (with brand-themed Chili)
 
-Ly boots straight into niri via `auto_login_user` (no password prompt). When niri exits, Ly appears — a polished TUI with username memory and a fire animation.
+SDDM provides a modern, graphical "face" for the login screen. We use the minimalist **Chili** theme, skinned with the official brand Navy background and Cream text via QML patches. No autologin is configured by default.
 
 ```bash
-# install.sh wizard handles this:
-sudo dnf install ly
-sudo tee /etc/ly/config.ini << 'EOF'
-[config]
-auto_login_user = <user>
-auto_login_session = niri
-save = true
-animate = true
-service = ly
-EOF
-sudo systemctl enable ly@tty1.service   # Fedora ships only the templated ly@.service
-sudo systemctl disable greetd
+# install.sh handles this:
+sudo dnf install sddm git
+sudo git clone --depth 1 https://github.com/MarianArlt/sddm-chili.git /usr/share/sddm/themes/chili
+# (Configuration in /etc/sddm.conf.d/branding.conf and Chili QML patches)
+sudo systemctl enable sddm
+sudo systemctl disable ly@tty1.service
 ```
 
 To revert: `sudo systemctl disable ly@tty1.service && sudo systemctl enable gdm`.

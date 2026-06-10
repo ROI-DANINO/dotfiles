@@ -53,4 +53,4 @@
 
 | Component | Why changed | If re-requested |
 |-----------|------------|-----------------|
-| `greetd` + `tuigreet` → **Ly** | User preference for a polished TUI aesthetic with robust username memory on logout. Greetd/tuigreet felt too minimal or inconsistent for the owner's taste. | Revert in `install.sh` (§4c), `packages.md`, and `README.md`. Greetd configuration: `/etc/greetd/config.toml`. |
+| `Ly` → **SDDM + Chili** | User preference for a graphical KDE-style "face" with brand colors (Navy/Cream/Teal). | Revert in `install.sh` (§4c), `packages.md`, and `README.md`. Ly configuration: `/etc/ly/config.ini`. |
