@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 # install.sh — one-command fresh Fedora + Niri dotfiles deploy
-# Usage: bash install.sh [--dry-run]
+# Usage: bash install.sh [--dry-run] [--all] [--minimal]
+#   --all      install every optional extra without asking
+#   --minimal  core desktop only, skip all optional extras
+# With no flags on a terminal, a short wizard asks about the optional extras
+# (browser, IDE, flatpak apps, …) up front, then runs unattended.
 set -euo pipefail
 
 # ── Colours ──────────────────────────────────────────────────────────────────
@@ -13,7 +17,28 @@ hdr()  { echo -e "\n${CYN}══ $* ══${NC}"; }
 # ── Helpers ───────────────────────────────────────────────────────────────────
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DRY=false
-[[ "${1:-}" == "--dry-run" ]] && DRY=true && info "Dry-run mode — no changes will be made"
+EXTRAS=ask     # ask | all | none
+for arg in "$@"; do
+    case "$arg" in
+        --dry-run) DRY=true; info "Dry-run mode — no changes will be made" ;;
+        --all)     EXTRAS=all ;;
+        --minimal) EXTRAS=none ;;
+        *)         err "Unknown flag: $arg"; exit 1 ;;
+    esac
+done
+# Not a terminal (CI, piped)? Keep the old install-everything behaviour.
+[[ "$EXTRAS" == ask && ! -t 0 ]] && EXTRAS=all
+
+# ask "Question?" default(Y|N) → 0 = yes
+ask() {
+    local q="$1" def="${2:-Y}" hint reply
+    [[ "$EXTRAS" == all  ]] && return 0
+    [[ "$EXTRAS" == none ]] && return 1
+    [[ "$def" == Y ]] && hint="[Y/n]" || hint="[y/N]"
+    read -r -p "$(echo -e "  ${CYN}?${NC}  $q $hint ")" reply
+    reply="${reply:-$def}"
+    [[ "$reply" =~ ^[Yy] ]]
+}
 
 cmd_exists() { command -v "$1" &>/dev/null; }
 rpm_installed() { rpm -q "$1" &>/dev/null; }
@@ -54,6 +79,34 @@ echo "  ════════════════════════
 echo "  Dotfiles: $DOTFILES_DIR"
 echo "  Target  : $HOME"
 echo ""
+
+# ═════════════════════════════════════════════════════════════════════════════
+# Optional extras — asked up front so the rest runs unattended.
+# The core desktop (niri, shell, kitty, hyprlock, TLP, CLI tools, stow) is
+# always installed; these are the personal-taste picks that vary per person.
+# ═════════════════════════════════════════════════════════════════════════════
+if [[ "$EXTRAS" == ask ]]; then
+    echo "  A few choices before we start — everything else is core and just installs."
+    echo ""
+fi
+ask "Zen Browser (set as default browser)?"        Y && WANT_ZEN=true     || WANT_ZEN=false
+ask "Zed IDE?"                                     Y && WANT_ZED=true     || WANT_ZED=false
+ask "Claude Code + plugins?"                       Y && WANT_CLAUDE=true  || WANT_CLAUDE=false
+ask "Zellij multiplexer? (config is archived)"     N && WANT_ZELLIJ=true  || WANT_ZELLIJ=false
+
+# Flatpak apps: all / pick one-by-one / skip
+FLATPAK_MODE=all
+if [[ "$EXTRAS" == ask ]]; then
+    read -r -p "$(echo -e "  ${CYN}?${NC}  Flatpak apps (Chromium, Obsidian, Spotify, …) — all, pick, or skip? [A/p/s] ")" reply
+    case "${reply:-a}" in
+        [Pp]*) FLATPAK_MODE=pick ;;
+        [Ss]*) FLATPAK_MODE=skip ;;
+        *)     FLATPAK_MODE=all ;;
+    esac
+elif [[ "$EXTRAS" == none ]]; then
+    FLATPAK_MODE=skip
+fi
+[[ "$EXTRAS" == ask ]] && echo ""
 
 # ═════════════════════════════════════════════════════════════════════════════
 hdr "1 · Core tools"
@@ -146,7 +199,10 @@ fi
 # ═════════════════════════════════════════════════════════════════════════════
 hdr "6 · Multiplexer (zellij — Rust, via cargo)"
 # ═════════════════════════════════════════════════════════════════════════════
-if cmd_exists zellij; then
+# Config is archived/ (breaks AI-agent CLI rendering) — opt-in only.
+if ! $WANT_ZELLIJ; then
+    info "zellij — skipped (opt-in)"
+elif cmd_exists zellij; then
     ok "zellij (already installed)"
 else
     if cmd_exists cargo; then
@@ -239,7 +295,9 @@ fi
 # ═════════════════════════════════════════════════════════════════════════════
 hdr "14 · Zen Browser"
 # ═════════════════════════════════════════════════════════════════════════════
-if [[ -x "/opt/zen/zen" ]]; then
+if ! $WANT_ZEN; then
+    info "Zen Browser — skipped (opt-in)"
+elif [[ -x "/opt/zen/zen" ]]; then
     ok "Zen Browser (already installed)"
 else
     info "Installing Zen Browser → /opt/zen"
@@ -272,14 +330,16 @@ DESKTOP
 fi
 
 # Set Zen as default browser
-if [[ -x "/opt/zen/zen" ]]; then
+if $WANT_ZEN && [[ -x "/opt/zen/zen" ]]; then
     $DRY || xdg-settings set default-web-browser zen.desktop 2>/dev/null && ok "Zen → default browser" || true
 fi
 
 # ═════════════════════════════════════════════════════════════════════════════
 hdr "15 · Zed IDE"
 # ═════════════════════════════════════════════════════════════════════════════
-if cmd_exists zed; then
+if ! $WANT_ZED; then
+    info "Zed — skipped (opt-in)"
+elif cmd_exists zed; then
     ok "Zed (already installed)"
 else
     info "Installing Zed IDE"
@@ -292,16 +352,24 @@ hdr "16 · Flatpak apps"
 # ═════════════════════════════════════════════════════════════════════════════
 flatpak_install() {
     local app="$1"; local label="$2"
+    if [[ "$FLATPAK_MODE" == skip ]]; then
+        info "$label — skipped"
+        return 0
+    fi
     if flatpak list --app 2>/dev/null | grep -q "^$app"; then
         ok "$label (already installed)"
-    else
-        info "Installing $label"
-        $DRY || flatpak install -y flathub "$app"
-        ok "$label"
+        return 0
     fi
+    if [[ "$FLATPAK_MODE" == pick ]] && ! ask "$label?" Y; then
+        info "$label — skipped"
+        return 0
+    fi
+    info "Installing $label"
+    $DRY || flatpak install -y flathub "$app"
+    ok "$label"
 }
 
-flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo 2>/dev/null || true
+[[ "$FLATPAK_MODE" == skip ]] || flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo 2>/dev/null || true
 
 flatpak_install org.chromium.Chromium                "Chromium"
 flatpak_install md.obsidian.Obsidian                 "Obsidian"
@@ -316,7 +384,9 @@ flatpak_install com.mattjakeman.ExtensionManager     "Extension Manager"
 # ═════════════════════════════════════════════════════════════════════════════
 hdr "17 · Claude Code"
 # ═════════════════════════════════════════════════════════════════════════════
-if [[ -x "$HOME/.local/bin/claude" ]]; then
+if ! $WANT_CLAUDE; then
+    info "Claude Code — skipped (opt-in)"
+elif [[ -x "$HOME/.local/bin/claude" ]]; then
     ok "Claude Code (already installed)"
 else
     info "Installing Claude Code native binary"
@@ -338,7 +408,9 @@ claude_plugin_install() {
     fi
 }
 
-if [[ -x "$HOME/.local/bin/claude" ]]; then
+if ! $WANT_CLAUDE; then
+    info "Claude Code plugins — skipped (opt-in)"
+elif [[ -x "$HOME/.local/bin/claude" ]]; then
     claude_plugin_install "remember@claude-plugins-official"
     claude_plugin_install "superpowers@claude-plugins-official"
 else
