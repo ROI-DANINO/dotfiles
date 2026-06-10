@@ -32,3 +32,19 @@ __pycache__/
 
 # Auto-generated agent skills (mirrored from /rdw-* commands; regenerated)
 .agents/
+
+# RDW personal state — user/machine-specific, stays local.
+# The spine stays tracked: journal/docs-map.md + .gitkeep skeleton.
+journal/context/
+journal/log.md
+journal/ops/phase.md
+journal/ops/tasks.md
+journal/ops/sessions/*
+!journal/ops/sessions/.gitkeep
+journal/ops/archive/*
+!journal/ops/archive/.gitkeep
+journal/raw/*
+!journal/raw/_inbox/
+journal/raw/_inbox/*
+!journal/raw/_inbox/.gitkeep
+docs/superpowers/handoffs/
