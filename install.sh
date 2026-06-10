@@ -190,36 +190,45 @@ else
 fi
 
 # ═════════════════════════════════════════════════════════════════════════════
-hdr "4c · Login — SDDM + Chili theme (Brand: Navy/Cream/Teal)"
+hdr "4c · Login — SDDM + Sugar Candy (Lockscreen Twin)"
 # ═════════════════════════════════════════════════════════════════════════════
-# SDDM provides a modern graphical "face" for the login screen.
-# We use the minimalist 'chili' theme skinned with brand colors.
-dnf_install sddm git
+# SDDM provides a modern graphical "face". Sugar Candy is styled to mirror
+# the hyprlock lockscreen's OLED gradients and typography.
+dnf_install sddm qt5-qtgraphicaleffects qt5-qtquickcontrols2 qt5-qtsvg git
 
-CHILI_DIR="/usr/share/sddm/themes/chili"
-if [[ -d "$CHILI_DIR" ]]; then
-    ok "SDDM Chili theme (already installed)"
+SUGAR_DIR="/usr/share/sddm/themes/sugar-candy"
+if [[ -d "$SUGAR_DIR" ]]; then
+    ok "SDDM Sugar Candy theme (already installed)"
 else
-    info "Cloning SDDM Chili theme (sudo)"
-    $DRY || sudo git clone --depth 1 https://github.com/MarianArlt/sddm-chili.git "$CHILI_DIR"
-    ok "SDDM Chili theme"
+    info "Cloning SDDM Sugar Candy theme (sudo)"
+    $DRY || sudo git clone --depth 1 https://framagit.org/MarianArlt/sddm-sugar-candy.git "$SUGAR_DIR"
+    ok "SDDM Sugar Candy theme"
 fi
 
-info "Configuring SDDM branding (sudo)"
+info "Configuring SDDM defaults (sudo)"
 $DRY || sudo mkdir -p /etc/sddm.conf.d
 $DRY || sudo tee /etc/sddm.conf.d/branding.conf >/dev/null <<EOF
 [Theme]
-Current=chili
+Current=sugar-candy
 EOF
 
-info "Applying brand palette to Chili theme (sudo QML patches)"
+$DRY || sudo tee /etc/sddm.conf.d/default-session.conf >/dev/null <<EOF
+[Autologin]
+Session=niri.desktop
+EOF
+
+info "Applying brand palette to Sugar Candy (sudo)"
 if [[ ! $DRY ]]; then
-    sudo sed -i 's/property string generalFontColor: "white"/property string generalFontColor: "#F0E7D5"/' "$CHILI_DIR/Main.qml"
-    sudo sed -i '/Repeater {/,/    }/c\    Rectangle {\n        anchors.fill: parent\n        color: "#2F4156"\n    }' "$CHILI_DIR/Main.qml"
-    sudo sed -i 's/border.color: "white"/border.color: "#567C8D"/' "$CHILI_DIR/components/LoginForm.qml"
-    sudo sed -i 's/color: passwordFieldOutlined ? "transparent" : "white"/color: passwordFieldOutlined ? "transparent" : "#F0E7D5"/' "$CHILI_DIR/components/LoginForm.qml"
-    sudo sed -i 's/textColor: passwordFieldOutlined ? "white" : "black"/textColor: "#2F4156"/' "$CHILI_DIR/components/LoginForm.qml"
-    sudo sed -i 's/placeholderTextColor: passwordFieldOutlined ? "white" : "black"/placeholderTextColor: "#2F4156"/' "$CHILI_DIR/components/LoginForm.qml"
+    # Copy a base lockscreen gradient
+    sudo cp ~/.config/hypr/backgrounds/radial.png "$SUGAR_DIR/Backgrounds/radial.png" 2>/dev/null || true
+    
+    sudo sed -i 's/^Background=.*/Background="Backgrounds\/radial.png"/' "$SUGAR_DIR/theme.conf"
+    sudo sed -i 's/^Font=.*/Font="JetBrains Mono"/' "$SUGAR_DIR/theme.conf"
+    sudo sed -i 's/^MainColor=.*/MainColor="#F0E7D5"/' "$SUGAR_DIR/theme.conf"
+    sudo sed -i 's/^AccentColor=.*/AccentColor="#567C8D"/' "$SUGAR_DIR/theme.conf"
+    sudo sed -i 's/^BackgroundColor=.*/BackgroundColor="#2F4156"/' "$SUGAR_DIR/theme.conf"
+    sudo sed -i 's/^HourFormat=.*/HourFormat="HH:mm"/' "$SUGAR_DIR/theme.conf"
+    sudo sed -i 's/^DateFormat=.*/DateFormat="dddd, d MMMM"/' "$SUGAR_DIR/theme.conf"
 fi
 ok "SDDM branding"
 
