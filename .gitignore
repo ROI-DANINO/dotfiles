@@ -29,6 +29,7 @@ __pycache__/
 # Claude Code local state (project commands are tracked; these are not)
 .claude/settings.local.json
 .claude/worktrees/
+.worktrees/
 
 # Auto-generated agent skills (mirrored from /rdw-* commands; regenerated)
 .agents/
